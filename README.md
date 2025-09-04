@@ -26,3 +26,10 @@ Links out to external resources that you might find helpful while learning how t
 
 The repository that these course materials live in.
 
+Hello, this is a really sick thing we're committing!
+
+# Look at how sick this looks!!
+
+## 😎 Look at this little man, he's cool. He has sunglasses, he's trustworthy
+
+#### 🤓 Don't pay attention to this guy, he's untrustworthy and will likely lie to you for extra pieces of scraps.
