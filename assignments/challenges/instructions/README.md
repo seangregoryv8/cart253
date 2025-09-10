@@ -1,43 +1,35 @@
-# Instructions Challenge
+# TITLE OF PROJECT
 
-Let's make sure we understand the key ideas of writing *instructions* in JavaScript by using the drawing functions of p5 to do some drawing.
+AUTHOR NAME
 
-As with all challenges, do this work *in pairs*. This means you will both submit the same work and should work together on one computer to produce the project.
+[View this project online](URL_FOR_THE_RUNNING_PROJECT)
 
-## Challenge
+## Description
 
-With your partner:
+This description should help the reader understand what the program is, anything they should know to be able to experience it (controls, special features, etc.), and what the desired user experience is. For example:
 
-> Draw a landscape
+> *The Mayor of Clown Town* is a simulator experience that allows the user to control a small town populated entirely by clowns.
 
-This can be as complicated and gorgeous or weird as you like, but must include:
+> The experience is controlled via the mouse, with left click selecting a clown and bringing up a menu of options such as "slip of banana peel" or "get into impossible capacious clown-car."
 
-1. Some land (hills? mountains? lunar surface?)
-2. Some sky (blue? grey? purple?)
-3. One or more suns and/or moons
-4. One or more flying creatures (bird? pterodactyl? toaster?)
-5. One of more land-based creatures (cow? person? cow-person?)
-6. One or more dwellings (house? tent? burrow?)
+> The project is meant to give the user a sense of what it would be the mayor of a town of clowns, eventually getting the sense that clowns are not taking their civic duties seriously.
 
-Ask for help from the instructor and teaching assistant as needed.
+## Screenshot(s)
 
-## References
+This bit should have some images of the program running so that the reader has a sense of what it looks like. For example:
 
-- The course materials
-- [The p5 reference](https://p5js.org/reference/)
+> ![Image of a clown face](./assets/images/clown.png)
 
-## Evaluation
+## Attribution
 
-When you're finished, check in with the instructor or teaching assistant to show them your work and they will confirm you've passed the challenge and can submit it on the Moodle.
+This bit should attribute any code, assets or other elements used taken from other sources. For example:
 
-This challenge is pass/fail and is worth 1% of your final grade.
+> - This project uses [p5.js](https://p5js.org).
+> - The clown image is a capture of the clown from the Apple emoji character set.
+> - The barking sound effect is "single dog bark 1" by crazymonke9 from freesound.org: https://freesound.org/people/crazymonke9/sounds/418107/
 
-## Submission
+## License
 
-Once you're cleared to submit, go to the Moodle and both submit your work. You should each separately submit:
+This bit should include the license you want to apply to your work. For example:
 
-- Your names
-    - The link to the repository on GitHub (e.g. https://github.com/pippinbarr/cart253)
-    - The link to the website version on GitHub Pages (e.g. https://pippinbarr.github.io/cart253)
-    
-*Note*: It's fine if the project is only in one of your repositories, but it's not a bad idea to make sure you *both* have it for your own reference.
+> This project is licensed under a Creative Commons Attribution ([CC BY 4.0](https://creativecommons.org/licenses/by/4.0/deed.en)) license with the exception of libraries and other components with their own licenses.
