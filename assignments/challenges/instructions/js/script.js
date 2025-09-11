@@ -1,24 +1,59 @@
 /**
- * Title of Project
- * Author Name
+ * Instructions Challenge: Field of Dreams
+ * Sean Gregory
  * 
- * HOW EMBARRASSING! I HAVE NO DESCRIPTION OF MY PROJECT!
- * PLEASE REMOVE A GRADE FROM MY WORK IF IT'S GRADED!
+ * If you build it, they will come
+ * This creates the field of dreams, a proper baseball diamond (hopefully) with birds and a night sky.
+ * Its a beautiful thing, really
  */
 
 "use strict";
 
 /**
- * OH LOOK I DIDN'T DESCRIBE SETUP!!
+ * This will set up the dimensions of the canvas
 */
-function setup() {
+function setup()
+{
+    createCanvas(800, 600);
+}
+
+/**
+ * This calls all the functions that will draw all the portions of the assignment
+*/
+function draw()
+{
+    background(0, 225, 0);
+    drawSky();
+}
+
+function drawLand()
+{
 
 }
 
+function drawSky()
+{
+    fill(0, 0, 255);
+    noStroke();
+    rect(0, 0, 800, 250);
+}
 
-/**
- * OOPS I DIDN'T DESCRIBE WHAT MY DRAW DOES!
-*/
-function draw() {
+function drawSun()
+{
+
+}
+
+function drawFlyingCreatures()
+{
+
+}
+
+function drawLandCreatures()
+{
+
+}
+
+function drawHouses()
+{
 
 }
