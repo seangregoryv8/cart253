@@ -15,6 +15,7 @@
 function setup()
 {
     createCanvas(800, 400);
+    background(0, 0, 255);
 }
 
 /**
@@ -22,20 +23,33 @@ function setup()
 */
 function draw()
 {
-    drawLand();
+    noStroke();
     drawSky();
+    drawLand();
     drawSun();
     drawBird(150, 100);
     drawBird(250, 100);
     drawBird(200, 125);
     drawBird(500, 110);
     drawBird(300, 135);
+    drawGuy(100, 220, 1);
+    drawGuy(450, 310, 1);
     drawHouse();
+    drawHills();
 }
 
 function drawLand()
 {
-    background(0, 225, 0);
+    let w = 1000;
+    let h = 225;
+    fill(0, 150, 0);
+    ellipse(500, 300, w, h);
+    fill(0, 175, 0);
+    ellipse(0, 300, w, h);
+    ellipse(1000, 300, w, h);
+    fill(0, 225, 0);
+    ellipse(400, 450, 1400, 400)
+    //rect(0, 250, 800, 400);
 }
 
 function drawSky()
@@ -61,9 +75,14 @@ function drawBird(x, y)
     arc(x + size, y, size, size, radians(180), radians(-30));
 }
 
-function drawLandCreatures()
+function drawGuy(x, y, mult)
 {
-
+    fill(ranInt(0, 150), ranInt(0, 150), ranInt(0, 150));
+    noStroke();
+    arc(x, y, 30 * mult, 75 * mult, radians(180), 0)
+    circle(x, y - 45, 25 * mult)
+    circle(x - 20, y - 25, 10 * mult)
+    circle(x + 20, y - 25, 10 * mult)
 }
 
 function drawHouse()
@@ -75,7 +94,7 @@ function drawHouse()
     fill(200, 125, 0);
     noStroke();
     rect(x, y, w, h);
-    fill(255, 0, 0);
+    fill(ranInt(0, 150), ranInt(0, 150), ranInt(0, 150));
     noStroke();
     triangle(x - 10, y, x + (w / 2), y - (h / 2), x + w + 10, y);
     fill(130, 130, 255);
@@ -83,4 +102,8 @@ function drawHouse()
     fill(100, 50, 0);
     rect(x + 20, y + 30, w / 3, h - 30)
     rect
+}
+
+function ranInt(min, max) {
+    return Math.floor(Math.random() * (max - min) ) + min;
 }
