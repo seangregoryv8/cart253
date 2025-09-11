@@ -25,7 +25,12 @@ function draw()
     drawLand();
     drawSky();
     drawSun();
-    drawBirds();
+    drawBird(150, 100);
+    drawBird(250, 100);
+    drawBird(200, 125);
+    drawBird(500, 110);
+    drawBird(300, 135);
+    drawHouse();
 }
 
 function drawLand()
@@ -47,9 +52,13 @@ function drawSun()
     circle(radius + 60, radius + 40, radius * 2);
 }
 
-function drawBirds()
+function drawBird(x, y)
 {
-
+    let size = 25;
+    stroke(0);
+    noFill();
+    arc(x, y, size, size, radians(210), 0);
+    arc(x + size, y, size, size, radians(180), radians(-30));
 }
 
 function drawLandCreatures()
@@ -57,7 +66,9 @@ function drawLandCreatures()
 
 }
 
-function drawHouses()
+function drawHouse()
 {
-
+    fill(0, 0, 0);
+    rect(500, 210, 100, 100);
+    triangle(1, 1, 2, 2, 3, 3);
 }
