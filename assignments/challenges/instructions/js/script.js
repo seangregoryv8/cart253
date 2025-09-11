@@ -68,7 +68,19 @@ function drawLandCreatures()
 
 function drawHouse()
 {
-    fill(0, 0, 0);
-    rect(500, 210, 100, 100);
-    triangle(1, 1, 2, 2, 3, 3);
+    let x = 500;
+    let y = 210;
+    let w = 100;
+    let h = 100;
+    fill(200, 125, 0);
+    noStroke();
+    rect(x, y, w, h);
+    fill(255, 0, 0);
+    noStroke();
+    triangle(x - 10, y, x + (w / 2), y - (h / 2), x + w + 10, y);
+    fill(130, 130, 255);
+    rect(x + 60, y + 30, w / 4, h / 4)
+    fill(100, 50, 0);
+    rect(x + 20, y + 30, w / 3, h - 30)
+    rect
 }
