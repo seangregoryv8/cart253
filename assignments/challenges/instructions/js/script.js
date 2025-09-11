@@ -14,7 +14,7 @@
 */
 function setup()
 {
-    createCanvas(800, 600);
+    createCanvas(800, 400);
 }
 
 /**
@@ -22,13 +22,15 @@ function setup()
 */
 function draw()
 {
-    background(0, 225, 0);
+    drawLand();
     drawSky();
+    drawSun();
+    drawBirds();
 }
 
 function drawLand()
 {
-
+    background(0, 225, 0);
 }
 
 function drawSky()
@@ -40,10 +42,12 @@ function drawSky()
 
 function drawSun()
 {
-
+    let radius = 30;
+    fill(200, 200, 200)
+    circle(radius + 60, radius + 40, radius * 2);
 }
 
-function drawFlyingCreatures()
+function drawBirds()
 {
 
 }
