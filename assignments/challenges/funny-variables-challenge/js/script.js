@@ -51,7 +51,7 @@ function setup() {
 
     setTimeout(() => {
         birdSound.loop();
-        stupidBird.startDVD = true;
+        annoyingBird.startDVD = true;
     }, ranInt(2000, 5000));
     setTimeout(() => { mrFurious.getAngry = true; }, ranInt(7000, 9000));
     setTimeout(() => { sky.nightTime = true; }, ranInt(7000, 9000));
@@ -96,37 +96,37 @@ function draw()
         case 4: ellipse(mrFurious.x - rand, mrFurious.y - rand, mrFurious.size); break;
     }
     pop();
-    if (stupidBird.startRandomness) drawBird(ranInt(50, 400), ranInt(50, 400), annoyingFlap);
-    if (stupidBird.startDVD)
+    if (annoyingBird.startRandomness) drawBird(ranInt(50, 400), ranInt(50, 400), annoyingFlap);
+    if (annoyingBird.startDVD)
     {
-        drawBird(stupidBird.x, stupidBird.y, annoyingFlap);
-        stupidBird.x = (stupidBird.flipX) ? stupidBird.x - stupidBird.addX : stupidBird.x + stupidBird.addX;
-        stupidBird.y = (stupidBird.flipY) ? stupidBird.y - stupidBird.addY : stupidBird.y + stupidBird.addY;
+        drawBird(annoyingBird.x, annoyingBird.y, annoyingFlap);
+        annoyingBird.x = (annoyingBird.flipX) ? annoyingBird.x - annoyingBird.addX : annoyingBird.x + annoyingBird.addX;
+        annoyingBird.y = (annoyingBird.flipY) ? annoyingBird.y - annoyingBird.addY : annoyingBird.y + annoyingBird.addY;
 
-        if (stupidBird.x <= 10)
+        if (annoyingBird.x <= 10)
         {
-            stupidBird.flipX = false;
-            stupidBird.addX = ranDouble(1, 3)
+            annoyingBird.flipX = false;
+            annoyingBird.addX = ranDouble(1, 3)
         }
-        if (stupidBird.x >= 370)
+        if (annoyingBird.x >= 370)
         {
-            stupidBird.flipX = true;
-            stupidBird.addX = ranDouble(1, 3)
+            annoyingBird.flipX = true;
+            annoyingBird.addX = ranDouble(1, 3)
         }
-        if (stupidBird.y <= 20)
+        if (annoyingBird.y <= 20)
         {
-            stupidBird.flipY = false;
-            stupidBird.addY = ranDouble(1, 3)
+            annoyingBird.flipY = false;
+            annoyingBird.addY = ranDouble(1, 3)
         }
-        if (stupidBird.y >= 400)
+        if (annoyingBird.y >= 400)
         {
-            stupidBird.flipY = true;
-            stupidBird.addY = ranDouble(1, 3)
+            annoyingBird.flipY = true;
+            annoyingBird.addY = ranDouble(1, 3)
         }
     }
 }
 
-let stupidBird = {
+let annoyingBird = {
     startRandomness: false,
     startDVD: false,
     x: 0,
@@ -154,8 +154,6 @@ function drawBird(x, y, cycle)
         rotate(angleOffset)
         arc(0, 0 - 5, size, size, radians(210), 0);
         pop();
-        //if (cycle) arc(x, y, size, size, radians(240), 30);
-        //else arc(x, y, size, size, radians(210), 0);
     
         push();
         translate(bodyX, bodyY);
@@ -169,9 +167,7 @@ function drawBird(x, y, cycle)
         translate(bodyX, bodyY);
         arc(0, 0, size, size, radians(210), 0);
         pop();
-        //if (cycle) arc(x, y, size, size, radians(240), 30);
-        //else arc(x, y, size, size, radians(210), 0);
-    
+
         push();
         translate(bodyX, bodyY);
         arc(size, 0, size, size, radians(180), radians(-30));
