@@ -32,14 +32,30 @@ let sky = {
 function ranInt(min, max) {
     return Math.floor(Math.random() * (max - min) ) + min;
 }
+function ranDouble(min, max) {
+    return Math.random() * (max - min) + min;
+}
 
+let annoyingFlap = false;
+
+let birdSound;
+function preload()
+{
+    birdSound = loadSound("assets/sounds/birb.mp3");
+}
 /**
  * Create the canvas
  */
 function setup() {
     createCanvas(400, 400);
-    setTimeout(() => { mrFurious.getAngry = true; }, ranInt(2000, 5000));
-    setTimeout(() => { sky.nightTime = true; }, ranInt(2000, 5000));
+
+    setTimeout(() => {
+        birdSound.loop();
+        stupidBird.startDVD = true;
+    }, ranInt(2000, 5000));
+    setTimeout(() => { mrFurious.getAngry = true; }, ranInt(7000, 9000));
+    setTimeout(() => { sky.nightTime = true; }, ranInt(7000, 9000));
+    annoyingFlap = false;
 }
 
 
@@ -48,7 +64,10 @@ function setup() {
  */
 function draw()
 {
-    drawBird(0, 0);
+    if (frameCount % 6 == 0)
+        annoyingFlap = true;
+    else if (frameCount % 6 == 3)
+        annoyingFlap = false;
     if (sky.nightTime)
     {
         if (sky.r != 0) sky.r--;
@@ -60,21 +79,115 @@ function draw()
     // Draw Mr. Furious as a coloured circle
     push();
     noStroke();
+    //console.log(mrFurious.fill.r * mrFurious.fill.g * mrFurious.fill.b)
+    let mrColor = mrFurious.fill.r * mrFurious.fill.g * mrFurious.fill.b;
     if (mrFurious.getAngry)
     {
         if (mrFurious.fill.g != 0) mrFurious.fill.g--;
         if (mrFurious.fill.b != 0) mrFurious.fill.b--;
     }
     fill(mrFurious.fill.r, mrFurious.fill.g, mrFurious.fill.b);
-    ellipse(mrFurious.x, mrFurious.y, mrFurious.size);
+    const rand = getRageValue(mrColor);
+    switch (ranInt(1, 4))
+    {
+        case 1: ellipse(mrFurious.x + rand, mrFurious.y + rand, mrFurious.size); break;
+        case 2: ellipse(mrFurious.x + rand, mrFurious.y - rand, mrFurious.size); break;
+        case 3: ellipse(mrFurious.x - rand, mrFurious.y + rand, mrFurious.size); break;
+        case 4: ellipse(mrFurious.x - rand, mrFurious.y - rand, mrFurious.size); break;
+    }
     pop();
+    if (stupidBird.startRandomness) drawBird(ranInt(50, 400), ranInt(50, 400), annoyingFlap);
+    if (stupidBird.startDVD)
+    {
+        drawBird(stupidBird.x, stupidBird.y, annoyingFlap);
+        stupidBird.x = (stupidBird.flipX) ? stupidBird.x - stupidBird.addX : stupidBird.x + stupidBird.addX;
+        stupidBird.y = (stupidBird.flipY) ? stupidBird.y - stupidBird.addY : stupidBird.y + stupidBird.addY;
+
+        if (stupidBird.x <= 10)
+        {
+            stupidBird.flipX = false;
+            stupidBird.addX = ranDouble(1, 3)
+        }
+        if (stupidBird.x >= 370)
+        {
+            stupidBird.flipX = true;
+            stupidBird.addX = ranDouble(1, 3)
+        }
+        if (stupidBird.y <= 20)
+        {
+            stupidBird.flipY = false;
+            stupidBird.addY = ranDouble(1, 3)
+        }
+        if (stupidBird.y >= 400)
+        {
+            stupidBird.flipY = true;
+            stupidBird.addY = ranDouble(1, 3)
+        }
+    }
 }
 
-function drawBird(x, y)
+let stupidBird = {
+    startRandomness: false,
+    startDVD: false,
+    x: 0,
+    y: 0,
+    flipX: false,
+    flipY: false,
+    addX: ranDouble(1, 3),
+    addY: ranDouble(1, 3)
+}
+
+function drawBird(x, y, cycle)
 {
+    let angleOffset = PI / 8;
     let size = 25;
-    stroke(0);
+    stroke(255);
     noFill();
-    arc(x, y, size, size, radians(210), 0);
-    arc(x + size, y, size, size, radians(180), radians(-30));
+
+    let bodyX = x;
+    let bodyY = y;
+
+    if (cycle)
+    {
+        push();
+        translate(bodyX, bodyY);
+        rotate(angleOffset)
+        arc(0, 0 - 5, size, size, radians(210), 0);
+        pop();
+        //if (cycle) arc(x, y, size, size, radians(240), 30);
+        //else arc(x, y, size, size, radians(210), 0);
+    
+        push();
+        translate(bodyX, bodyY);
+        rotate(-angleOffset);
+        arc(size, 0 + 5, size, size, radians(180), radians(-30));
+        pop();
+    }
+    else
+    {
+        push();
+        translate(bodyX, bodyY);
+        arc(0, 0, size, size, radians(210), 0);
+        pop();
+        //if (cycle) arc(x, y, size, size, radians(240), 30);
+        //else arc(x, y, size, size, radians(210), 0);
+    
+        push();
+        translate(bodyX, bodyY);
+        arc(size, 0, size, size, radians(180), radians(-30));
+        pop();
+
+    }
+    cycle = !cycle;
+}
+
+function getRageValue(input)
+{
+    const max = 12909375;
+    const min = 255;
+  
+    const normalizedInput = (input - min) / (max - min);
+    const rageValue = Math.exp(-normalizedInput * 5);
+  
+    return (Math.random() - 0.5) * (rageValue * 100);
 }
