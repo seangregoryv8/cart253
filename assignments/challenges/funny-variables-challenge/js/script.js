@@ -52,6 +52,7 @@ function setup() {
     setTimeout(() => {
         birdSound.loop();
         annoyingBird.startDVD = true;
+        //annoyingBird.startRandomness = true;
     }, ranInt(2000, 5000));
     setTimeout(() => { mrFurious.getAngry = true; }, ranInt(7000, 9000));
     setTimeout(() => { sky.nightTime = true; }, ranInt(7000, 9000));
@@ -64,9 +65,9 @@ function setup() {
  */
 function draw()
 {
-    if (frameCount % 6 == 0)
+    if (frameCount % 4 == 0)
         annoyingFlap = true;
-    else if (frameCount % 6 == 3)
+    else if (frameCount % 4 == 2)
         annoyingFlap = false;
     if (sky.nightTime)
     {
@@ -106,35 +107,37 @@ function draw()
         if (annoyingBird.x <= 10)
         {
             annoyingBird.flipX = false;
-            annoyingBird.addX = ranDouble(1, 3)
+            annoyingBird.addX = ranDouble(annoyingBird.min, annoyingBird.max)
         }
         if (annoyingBird.x >= 370)
         {
             annoyingBird.flipX = true;
-            annoyingBird.addX = ranDouble(1, 3)
+            annoyingBird.addX = ranDouble(annoyingBird.min, annoyingBird.max)
         }
         if (annoyingBird.y <= 20)
         {
             annoyingBird.flipY = false;
-            annoyingBird.addY = ranDouble(1, 3)
+            annoyingBird.addY = ranDouble(annoyingBird.min, annoyingBird.max)
         }
         if (annoyingBird.y >= 400)
         {
             annoyingBird.flipY = true;
-            annoyingBird.addY = ranDouble(1, 3)
+            annoyingBird.addY = ranDouble(annoyingBird.min, annoyingBird.max)
         }
     }
 }
 
 let annoyingBird = {
+    min: 15,
+    max: 20,
     startRandomness: false,
     startDVD: false,
     x: 0,
     y: 0,
     flipX: false,
     flipY: false,
-    addX: ranDouble(1, 3),
-    addY: ranDouble(1, 3)
+    addX: ranDouble(15, 20),
+    addY: ranDouble(15, 20)
 }
 
 function drawBird(x, y, cycle)
