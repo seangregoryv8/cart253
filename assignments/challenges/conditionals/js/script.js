@@ -84,9 +84,13 @@ function drawUser()
 function drawTarget()
 {
     push();
-    noStroke();
+    stroke("#ffffff");
+    strokeWeight(3);
+    drawingContext.setLineDash([15, 15]);
     fill(target.fill);
     ellipse(target.x, target.y, target.size);
+
+    drawingContext.setLineDash([]);
     pop();
 }
 
