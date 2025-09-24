@@ -17,6 +17,17 @@ const puck = {
     }
 };
 
+const target = {
+    x: 350,
+    y: 350,
+    size: 50,
+    fill: "#ffff00",
+    fills: {
+      noOverlap: "#ff0000", // red for no overlap
+      overlap: "#00ff00" // green for overlap
+    }
+};
+
 const user = {
     x: undefined, // will be mouseX
     y: undefined, // will be mouseY
@@ -45,6 +56,7 @@ function draw()
     // Draw the user and puck
     drawUser();
     drawPuck();
+    drawTarget();
 }
 
 /**
@@ -65,6 +77,18 @@ function drawUser()
     noStroke();
     fill(user.fill);
     ellipse(user.x, user.y, user.size);
+    pop();
+}
+
+/**
+ * Displays the target
+ */
+function drawTarget()
+{
+    push();
+    noStroke();
+    fill(target.fill);
+    ellipse(target.x, target.y, target.size);
     pop();
 }
 
