@@ -100,6 +100,7 @@ function drawTarget()
 function drawPuck()
 {
     movePuck();
+    checkTarget();
 
     push();
     noStroke();
@@ -149,12 +150,14 @@ function movePuck()
             }
         }
     }
+}
 
-    d = dist(puck.x, puck.y, target.x, target.y);
+function checkTarget()
+{
+    let d = dist(puck.x, puck.y, target.x, target.y);
 
-    overlap = (d < puck.size / 2 + target.size / 2);
+    let overlap = (d < puck.size / 2 + target.size / 2);
 
     if (overlap) target.fill = target.fills.overlap;
     else target.fill = target.fills.noOverlap;
-
 }
