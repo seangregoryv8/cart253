@@ -6,6 +6,8 @@
  * on the canvas using their own circle.
  */
 
+let mainSize = 400;
+
 const puck = {
     x: 200,
     y: 200,
@@ -36,7 +38,7 @@ const user = {
  */
 function setup()
 {
-    createCanvas(400, 400);
+    createCanvas(mainSize, mainSize);
 }
 
 /**
@@ -121,9 +123,27 @@ function movePuck()
 
         
         if (Math.abs(dx) > Math.abs(dy))
-            puck.x = dx > 0 ? puck.x + 1 : puck.x - 1;
+        {
+            if (dx > 0 && puck.x != mainSize - puck.size / 2)
+            {
+                puck.x++;
+            }
+            else if (puck.x != puck.size / 2)
+            {
+                puck.x--;
+            }
+        }
         else
-            puck.y = dy > 0 ? puck.y + 1 : puck.y - 1;
+        {
+            if (dy > 0 && puck.y != mainSize - puck.size / 2)
+            {
+                puck.y++;
+            }
+            else if (puck.y != puck.size / 2)
+            {
+                puck.y--;
+            }
+        }
     }
 
     d = dist(puck.x, puck.y, target.x, target.y);
