@@ -28,7 +28,6 @@ function draw() {
     drawSmile();
     drawEars();
     drawEyes();
-    //drawExampleFace();
 }
 
 function drawGrid()
@@ -45,10 +44,12 @@ function drawGrid()
     }
 }
 
+// These functions help with the pixel art drawing
 function pixel(s) { return s * 20; }
 function locX(x) { return x * 20;}
 function locY(y) { return y * 20; }
 
+// This draws a rectangle and its mirrored counterpart
 function symmRectX(x, y, w, h)
 {
     rect(locX(x), locY(y), pixel(w), pixel(h));
@@ -65,6 +66,8 @@ function symmetryY(y)
 {
     return (HEIGHT / 20) - (y * 2);
 }
+
+// These functions draw the facial outline for the pixel art
 function drawOutline()
 {
     fill(0);
@@ -88,6 +91,9 @@ function drawOutline()
     rect(locX(11), locY(HEIGHT / 20 - 1), pixel(symmetryX(11)), pixel(1));
 }
 
+/**
+ * These functions draw the facial features for the pixel art
+ */
 function drawHair()
 {
     fill(0);
@@ -119,6 +125,7 @@ function drawEyes()
     pixel3Circle(15, 17);
 }
 
+// This draws a 3x3 circle for the eyes
 function pixel3Circle(x, y)
 {
     rect(locX(x + 2), locY(y), pixel(3), pixel(1));
@@ -129,18 +136,4 @@ function pixel3Circle(x, y)
     rect(locX(x + 5), locY(y + 1), pixel(1), pixel(1));
     rect(locX(x + 1), locY(y + 5), pixel(1), pixel(1));
     rect(locX(x + 5), locY(y + 5), pixel(1), pixel(1));
-}
-
-function drawExampleFace()
-{
-    // This is for the face
-    fill(255, 224, 189);
-    rect(locX(10), locY(7), pixel(8), pixel(8));
-    // This is for the eyes
-    fill(0);
-    rect(locX(12), locY(9), pixel(1), pixel(1));
-    rect(locX(15), locY(9), pixel(1), pixel(1));
-    // This is for the mouth
-    fill(255, 0, 0);
-    rect(locX(13), locY(12), pixel(2), pixel(1));
 }
