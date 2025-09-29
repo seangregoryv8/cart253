@@ -1,70 +1,35 @@
-# Art Jam {
+# TITLE OF PROJECT
 
-#### Grade
+AUTHOR NAME
 
-- 10% of final grade
+[View this project online](URL_FOR_THE_RUNNING_PROJECT)
 
-#### Deadlines
+## Description
 
-- 🔥 Section B: 23:59, 30 September 2025
-- 🔥 Section AA: 23:59, 1 October 2025
-- 🔥 Section A: 23:59, 2 October 2025
+This description should help the reader understand what the program is, anything they should know to be able to experience it (controls, special features, etc.), and what the desired user experience is. For example:
 
-That is, you have three weeks from assignment.
+> *The Mayor of Clown Town* is a simulator experience that allows the user to control a small town populated entirely by clowns.
 
-If there is a serious need for an extension, contact your instructor at least 3 days *before* the final deadline.
+> The experience is controlled via the mouse, with left click selecting a clown and bringing up a menu of options such as "slip of banana peel" or "get into impossible capacious clown-car."
 
-## Objectives
+> The project is meant to give the user a sense of what it would be the mayor of a town of clowns, eventually getting the sense that clowns are not taking their civic duties seriously.
 
-- Get comfortable with starting, coding, and distributing a simple JavaScript project
-- Develop familiarity with the p5 library and its drawing functions and variables in particular
-- Build confidence in understanding variables both in terms of how they work and how they can contribute to expressive work
+## Screenshot(s)
 
-## Brief
+This bit should have some images of the program running so that the reader has a sense of what it looks like. For example:
 
-> Draw a self-portrait (in JavaScript with p5)
+> ![Image of a clown face](./assets/images/clown.png)
 
-Using p5's drawing instructions, create a self-portrait on the canvas. You have total freedom of representation here, so it could be realistic, abstract, absurd, dada, pointilist, expressionist, cubist, procedural, scary, etc.
+## Attribution
 
-The self-portrait must:
+This bit should attribute any code, assets or other elements used taken from other sources. For example:
 
-- **Use variables** to create change over time
+> - This project uses [p5.js](https://p5js.org).
+> - The clown image is a capture of the clown from the Apple emoji character set.
+> - The barking sound effect is "single dog bark 1" by crazymonke9 from freesound.org: https://freesound.org/people/crazymonke9/sounds/418107/
 
-- **Use `mouseX` and `mouseY`** to allow for some user interaction
+## License
 
-- **Use at least one p5 function you've never tried** (search the reference, make sure you *state* the new function in your `README.md`)
+This bit should include the license you want to apply to your work. For example:
 
-- **Use at least one conditional** to make the program respond to a changing variable
-
-Feel free to borrow from any of the example code you've seen so far in the course, but make sure to **attribute** in your `README.md`.
-
-## Advice
-
-1. **Start early**. Don't delay thinking about the project. Get your ideas together early so that you've got a good amount of time to work on them.
-2. **Start small**. Think of the smallest possible version of what you want to make and make that first. Once it works, you can start adding to it.
-3. **Seek help**. Ask for help early to discuss your idea and work out ways to achieve it, as well as to get specific technical help as you run into problems. If you can't think of an idea, ask for help with that.
-4. **Be stylish**. Make sure you read the [style guide](../../guides/style-guide.md).
-5. **Be committed**. Remember your grade is heavily affected by your use of version control and writing good commit messages.
-
-## Submission
-
-Submission will take place on **Moodle**. Go to the appropriately named **assignment** on the Moodle and then submit your work there.
-
-Your submission should just be plain text that includes:
-
-1. A link to your exercise code in your repository (e.g. <https://github.com/pippinbarr/cart253/tree/main/assignments/art-jam/>)
-2. A link to your project running online (e.g. <https://pippinbarr.github.io/cart253/assignments/art-jam/>)
-
-🔥 Make sure that your project actually runs online before you submit 🔥
-
-🔥 Make sure that you have commented your project before you submit 🔥
-
-🔥 Make sure that you have filled out your `README.md` before you submit 🔥
-
-## Evaluation
-
-See the assignment rubric on Moodle for details.
-
----
-
-## }
+> This project is licensed under a Creative Commons Attribution ([CC BY 4.0](https://creativecommons.org/licenses/by/4.0/deed.en)) license with the exception of libraries and other components with their own licenses.
