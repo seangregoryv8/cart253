@@ -19,6 +19,47 @@ function setup() {
     background(220);
 }
 
+// This is a simple function to detect if the mouse is over a rectangle, using my pixel art detection system
+function isMouseOver(x, y, w, h) { return mouseX >= locX(x) && mouseX <= locX(x + w) && mouseY >= locY(y) && mouseY <= locY(y + h); }
+
+// This is a list of feature boxes for the eyes, mouth, eyebrows, and ears, detecting where they are in the portrait
+const featureBoxes = {
+    leftEye: [6, 15, 7, 7],
+    rightEye: [15, 15, 7, 7],
+    mouth: [10, 26, 8, 5],
+    leftEyebrow: [6, 10, 16, 5],
+    leftEar: [1, 18, 3, 4],
+    rightEar: [24, 18, 3, 4]
+};
+
+// This is a map of features to their corresponding emotion-changing functions
+const featureMap = {
+    leftEye: () => leftEyeEmotion = random(eyeEmotions),
+    rightEye: () => rightEyeEmotion = random(eyeEmotions),
+    mouth: () => {
+        let newMouth;
+        do { newMouth = random(mouthEmotions); } while(newMouth === mouthEmotion);
+        mouthEmotion = newMouth;
+    },
+    leftEyebrow: () => {
+        let newBrow;
+        do { newBrow = random(browEmotions); } while(newBrow === browEmotion);
+        browEmotion = newBrow;
+    }
+};
+
+// This function detects which feature the mouse is currently over, if any
+function detectFeature()
+{
+    for (let feature in featureBoxes)
+    {
+        let box = featureBoxes[feature];
+        if (isMouseOver(box[0], box[1], box[2], box[3]))
+            return feature;
+    }
+    return null; // mouse is not over any feature
+}
+
 /**
  * This will be drawing the beautiful pixel art!
 */
@@ -35,6 +76,19 @@ function draw() {
     drawEyebrows(6, 15);
 }
 
+function mousePressed()
+{
+    for (let feature in featureBoxes)
+    {
+        let box = featureBoxes[feature];
+        if (isMouseOver(box[0], box[1], box[2], box[3]))
+        {
+            featureMap[feature]();
+            break;
+        }
+    }
+}
+
 function randomizeEmotions()
 {
     let newBrowEmotion;
@@ -47,6 +101,11 @@ function randomizeEmotions()
     
     leftEyeEmotion = random(eyeEmotions);
     rightEyeEmotion = random(eyeEmotions);
+}
+
+function mouseClick()
+{
+
 }
 
 function keyPressed()
