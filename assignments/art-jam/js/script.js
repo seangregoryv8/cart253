@@ -12,6 +12,7 @@ const HEIGHT = 680;
 
 let browEmotion = "normal";
 const browEmotions = ["normal", "sad", "angry", "surprised"];
+
 /**
  * This sets up the grid in a 20x20 pixel art style.
 */
@@ -30,7 +31,7 @@ function draw() {
     colorHair(150, 75, 0);
     drawOutline();
     drawHair();
-    drawSmile();
+    drawMouth(mouthEmotion);
     drawEars();
     drawEyes(6, 17, browEmotion);
 }
@@ -42,6 +43,10 @@ function keyPressed()
         let newBrowEmotion;
         do { newBrowEmotion = random(browEmotions); } while (newBrowEmotion === browEmotion); // This repeats until a new emotion has been selected
         browEmotion = newBrowEmotion;
+        
+        let newMouthEmotion;
+        do { newMouthEmotion = random(mouthEmotions); } while (newMouthEmotion === mouthEmotion); // This repeats until a new emotion has been selected
+        mouthEmotion = newMouthEmotion;
     }
 }
 
@@ -174,11 +179,57 @@ function colorEyes(col, x, y)
     rect(locX(x + 13), locY(y + 2), pixel(1), pixel(1));
 }
 
-function drawSmile()
+let mouthEmotion = "surprised";
+const mouthEmotions = ["smallSmile", "bigSmile", "frown", "bigFrown", "cat", "surprised"];
+
+/**
+ * This draws the mouth of the pixel art, and picks from a variety of emotions
+ * @param {*} mouthEmotion 
+ */
+function drawMouth(mouthEmotion)
 {
     fill(0);
-    symmRectX(11, 27, 1, 2);
-    rect(locX(12), locY(29), pixel(symmetryX(12)), pixel(1));
+    switch (mouthEmotion)
+    {
+        case "frown":
+            symmRectX(11, 28, 1, 1);
+            rect(locX(12), locY(27), pixel(symmetryX(12)), pixel(1));
+            break;
+        case "bigFrown":
+            fill(255, 100, 100);
+            rect(locX(11), locY(27), pixel(symmetryX(11)), pixel(3));
+            fill(255, 192, 203);
+            rect(locX(12), locY(29), pixel(symmetryX(12)), pixel(1));
+            fill(0);
+            symmRectX(10, 27, 1, 4);
+            rect(locX(11), locY(30), pixel(symmetryX(11)), pixel(1));
+            rect(locX(11), locY(26), pixel(symmetryX(11)), pixel(1));
+            break;
+        case "cat":
+            symmRectX(10, 26, 1, 2);
+            symmRectX(11, 28, 2, 1);
+            rect(locX(13), locY(27), pixel(symmetryX(13)), pixel(1));
+            break;
+        case "bigSmile":
+            fill(255, 100, 100);
+            rect(locX(11), locY(27), pixel(symmetryX(11)), pixel(3));
+            fill(255, 192, 203);
+            rect(locX(12), locY(29), pixel(symmetryX(12)), pixel(1));
+            fill(0);
+            symmRectX(10, 26, 1, 4);
+            rect(locX(11), locY(30), pixel(symmetryX(11)), pixel(1));
+            rect(locX(11), locY(26), pixel(symmetryX(11)), pixel(1));
+            break;
+        case "surprised":
+            rect(locX(12), locY(25), pixel(symmetryX(12)), pixel(1));
+            symmRectX(11, 26, 1, 3);
+            rect(locX(12), locY(29), pixel(symmetryX(12)), pixel(1));
+        case "smallSmile":
+        default:
+            symmRectX(11, 27, 1, 2);
+            rect(locX(12), locY(29), pixel(symmetryX(12)), pixel(1));
+            break;
+    }
 }
 
 function drawEars()
