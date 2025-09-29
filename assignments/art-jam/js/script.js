@@ -23,15 +23,18 @@ function setup() {
 */
 function draw() {
     drawGrid();
+    colorSkin(255, 224, 189);
+    colorHair(150, 75, 0);
     drawOutline();
     drawHair();
     drawSmile();
     drawEars();
-    drawEyes();
+    drawEyes(6, 15);
 }
 
 function drawGrid()
 {
+    stroke(0);
     fill(230);
     // This is for the grid for the pixel art
     // This is for the vertical lines at 34 pixels
@@ -42,6 +45,7 @@ function drawGrid()
         for (let y = 0; y <= HEIGHT; y += 20)
             rect(x, y, 20, 20);
     }
+    noStroke();
 }
 
 // These functions help with the pixel art drawing
@@ -70,6 +74,7 @@ function symmetryY(y)
 // These functions draw the facial outline for the pixel art
 function drawOutline()
 {
+    noStroke();
     fill(0);
     rect(locX(8), 0, pixel(symmetryX(8)), pixel(1))
     symmRectX(6, 1, 1, 1);
@@ -105,6 +110,57 @@ function drawHair()
     symmRectX(2, 15, 1, 1);
 }
 
+/**
+ * Colors the hair of the pixel art
+ * @param {*} r Red value 
+ * @param {*} g Green value
+ * @param {*} b Blue value
+ */
+function colorHair(r, g, b)
+{
+    fill(r, g, b);
+    rect(locX(8), locY(1), pixel(symmetryX(8)), pixel(symmetryY(14)));
+    rect(locX(6), locY(2), pixel(symmetryX(6)), pixel(symmetryY(14.5)));
+    symmRectX(5, 3, 3, 5);
+    symmRectX(3, 5, 3, 4);
+    symmRectX(2, 7, 3, 6);
+    symmRectX(2, 13, 2, 2);
+    symmRectX(3, 15, 1, 1);
+}
+
+/**
+ * Colors the skin of the pixel art
+ * @param {*} r Red value 
+ * @param {*} g Green value
+ * @param {*} b Blue value
+ */
+function colorSkin(r, g, b)
+{
+    fill(r, g, b);
+    rect(locX(8), locY(8), pixel(symmetryX(8)), pixel(symmetryY(5)));
+    rect(locX(1), locY(16), pixel(symmetryX(1)), pixel(symmetryY(13.5)));
+    symmRectX(6, 9, 2, 21);
+    symmRectX(5, 13, 1, 15);
+    symmRectX(11, 32, 5, 1);
+}
+
+/**
+ * Colors the eyes of the pixel art
+ * @param {*} r Red value 
+ * @param {*} g Green value
+ * @param {*} b Blue value
+ */
+function colorEyes(col, x, y)
+{
+    fill(col);
+    rect(locX(x + 1), locY(y + 1), pixel(5), pixel(5));
+    rect(locX(x + 10), locY(y + 1), pixel(5), pixel(5));
+    //symmRectX(x + 1, y + 1, 5, 5)
+    fill(255);
+    rect(locX(x + 4), locY(y + 2), pixel(1), pixel(1));
+    rect(locX(x + 13), locY(y + 2), pixel(1), pixel(1));
+}
+
 function drawSmile()
 {
     fill(0);
@@ -119,15 +175,28 @@ function drawEars()
     symmRectX(3, 19, 1, 2);
 }
 
-function drawEyes()
+function drawEyebrows()
 {
-    pixel3Circle(6, 17);
-    pixel3Circle(15, 17);
+    
+}
+
+/**
+ * Combines the eye coloring and the eye drawing functions
+ * @param {*} x Position x
+ * @param {*} y Position y
+ */
+function drawEyes(x, y)
+{
+    colorEyes(80, x, y);
+    fill(0);
+    pixel3Circle(x, y);
+    pixel3Circle(x + 9, y);
 }
 
 // This draws a 3x3 circle for the eyes
 function pixel3Circle(x, y)
 {
+    noStroke();
     rect(locX(x + 2), locY(y), pixel(3), pixel(1));
     rect(locX(x), locY(y + 2), pixel(1), pixel(3));
     rect(locX(x + 2), locY(y + 6), pixel(3), pixel(1));
