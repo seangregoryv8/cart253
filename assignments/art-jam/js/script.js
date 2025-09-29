@@ -25,6 +25,9 @@ function draw() {
     drawGrid();
     drawOutline();
     drawHair();
+    drawSmile();
+    drawEars();
+    drawEyes();
     //drawExampleFace();
 }
 
@@ -94,6 +97,38 @@ function drawHair()
     symmRectX(4, 13, 1, 3);
     symmRectX(3, 16, 1, 1);
     symmRectX(2, 15, 1, 1);
+}
+
+function drawSmile()
+{
+    fill(0);
+    symmRectX(11, 27, 1, 2);
+    rect(locX(12), locY(29), pixel(symmetryX(12)), pixel(1));
+}
+
+function drawEars()
+{
+    fill(0);
+    symmRectX(2, 18, 1, 1);
+    symmRectX(3, 19, 1, 2);
+}
+
+function drawEyes()
+{
+    pixel3Circle(6, 17);
+    pixel3Circle(15, 17);
+}
+
+function pixel3Circle(x, y)
+{
+    rect(locX(x + 2), locY(y), pixel(3), pixel(1));
+    rect(locX(x), locY(y + 2), pixel(1), pixel(3));
+    rect(locX(x + 2), locY(y + 6), pixel(3), pixel(1));
+    rect(locX(x + 6), locY(y + 2), pixel(1), pixel(3));
+    rect(locX(x + 1), locY(y + 1), pixel(1), pixel(1));
+    rect(locX(x + 5), locY(y + 1), pixel(1), pixel(1));
+    rect(locX(x + 1), locY(y + 5), pixel(1), pixel(1));
+    rect(locX(x + 5), locY(y + 5), pixel(1), pixel(1));
 }
 
 function drawExampleFace()
