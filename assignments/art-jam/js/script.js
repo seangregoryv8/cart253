@@ -18,6 +18,16 @@ function setup() {
     background(220);
 }
 
+/**
+ * This will be drawing the beautiful pixel art!
+*/
+function draw() {
+    drawGrid();
+    drawOutline();
+    drawHair();
+    //drawExampleFace();
+}
+
 function drawGrid()
 {
     fill(230);
@@ -64,16 +74,28 @@ function drawOutline()
     symmRectX(2, 5, 1, 2);
     symmRectX(1, 7, 1, 9);
     symmRectX(0, 16, 1, 6);
-    symmRectX(1, 22, 3, 1);
-    symmRectX(3, 21, 1, 5);
-    symmRectX(4, 26, 1, 2);
-    symmRectX(5, 28, 1, 1);
+    symmRectX(1, 22, 1, 1);
+    symmRectX(2, 23, 3, 1);
+    symmRectX(4, 22, 1, 5);
+    symmRectX(5, 27, 1, 2);
     symmRectX(6, 29, 1, 1);
     symmRectX(7, 30, 1, 1);
     symmRectX(8, 31, 1, 1);
     symmRectX(9, 32, 2, 1);
     rect(locX(11), locY(HEIGHT / 20 - 1), pixel(symmetryX(11)), pixel(1));
 }
+
+function drawHair()
+{
+    fill(0);
+    rect(locX(8), locY(7), pixel(symmetryX(8)), pixel(1))
+    symmRectX(6, 8, 2, 1);
+    symmRectX(5, 9, 1, 4);
+    symmRectX(4, 13, 1, 3);
+    symmRectX(3, 16, 1, 1);
+    symmRectX(2, 15, 1, 1);
+}
+
 function drawExampleFace()
 {
     // This is for the face
@@ -87,13 +109,3 @@ function drawExampleFace()
     fill(255, 0, 0);
     rect(locX(13), locY(12), pixel(2), pixel(1));
 }
-
-/**
- * This will be drawing the beautiful pixel art!
-*/
-function draw() {
-    drawGrid();
-    drawOutline();
-    //drawExampleFace();
-}
-
