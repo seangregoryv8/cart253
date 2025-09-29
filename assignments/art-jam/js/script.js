@@ -13,6 +13,8 @@ const HEIGHT = 680;
 let browEmotion = "normal";
 const browEmotions = ["normal", "sad", "angry", "surprised"];
 
+let eyeEmotions = ["closed", "regular"];
+
 /**
  * This sets up the grid in a 20x20 pixel art style.
 */
@@ -33,7 +35,9 @@ function draw() {
     drawHair();
     drawMouth(mouthEmotion);
     drawEars();
-    drawEyes(6, 17, browEmotion);
+    drawEye(6, 17, leftEyeEmotion);
+    drawEye(15, 17, rightEyeEmotion);
+    drawEyebrows(6, 17);
 }
 
 function keyPressed()
@@ -47,6 +51,9 @@ function keyPressed()
         let newMouthEmotion;
         do { newMouthEmotion = random(mouthEmotions); } while (newMouthEmotion === mouthEmotion); // This repeats until a new emotion has been selected
         mouthEmotion = newMouthEmotion;
+
+        leftEyeEmotion = random(eyeEmotions);
+        rightEyeEmotion = random(eyeEmotions);
     }
 }
 
@@ -162,23 +169,6 @@ function colorSkin(r, g, b)
     symmRectX(11, 32, 5, 1);
 }
 
-/**
- * Colors the eyes of the pixel art
- * @param {*} r Red value 
- * @param {*} g Green value
- * @param {*} b Blue value
- */
-function colorEyes(col, x, y)
-{
-    fill(col);
-    rect(locX(x + 1), locY(y + 1), pixel(5), pixel(5));
-    rect(locX(x + 10), locY(y + 1), pixel(5), pixel(5));
-    //symmRectX(x + 1, y + 1, 5, 5)
-    fill(255);
-    rect(locX(x + 4), locY(y + 2), pixel(1), pixel(1));
-    rect(locX(x + 13), locY(y + 2), pixel(1), pixel(1));
-}
-
 let mouthEmotion = "surprised";
 const mouthEmotions = ["smallSmile", "bigSmile", "frown", "bigFrown", "cat", "surprised"];
 
@@ -221,6 +211,11 @@ function drawMouth(mouthEmotion)
             rect(locX(11), locY(26), pixel(symmetryX(11)), pixel(1));
             break;
         case "surprised":
+            fill(255, 100, 100);
+            rect(locX(11), locY(26), pixel(symmetryX(11)), pixel(3));
+            fill(255, 192, 203);
+            rect(locX(12), locY(28), pixel(symmetryX(12)), pixel(1));
+            fill(0);
             rect(locX(12), locY(25), pixel(symmetryX(12)), pixel(1));
             symmRectX(11, 26, 1, 3);
             rect(locX(12), locY(29), pixel(symmetryX(12)), pixel(1));
@@ -268,18 +263,37 @@ function drawEyebrows(x, y, pattern = "normal")
     }
 }
 
+let leftEyeEmotion = "sad";
+let rightEyeEmotion = "closed";
+
 /**
  * Combines the eye coloring and the eye drawing functions
  * @param {*} x Position x
  * @param {*} y Position y
  */
-function drawEyes(x, y, browEmotion = "normal")
+function drawEye(x, y, eyeEmotion)
 {
-    colorEyes(80, x, y);
-    fill(0);
-    pixel3Circle(x, y);
-    pixel3Circle(x + 9, y);
-    drawEyebrows(x, y, browEmotion);
+    switch (eyeEmotion)
+    {
+        case "closed":
+            fill(0);
+            rect(locX(x), locY(y + 3), pixel(7), pixel(1));
+            break;
+        case "regular":
+            colorEyes(80, x, y);
+            fill(0);
+            pixel3Circle(x, y);
+            break;
+        case "sad":
+            fill(0);
+            rect(locX(x + 1), locY(y + 3), pixel(5), pixel(1));
+            fill(150, 150, 255);
+            rect(locX(x + 1), locY(y + 4), pixel(5), pixel(1));
+            fill(200, 200, 255);
+            rect(locX(x + 1), locY(y + 5), pixel(5), pixel(4));
+            break;
+            
+    }
 }
 
 // This draws a 3x3 circle for the eyes
@@ -294,4 +308,19 @@ function pixel3Circle(x, y)
     rect(locX(x + 5), locY(y + 1), pixel(1), pixel(1));
     rect(locX(x + 1), locY(y + 5), pixel(1), pixel(1));
     rect(locX(x + 5), locY(y + 5), pixel(1), pixel(1));
+}
+
+/**
+ * Colors the eyes of the pixel art
+ * @param {*} r Red value 
+ * @param {*} g Green value
+ * @param {*} b Blue value
+ */
+function colorEyes(col, x, y)
+{
+    fill(col);
+    rect(locX(x + 1), locY(y + 1), pixel(5), pixel(5));
+    //symmRectX(x + 1, y + 1, 5, 5)
+    fill(255);
+    rect(locX(x + 4), locY(y + 2), pixel(1), pixel(1));
 }
