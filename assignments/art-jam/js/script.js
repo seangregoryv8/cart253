@@ -32,22 +32,49 @@ function drawGrid()
     }
 }
 
-function pixel(s)
+function pixel(s) { return s * 20; }
+function locX(x) { return x * 20;}
+function locY(y) { return y * 20; }
+
+function symmRectX(x, y, w, h)
 {
-    return s * 20;
+    rect(locX(x), locY(y), pixel(w), pixel(h));
+    let totalCols = WIDTH / 20; // 28
+    let mirrorX = (totalCols - w) - x;
+    rect(locX(mirrorX), locY(y), pixel(w), pixel(h));
+}
+function symmetryX(x)
+{
+    return (WIDTH / 20) - (x * 2);
 }
 
-function locX(x)
+function symmetryY(y)
 {
-    return x * 20;
+    return (HEIGHT / 20) - (y * 2);
 }
-
-function locY(y)
+function drawOutline()
 {
-    return y * 20;
+    fill(0);
+    rect(locX(8), 0, pixel(symmetryX(8)), pixel(1))
+    symmRectX(6, 1, 1, 1);
+    symmRectX(7, 1, 1, 1);
+    symmRectX(5, 2, 1, 1);
+    symmRectX(4, 3, 1, 2);
+    symmRectX(3, 4, 1, 1);
+    symmRectX(2, 5, 1, 2);
+    symmRectX(1, 7, 1, 9);
+    symmRectX(0, 16, 1, 6);
+    symmRectX(1, 22, 3, 1);
+    symmRectX(3, 21, 1, 5);
+    symmRectX(4, 26, 1, 2);
+    symmRectX(5, 28, 1, 1);
+    symmRectX(6, 29, 1, 1);
+    symmRectX(7, 30, 1, 1);
+    symmRectX(8, 31, 1, 1);
+    symmRectX(9, 32, 2, 1);
+    rect(locX(11), locY(HEIGHT / 20 - 1), pixel(symmetryX(11)), pixel(1));
 }
-
-function drawFace()
+function drawExampleFace()
 {
     // This is for the face
     fill(255, 224, 189);
@@ -66,6 +93,7 @@ function drawFace()
 */
 function draw() {
     drawGrid();
-    drawFace();
+    drawOutline();
+    //drawExampleFace();
 }
 
