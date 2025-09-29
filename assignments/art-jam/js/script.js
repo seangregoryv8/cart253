@@ -9,6 +9,9 @@
 
 const WIDTH = 560;
 const HEIGHT = 680;
+
+let browEmotion = "normal";
+const browEmotions = ["normal", "sad", "angry", "surprised"];
 /**
  * This sets up the grid in a 20x20 pixel art style.
 */
@@ -29,7 +32,17 @@ function draw() {
     drawHair();
     drawSmile();
     drawEars();
-    drawEyes(6, 15);
+    drawEyes(6, 17, browEmotion);
+}
+
+function keyPressed()
+{
+    if (key === ' ')
+    {
+        let newBrowEmotion;
+        do { newBrowEmotion = random(browEmotions); } while (newBrowEmotion === browEmotion); // This repeats until a new emotion has been selected
+        browEmotion = newBrowEmotion;
+    }
 }
 
 function drawGrid()
@@ -175,9 +188,33 @@ function drawEars()
     symmRectX(3, 19, 1, 2);
 }
 
-function drawEyebrows()
+function drawEyebrows(x, y, pattern = "normal")
 {
-    
+    fill(0);
+    switch(pattern)
+    {
+        case "sad":
+            symmRectX(x + 1, y - 2, 3, 1);
+            symmRectX(x + 2, y - 3, 3, 1);
+            break;
+        case "angry":
+            symmRectX(x + 4, y - 2, 2, 1);
+            symmRectX(x + 3, y - 3, 2, 1);
+            break;
+        case "surprised":
+            symmRectX(x, y - 2, 1, 1);
+            symmRectX(x + 6, y - 2, 1, 1);
+            symmRectX(x + 1, y - 3, 1, 1);
+            symmRectX(x + 5, y - 3, 1, 1);
+            symmRectX(x + 2, y - 4, 3, 1);
+            break;
+        case "normal":
+        default:
+            symmRectX(x, y - 2, 1, 1);
+            symmRectX(x + 6, y - 2, 1, 1);
+            symmRectX(x + 1, y - 3, 5, 1);
+            break;
+    }
 }
 
 /**
@@ -185,12 +222,13 @@ function drawEyebrows()
  * @param {*} x Position x
  * @param {*} y Position y
  */
-function drawEyes(x, y)
+function drawEyes(x, y, browEmotion = "normal")
 {
     colorEyes(80, x, y);
     fill(0);
     pixel3Circle(x, y);
     pixel3Circle(x + 9, y);
+    drawEyebrows(x, y, browEmotion);
 }
 
 // This draws a 3x3 circle for the eyes
