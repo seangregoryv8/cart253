@@ -1,11 +1,10 @@
-let mouthEmotion;
-const mouthEmotions = ["smallSmile", "bigSmile", "frown", "bigFrown", "cat", "surprised"];
+let mouthEmotion
+const mouthEmotions = ["smallSmile", "bigSmile", "frown", "bigFrown", "cat", "surprised", "kiss", "neutral", "miff", "smirk"];
 
 function drawMouthDizzy()
 {
     // Every 5 frames
     let rotation = floor(frameCount / 10) % 2;
-    console.log(rotation);
 
     for (let x = 9; x <= 18; x += 2)
     {
@@ -38,6 +37,25 @@ function drawMouth()
             symmRectX(10, 27, 1, 4);
             rect(locX(11), locY(30), pixel(symmetryX(11)), pixel(1));
             rect(locX(11), locY(26), pixel(symmetryX(11)), pixel(1));
+            break;
+        case "neutral":
+            rect(locX(11), locY(27), pixel(symmetryX(11)), pixel(1));
+            break;
+        case "miff":
+            rect(locX(12), locY(26), pixel(4), pixel(1))
+            rect(locX(16), locY(27), pixel(1), pixel(1))
+            break;
+        case "kiss":
+            rect(locX(13), locY(24), pixel(2), pixel(1))
+            rect(locX(15), locY(25), pixel(1), pixel(1))
+            rect(locX(13), locY(26), pixel(2), pixel(1))
+            rect(locX(15), locY(27), pixel(1), pixel(1))
+            rect(locX(13), locY(28), pixel(2), pixel(1))
+            break;
+        case "smirk":
+            rect(locX(12), locY(27), pixel(4), pixel(1))
+            rect(locX(16), locY(26), pixel(1), pixel(1))
+            rect(locX(17), locY(25), pixel(1), pixel(1))
             break;
         case "cat":
             symmRectX(10, 26, 1, 2);

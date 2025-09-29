@@ -1,11 +1,14 @@
 let browEmotion;
-const browEmotions = ["normal", "sad", "angry", "surprised"];
+const browEmotions = ["normal", "sad", "angry", "surprised", "neutral"];
 
 function drawEyebrows(x, y)
 {
     fill(0);
     switch(browEmotion)
     {
+        case "neutral":
+            symmRectX(x + 1, y - 2, 5, 1)
+            break;
         case "sad":
             symmRectX(x + 1, y - 2, 3, 1);
             symmRectX(x + 2, y - 3, 3, 1);

@@ -2,15 +2,18 @@
  * The Pixelated Artist
  * Sean Gregory
  * 
- * This will, for now, draw a pixelated face.
+ * This draws the pixelated face, complete with plenty of features!
  */
 /// <reference path="path-to/p5.global-mode.d.ts" />
 "use strict";
 
+// default skin colour
 let skin = {
     "name": "Light",
     "rgb": [255,205,148]
 };
+
+// default hair colour
 let hair = {
     "name": "Chestnut",
     "rgb": [150,75,0]

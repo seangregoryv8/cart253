@@ -1,7 +1,7 @@
-let leftEyeEmotion;
-let rightEyeEmotion;
+let leftEyeEmotion
+let rightEyeEmotion
 
-let eyeEmotions = ["regular", "closed", "sadClosed", "sad", "squint", "happy", "dead"];
+let eyeEmotions = ["regular", "closed", "sadClosed", "sad", "squint", "happy", "dead", "cool"];
 
 const dizzyPattern = [
     {x: 3, y: 3},
@@ -56,6 +56,12 @@ function drawEye(x, y, eyeEmotion)
         case "closed":
             fill(0);
             rect(locX(x), locY(y + 3), pixel(7), pixel(1));
+            break;
+        case "cool":
+            fill(0);
+            rect(locX(x), locY(y + 2), pixel(7), pixel(1));
+            rect(locX(x + 1), locY(y + 3), pixel(5), pixel(1));
+            rect(locX(x + 2), locY(y + 4), pixel(3), pixel(1));
             break;
         case "sadClosed":
             fill(0);
@@ -130,10 +136,10 @@ function pixel3Circle(x, y)
  * @param {*} g Green value
  * @param {*} b Blue value
  */
-function colorEyes(col, x, y)
+function colorEyes(col, x, y, height = 5)
 {
     fill(col);
-    rect(locX(x + 1), locY(y + 1), pixel(5), pixel(5));
+    rect(locX(x + 1), locY(y + 1), pixel(5), pixel(height));
     //symmRectX(x + 1, y + 1, 5, 5)
     fill(255);
     rect(locX(x + 2 + currentQuadrant.col), locY(y + 2 + currentQuadrant.row), pixel(1), pixel(1));

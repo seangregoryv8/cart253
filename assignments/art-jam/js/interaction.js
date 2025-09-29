@@ -149,8 +149,11 @@ function updateSpin()
     prevMouseX = mouseX;
     prevMouseY = mouseY;
 
+    if (frameCount % 150 === 0) spinAmount = 0;
+
     if (spinAmount > 20)
     {
+        console.log("HELP IM DIZZY!");
         dizzy = true;
         dizzyTimer = 0;
         spinAmount = 0;
