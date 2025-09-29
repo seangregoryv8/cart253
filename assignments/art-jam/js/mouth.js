@@ -1,9 +1,10 @@
 let mouthEmotion
 const mouthEmotions = ["smallSmile", "bigSmile", "frown", "bigFrown", "cat", "surprised", "kiss", "neutral", "miff", "smirk"];
 
+// This simply rotates the dizzy mouth rotation every 10 frames
 function drawMouthDizzy()
 {
-    // Every 5 frames
+    // Every 10 frames
     let rotation = floor(frameCount / 10) % 2;
 
     for (let x = 9; x <= 18; x += 2)

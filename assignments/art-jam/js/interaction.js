@@ -20,6 +20,10 @@ const featureMap = {
     }
 };
 
+/**
+ * When something is clicked, every feature of the featurebox is checked (eyes, eyebrows, mouth)
+ * It then checks if the mouse is currently hovering over it, and if it is and the mouse is clicked, it toggles the randomizer for that feature.
+ */
 function handleClick() {
     for (let feature in featureBoxes) {
         let box = featureBoxes[feature];
@@ -30,6 +34,12 @@ function handleClick() {
     }
 }
 
+/**
+ * This completely randomizes every togglable feature there is from teh assortment of available features.
+ * @param {boolean} brow If you want to change the eyebrows
+ * @param {boolean} mouth If you want to change the mouth
+ * @param {boolean} eyes If you want to change the eyes
+ */
 function randomizeEmotions(brow = true, mouth = true, eyes = true)
 {
     if (brow)
@@ -58,11 +68,17 @@ function randomizeEmotions(brow = true, mouth = true, eyes = true)
     }
 }
 
+/**
+ * I wanted to get a json palette working, but load times weren't my friend for this one. This selects a random value from the selection in colours.js in palette
+ */
 function skinRandomizer()
 {
     skin = random(palettes.skinColors);
 }
 
+/**
+ * I wanted to get a json palette working, but load times weren't my friend for this one. This selects a random value from the selection in colours.js in palette
+ */
 function hairRandomizer()
 {
     hair = random(palettes.hairColors);
@@ -80,6 +96,12 @@ class BlinkController
         this.prevEmotions = {}; // store previous emotions for each eye
     }
 
+    /**
+     * this is called as an updater every time to see if eyes are open and if we need to blink
+     * @param {*} leftEye 
+     * @param {*} rightEye 
+     * @returns 
+     */
     update(leftEye, rightEye)
     {
         // We need to see if both eyes are in some kind of "open" state to sync them
@@ -143,14 +165,17 @@ function updateSpin()
     let dx = mouseX - prevMouseX;
     let dy = mouseY - prevMouseY;
 
+    // Do some math stuff that I admittedly needed to use GeeksForGeeks to figure out
     let angle = atan2(dy, dx);
     spinAmount += abs(angle) * 0.1; // Scale down the effect
 
     prevMouseX = mouseX;
     prevMouseY = mouseY;
 
+    // Resets the frame count to make it harder to accidentally make him dizzy
     if (frameCount % 150 === 0) spinAmount = 0;
 
+    // If you've done it right, he should get real dizzy
     if (spinAmount > 20)
     {
         console.log("HELP IM DIZZY!");

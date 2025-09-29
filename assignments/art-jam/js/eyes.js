@@ -20,6 +20,15 @@ const dizzyPattern = [
     {x: 0, y: 4}
 ];
 
+/**
+ * This is a rotation pattern that takes the delta point and constantly rotates through each of the objects above in succession.
+ * @param {*} px 
+ * @param {*} py 
+ * @param {*} cx 
+ * @param {*} cy 
+ * @param {*} rotation 
+ * @returns 
+ */
 function rotatePoint(px, py, cx, cy, rotation)
 {
     let dx = px - cx;
@@ -30,6 +39,12 @@ function rotatePoint(px, py, cx, cy, rotation)
 
     return {x: cx + dx, y: cy + dy};
 }
+
+/**
+ * With dizziness now calculated, we can draw it out fully.
+ * @param {*} x 
+ * @param {*} y 
+ */
 function drawDizzy(x, y)
 {
     let rotation = floor(frameCount / 5) % 4;

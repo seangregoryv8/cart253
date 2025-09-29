@@ -3,6 +3,16 @@
  * Sean Gregory
  * 
  * This draws the pixelated face, complete with plenty of features!
+ * 
+ * Controls:
+ * - Click on parts of the face to change it
+ * - Move the mouse to activate some hidden features
+ * - Press spacebar to randomize the entire face
+ * - Click on buttons to change skin and hair colour
+ * 
+ * Uses:
+ * p5.js
+ * https://p5js.org
  */
 /// <reference path="path-to/p5.global-mode.d.ts" />
 "use strict";
@@ -70,16 +80,25 @@ function draw() {
     updateSpin();
 }
 
+/**
+ * This handles when the mouse is pressed
+ */
 function mousePressed()
 {
     if (!dizzy) handleClick();
 }
 
+/**
+ * This handles when specifically the spacebar is pressed
+ */
 function keyPressed()
 {
     if (!dizzy && key === ' ') randomizeEmotions();
 }
 
+/**
+ * It's hidden right now, but this draws a grid that was mainly used as reference for me to get the pixel art right
+ */
 function drawGrid()
 {
     stroke(0);
@@ -188,6 +207,9 @@ function colorSkin(rgb)
     symmRectX(11, 32, 5, 1);
 }
 
+/**
+ * This draws the little nubs at the end of the ears
+ */
 function drawEars()
 {
     fill(0);

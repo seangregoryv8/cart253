@@ -49,13 +49,11 @@ With this project, I really wanted to capture that charm by not only letting you
 
 ## Screenshot(s)
 
-![Face1](image.png)
-
-![Face2](image-1.png)
-
-![Face3](image-2.png)
-
-![Face4](image-3.png)
+![Face Chart](/assets/images/faceChart.jpg)
+![Face1](assets/images/image.png)
+![Face2](assets/images/image-1.png)
+![Face3](assets/images/image-2.png)
+![Face4](assets/images/image-3.png)
 
 ## License
 

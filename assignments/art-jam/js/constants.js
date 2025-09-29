@@ -8,7 +8,5 @@ const featureBoxes = {
     leftEye: [6, 15, 7, 7],
     rightEye: [15, 15, 7, 7],
     mouth: [10, 26, 8, 5],
-    leftEyebrow: [6, 10, 16, 5],
-    leftEar: [1, 18, 3, 4],
-    rightEar: [24, 18, 3, 4]
+    leftEyebrow: [6, 10, 16, 5]
 };
