@@ -10,11 +10,6 @@
 const WIDTH = 560;
 const HEIGHT = 680;
 
-let browEmotion = "normal";
-const browEmotions = ["normal", "sad", "angry", "surprised"];
-
-let eyeEmotions = ["closed", "regular"];
-
 /**
  * This sets up the grid in a 20x20 pixel art style.
 */
@@ -35,25 +30,30 @@ function draw() {
     drawHair();
     drawMouth(mouthEmotion);
     drawEars();
-    drawEye(6, 17, leftEyeEmotion);
-    drawEye(15, 17, rightEyeEmotion);
-    drawEyebrows(6, 17);
+    drawEye(6, 15, leftEyeEmotion);
+    drawEye(15, 15, rightEyeEmotion);
+    drawEyebrows(6, 15);
+}
+
+function randomizeEmotions()
+{
+    let newBrowEmotion;
+    do { newBrowEmotion = random(browEmotions); } while (newBrowEmotion === browEmotion); // This repeats until a new emotion has been selected
+    browEmotion = newBrowEmotion;
+
+    let newMouthEmotion;
+    do { newMouthEmotion = random(mouthEmotions); } while (newMouthEmotion === mouthEmotion); // This repeats until a new emotion has been selected
+    mouthEmotion = newMouthEmotion;
+    
+    leftEyeEmotion = random(eyeEmotions);
+    rightEyeEmotion = random(eyeEmotions);
 }
 
 function keyPressed()
 {
     if (key === ' ')
     {
-        let newBrowEmotion;
-        do { newBrowEmotion = random(browEmotions); } while (newBrowEmotion === browEmotion); // This repeats until a new emotion has been selected
-        browEmotion = newBrowEmotion;
-        
-        let newMouthEmotion;
-        do { newMouthEmotion = random(mouthEmotions); } while (newMouthEmotion === mouthEmotion); // This repeats until a new emotion has been selected
-        mouthEmotion = newMouthEmotion;
-
-        leftEyeEmotion = random(eyeEmotions);
-        rightEyeEmotion = random(eyeEmotions);
+        randomizeEmotions();
     }
 }
 
@@ -169,7 +169,7 @@ function colorSkin(r, g, b)
     symmRectX(11, 32, 5, 1);
 }
 
-let mouthEmotion = "surprised";
+let mouthEmotion;
 const mouthEmotions = ["smallSmile", "bigSmile", "frown", "bigFrown", "cat", "surprised"];
 
 /**
@@ -234,10 +234,13 @@ function drawEars()
     symmRectX(3, 19, 1, 2);
 }
 
-function drawEyebrows(x, y, pattern = "normal")
+let browEmotion;
+const browEmotions = ["normal", "sad", "angry", "surprised"];
+
+function drawEyebrows(x, y)
 {
     fill(0);
-    switch(pattern)
+    switch(browEmotion)
     {
         case "sad":
             symmRectX(x + 1, y - 2, 3, 1);
@@ -263,8 +266,10 @@ function drawEyebrows(x, y, pattern = "normal")
     }
 }
 
-let leftEyeEmotion = "sad";
-let rightEyeEmotion = "closed";
+let leftEyeEmotion;
+let rightEyeEmotion;
+
+let eyeEmotions = ["regular", "closed", "sadClosed", "sad", "squint", "happy", "dead"];
 
 /**
  * Combines the eye coloring and the eye drawing functions
@@ -279,12 +284,7 @@ function drawEye(x, y, eyeEmotion)
             fill(0);
             rect(locX(x), locY(y + 3), pixel(7), pixel(1));
             break;
-        case "regular":
-            colorEyes(80, x, y);
-            fill(0);
-            pixel3Circle(x, y);
-            break;
-        case "sad":
+        case "sadClosed":
             fill(0);
             rect(locX(x + 1), locY(y + 3), pixel(5), pixel(1));
             fill(150, 150, 255);
@@ -292,7 +292,48 @@ function drawEye(x, y, eyeEmotion)
             fill(200, 200, 255);
             rect(locX(x + 1), locY(y + 5), pixel(5), pixel(4));
             break;
-            
+        case "sad":
+            colorEyes(80, x, y);
+            fill(0);
+            pixel3Circle(x, y);
+            rect(locX(x + 2), locY(y + 5), pixel(3), pixel(1));
+            fill(150, 150, 255);
+            rect(locX(x + 1), locY(y + 6), pixel(5), pixel(1));
+            fill(200, 200, 255);
+            rect(locX(x + 1), locY(y + 7), pixel(5), pixel(4));
+            break;
+        case "squint":
+            colorEyes(80, x, y);
+            fill(0);
+            rect(locX(x + 2), locY(y), pixel(3), pixel(1));
+            rect(locX(x), locY(y + 2), pixel(1), pixel(3));
+            rect(locX(x + 6), locY(y + 2), pixel(1), pixel(3));
+            rect(locX(x + 1), locY(y + 1), pixel(1), pixel(1));
+            rect(locX(x + 5), locY(y + 1), pixel(1), pixel(1));
+            rect(locX(x + 1), locY(y + 5), pixel(1), pixel(1));
+            rect(locX(x + 5), locY(y + 5), pixel(1), pixel(1));
+            rect(locX(x + 2), locY(y + 5), pixel(3), pixel(1));
+            break;
+        case "happy":
+            fill(0);
+            rect(locX(x + 2), locY(y + 1), pixel(3), pixel(1));
+            rect(locX(x + 1), locY(y + 2), pixel(1), pixel(3));
+            rect(locX(x + 5), locY(y + 2), pixel(1), pixel(3));
+            break;
+        case "dead":
+            fill(0);
+            for (let i = 1; i <= 5; i++)
+            {
+                rect(locX(x + i), locY(y + i), pixel(1), pixel(1));
+                rect(locX(x + 6 - i), locY(y + i), pixel(1), pixel(1));
+            }
+            break;
+        case "regular":
+        default:
+            colorEyes(80, x, y);
+            fill(0);
+            pixel3Circle(x, y);
+            break;
     }
 }
 
