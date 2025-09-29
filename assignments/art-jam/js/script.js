@@ -32,18 +32,33 @@ function drawGrid()
     }
 }
 
+function pixel(s)
+{
+    return s * 20;
+}
+
+function locX(x)
+{
+    return x * 20;
+}
+
+function locY(y)
+{
+    return y * 20;
+}
+
 function drawFace()
 {
     // This is for the face
     fill(255, 224, 189);
-    rect(200, 140, 160, 160);
+    rect(locX(10), locY(7), pixel(8), pixel(8));
     // This is for the eyes
     fill(0);
-    rect(240, 180, 20, 20);
-    rect(300, 180, 20, 20);
+    rect(locX(12), locY(9), pixel(1), pixel(1));
+    rect(locX(15), locY(9), pixel(1), pixel(1));
     // This is for the mouth
     fill(255, 0, 0);
-    rect(250, 240, 60, 20);
+    rect(locX(13), locY(12), pixel(2), pixel(1));
 }
 
 /**
