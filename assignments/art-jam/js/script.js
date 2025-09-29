@@ -7,113 +7,74 @@
 /// <reference path="path-to/p5.global-mode.d.ts" />
 "use strict";
 
-const WIDTH = 560;
-const HEIGHT = 680;
+let skin = {
+    "name": "Light",
+    "rgb": [255,205,148]
+};
+let hair = {
+    "name": "Chestnut",
+    "rgb": [150,75,0]
+};
+
+let mainCanvas;
+let blinkController;
+
+let currentQuadrant = {col: 3, row: 1};
+let rows = 3;
+let cols = 3;
+let quadWidth = WIDTH / cols;
+let quadHeight = HEIGHT / rows;
 
 /**
  * This sets up the grid in a 20x20 pixel art style.
 */
-function setup() {
-    createCanvas(WIDTH, HEIGHT);
-    // 28x34 grid
-    background(220);
-}
-
-// This is a simple function to detect if the mouse is over a rectangle, using my pixel art detection system
-function isMouseOver(x, y, w, h) { return mouseX >= locX(x) && mouseX <= locX(x + w) && mouseY >= locY(y) && mouseY <= locY(y + h); }
-
-// This is a list of feature boxes for the eyes, mouth, eyebrows, and ears, detecting where they are in the portrait
-const featureBoxes = {
-    leftEye: [6, 15, 7, 7],
-    rightEye: [15, 15, 7, 7],
-    mouth: [10, 26, 8, 5],
-    leftEyebrow: [6, 10, 16, 5],
-    leftEar: [1, 18, 3, 4],
-    rightEar: [24, 18, 3, 4]
-};
-
-// This is a map of features to their corresponding emotion-changing functions
-const featureMap = {
-    leftEye: () => leftEyeEmotion = random(eyeEmotions),
-    rightEye: () => rightEyeEmotion = random(eyeEmotions),
-    mouth: () => {
-        let newMouth;
-        do { newMouth = random(mouthEmotions); } while(newMouth === mouthEmotion);
-        mouthEmotion = newMouth;
-    },
-    leftEyebrow: () => {
-        let newBrow;
-        do { newBrow = random(browEmotions); } while(newBrow === browEmotion);
-        browEmotion = newBrow;
-    }
-};
-
-// This function detects which feature the mouse is currently over, if any
-function detectFeature()
+function setup()
 {
-    for (let feature in featureBoxes)
-    {
-        let box = featureBoxes[feature];
-        if (isMouseOver(box[0], box[1], box[2], box[3]))
-            return feature;
-    }
-    return null; // mouse is not over any feature
+    mainCanvas = createCanvas(WIDTH, HEIGHT);
+    // 28x34 grid
+    //background(220);
+    
+    blinkController = new BlinkController();
 }
 
 /**
  * This will be drawing the beautiful pixel art!
 */
 function draw() {
-    drawGrid();
-    colorSkin(255, 224, 189);
-    colorHair(150, 75, 0);
+    //drawGrid();
+    colorSkin(skin.rgb);
+    colorHair(hair.rgb);
     drawOutline();
     drawHair();
-    drawMouth(mouthEmotion);
+    drawMouth();
     drawEars();
     drawEye(6, 15, leftEyeEmotion);
     drawEye(15, 15, rightEyeEmotion);
     drawEyebrows(6, 15);
+
+    const updated = blinkController.update(leftEyeEmotion, rightEyeEmotion);
+    leftEyeEmotion = updated.left;
+    rightEyeEmotion = updated.right;
+
+    if (!dizzy && frameCount % 400 === 0)
+        randomizeEmotions(true, true, false);
+
+    for (let r = 0; r < rows; r++)
+        for (let c = 0; c < cols; c++)
+            if (mouseOverQuadrant(c, r))
+                currentQuadrant = {col: c, row: r};
+    
+    updateSpin();
 }
 
 function mousePressed()
 {
-    for (let feature in featureBoxes)
-    {
-        let box = featureBoxes[feature];
-        if (isMouseOver(box[0], box[1], box[2], box[3]))
-        {
-            featureMap[feature]();
-            break;
-        }
-    }
-}
-
-function randomizeEmotions()
-{
-    let newBrowEmotion;
-    do { newBrowEmotion = random(browEmotions); } while (newBrowEmotion === browEmotion); // This repeats until a new emotion has been selected
-    browEmotion = newBrowEmotion;
-
-    let newMouthEmotion;
-    do { newMouthEmotion = random(mouthEmotions); } while (newMouthEmotion === mouthEmotion); // This repeats until a new emotion has been selected
-    mouthEmotion = newMouthEmotion;
-    
-    leftEyeEmotion = random(eyeEmotions);
-    rightEyeEmotion = random(eyeEmotions);
-}
-
-function mouseClick()
-{
-
+    if (!dizzy) handleClick();
 }
 
 function keyPressed()
 {
-    if (key === ' ')
-    {
-        randomizeEmotions();
-    }
+    if (!dizzy && key === ' ') randomizeEmotions();
 }
 
 function drawGrid()
@@ -196,13 +157,11 @@ function drawHair()
 
 /**
  * Colors the hair of the pixel art
- * @param {*} r Red value 
- * @param {*} g Green value
- * @param {*} b Blue value
+ * @param {*} rgb An object containing the RGB values for the hair color
  */
-function colorHair(r, g, b)
+function colorHair(rgb)
 {
-    fill(r, g, b);
+    fill(rgb[0], rgb[1], rgb[2]);
     rect(locX(8), locY(1), pixel(symmetryX(8)), pixel(symmetryY(14)));
     rect(locX(6), locY(2), pixel(symmetryX(6)), pixel(symmetryY(14.5)));
     symmRectX(5, 3, 3, 5);
@@ -214,13 +173,11 @@ function colorHair(r, g, b)
 
 /**
  * Colors the skin of the pixel art
- * @param {*} r Red value 
- * @param {*} g Green value
- * @param {*} b Blue value
+ * @param {*} rgb An object containing the RGB values for the skin
  */
-function colorSkin(r, g, b)
+function colorSkin(rgb)
 {
-    fill(r, g, b);
+    fill(rgb[0], rgb[1], rgb[2]);
     rect(locX(8), locY(8), pixel(symmetryX(8)), pixel(symmetryY(5)));
     rect(locX(1), locY(16), pixel(symmetryX(1)), pixel(symmetryY(13.5)));
     symmRectX(6, 9, 2, 21);
@@ -228,199 +185,9 @@ function colorSkin(r, g, b)
     symmRectX(11, 32, 5, 1);
 }
 
-let mouthEmotion;
-const mouthEmotions = ["smallSmile", "bigSmile", "frown", "bigFrown", "cat", "surprised"];
-
-/**
- * This draws the mouth of the pixel art, and picks from a variety of emotions
- * @param {*} mouthEmotion 
- */
-function drawMouth(mouthEmotion)
-{
-    fill(0);
-    switch (mouthEmotion)
-    {
-        case "frown":
-            symmRectX(11, 28, 1, 1);
-            rect(locX(12), locY(27), pixel(symmetryX(12)), pixel(1));
-            break;
-        case "bigFrown":
-            fill(255, 100, 100);
-            rect(locX(11), locY(27), pixel(symmetryX(11)), pixel(3));
-            fill(255, 192, 203);
-            rect(locX(12), locY(29), pixel(symmetryX(12)), pixel(1));
-            fill(0);
-            symmRectX(10, 27, 1, 4);
-            rect(locX(11), locY(30), pixel(symmetryX(11)), pixel(1));
-            rect(locX(11), locY(26), pixel(symmetryX(11)), pixel(1));
-            break;
-        case "cat":
-            symmRectX(10, 26, 1, 2);
-            symmRectX(11, 28, 2, 1);
-            rect(locX(13), locY(27), pixel(symmetryX(13)), pixel(1));
-            break;
-        case "bigSmile":
-            fill(255, 100, 100);
-            rect(locX(11), locY(27), pixel(symmetryX(11)), pixel(3));
-            fill(255, 192, 203);
-            rect(locX(12), locY(29), pixel(symmetryX(12)), pixel(1));
-            fill(0);
-            symmRectX(10, 26, 1, 4);
-            rect(locX(11), locY(30), pixel(symmetryX(11)), pixel(1));
-            rect(locX(11), locY(26), pixel(symmetryX(11)), pixel(1));
-            break;
-        case "surprised":
-            fill(255, 100, 100);
-            rect(locX(11), locY(26), pixel(symmetryX(11)), pixel(3));
-            fill(255, 192, 203);
-            rect(locX(12), locY(28), pixel(symmetryX(12)), pixel(1));
-            fill(0);
-            rect(locX(12), locY(25), pixel(symmetryX(12)), pixel(1));
-            symmRectX(11, 26, 1, 3);
-            rect(locX(12), locY(29), pixel(symmetryX(12)), pixel(1));
-        case "smallSmile":
-        default:
-            symmRectX(11, 27, 1, 2);
-            rect(locX(12), locY(29), pixel(symmetryX(12)), pixel(1));
-            break;
-    }
-}
-
 function drawEars()
 {
     fill(0);
     symmRectX(2, 18, 1, 1);
     symmRectX(3, 19, 1, 2);
-}
-
-let browEmotion;
-const browEmotions = ["normal", "sad", "angry", "surprised"];
-
-function drawEyebrows(x, y)
-{
-    fill(0);
-    switch(browEmotion)
-    {
-        case "sad":
-            symmRectX(x + 1, y - 2, 3, 1);
-            symmRectX(x + 2, y - 3, 3, 1);
-            break;
-        case "angry":
-            symmRectX(x + 4, y - 2, 2, 1);
-            symmRectX(x + 3, y - 3, 2, 1);
-            break;
-        case "surprised":
-            symmRectX(x, y - 2, 1, 1);
-            symmRectX(x + 6, y - 2, 1, 1);
-            symmRectX(x + 1, y - 3, 1, 1);
-            symmRectX(x + 5, y - 3, 1, 1);
-            symmRectX(x + 2, y - 4, 3, 1);
-            break;
-        case "normal":
-        default:
-            symmRectX(x, y - 2, 1, 1);
-            symmRectX(x + 6, y - 2, 1, 1);
-            symmRectX(x + 1, y - 3, 5, 1);
-            break;
-    }
-}
-
-let leftEyeEmotion;
-let rightEyeEmotion;
-
-let eyeEmotions = ["regular", "closed", "sadClosed", "sad", "squint", "happy", "dead"];
-
-/**
- * Combines the eye coloring and the eye drawing functions
- * @param {*} x Position x
- * @param {*} y Position y
- */
-function drawEye(x, y, eyeEmotion)
-{
-    switch (eyeEmotion)
-    {
-        case "closed":
-            fill(0);
-            rect(locX(x), locY(y + 3), pixel(7), pixel(1));
-            break;
-        case "sadClosed":
-            fill(0);
-            rect(locX(x + 1), locY(y + 3), pixel(5), pixel(1));
-            fill(150, 150, 255);
-            rect(locX(x + 1), locY(y + 4), pixel(5), pixel(1));
-            fill(200, 200, 255);
-            rect(locX(x + 1), locY(y + 5), pixel(5), pixel(4));
-            break;
-        case "sad":
-            colorEyes(80, x, y);
-            fill(0);
-            pixel3Circle(x, y);
-            rect(locX(x + 2), locY(y + 5), pixel(3), pixel(1));
-            fill(150, 150, 255);
-            rect(locX(x + 1), locY(y + 6), pixel(5), pixel(1));
-            fill(200, 200, 255);
-            rect(locX(x + 1), locY(y + 7), pixel(5), pixel(4));
-            break;
-        case "squint":
-            colorEyes(80, x, y);
-            fill(0);
-            rect(locX(x + 2), locY(y), pixel(3), pixel(1));
-            rect(locX(x), locY(y + 2), pixel(1), pixel(3));
-            rect(locX(x + 6), locY(y + 2), pixel(1), pixel(3));
-            rect(locX(x + 1), locY(y + 1), pixel(1), pixel(1));
-            rect(locX(x + 5), locY(y + 1), pixel(1), pixel(1));
-            rect(locX(x + 1), locY(y + 5), pixel(1), pixel(1));
-            rect(locX(x + 5), locY(y + 5), pixel(1), pixel(1));
-            rect(locX(x + 2), locY(y + 5), pixel(3), pixel(1));
-            break;
-        case "happy":
-            fill(0);
-            rect(locX(x + 2), locY(y + 1), pixel(3), pixel(1));
-            rect(locX(x + 1), locY(y + 2), pixel(1), pixel(3));
-            rect(locX(x + 5), locY(y + 2), pixel(1), pixel(3));
-            break;
-        case "dead":
-            fill(0);
-            for (let i = 1; i <= 5; i++)
-            {
-                rect(locX(x + i), locY(y + i), pixel(1), pixel(1));
-                rect(locX(x + 6 - i), locY(y + i), pixel(1), pixel(1));
-            }
-            break;
-        case "regular":
-        default:
-            colorEyes(80, x, y);
-            fill(0);
-            pixel3Circle(x, y);
-            break;
-    }
-}
-
-// This draws a 3x3 circle for the eyes
-function pixel3Circle(x, y)
-{
-    noStroke();
-    rect(locX(x + 2), locY(y), pixel(3), pixel(1));
-    rect(locX(x), locY(y + 2), pixel(1), pixel(3));
-    rect(locX(x + 2), locY(y + 6), pixel(3), pixel(1));
-    rect(locX(x + 6), locY(y + 2), pixel(1), pixel(3));
-    rect(locX(x + 1), locY(y + 1), pixel(1), pixel(1));
-    rect(locX(x + 5), locY(y + 1), pixel(1), pixel(1));
-    rect(locX(x + 1), locY(y + 5), pixel(1), pixel(1));
-    rect(locX(x + 5), locY(y + 5), pixel(1), pixel(1));
-}
-
-/**
- * Colors the eyes of the pixel art
- * @param {*} r Red value 
- * @param {*} g Green value
- * @param {*} b Blue value
- */
-function colorEyes(col, x, y)
-{
-    fill(col);
-    rect(locX(x + 1), locY(y + 1), pixel(5), pixel(5));
-    //symmRectX(x + 1, y + 1, 5, 5)
-    fill(255);
-    rect(locX(x + 4), locY(y + 2), pixel(1), pixel(1));
 }
