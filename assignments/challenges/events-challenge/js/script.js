@@ -76,6 +76,10 @@ function lose()
     gameOver = true;
 }
 
-document.getElementById("mainBody").addEventListener("click", () => { lose(); })
-document.getElementById("mainBody").addEventListener("mousemove", () => { lose(); })
-document.getElementById("mainBody").addEventListener("mousedown", () => { lose(); })
+let fs = document.getElementById("mainBody")
+
+fs.addEventListener("click", () => { lose(); })
+fs.addEventListener("mousemove", () => { lose(); })
+fs.addEventListener("mousedown", () => { lose(); })
+
+window.onoffline = () => { lose(); }
