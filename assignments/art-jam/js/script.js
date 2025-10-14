@@ -54,7 +54,7 @@ function setup()
  * This will be drawing the beautiful pixel art!
 */
 function draw() {
-    //drawGrid();
+    drawGrid();
     colorSkin(skin.rgb);
     colorHair(hair.rgb);
     drawOutline();
