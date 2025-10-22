@@ -51,11 +51,62 @@ function draw() {
     drawBall(ball);
 }
 
+let keyState = {
+    a: false,
+    d: false,
+    A: false,
+    D: false
+}
+
 /**
  * Moves the paddle
  */
-function movePaddle(paddle) {
+function movePaddle(paddle)
+{
+    if (keyState.a || keyState.A)
+        if (paddle.x - paddle.width / 2 > 0)
+        {
+            if (keyState.a) paddle.x -= 1;
+            if (keyState.A) paddle.x -= 3;
+        }
 
+    if (keyState.d || keyState.D)
+        if (paddle.x + paddle.width / 2 < 600)
+        {
+            if (keyState.d) paddle.x += 1;
+            if (keyState.D) paddle.x += 3;
+        }
+}
+
+/**
+ * This handles when specifically the spacebar is pressed
+ */
+function keyPressed()
+{
+    if (key === "Shift")
+    {
+        if (keyState.a) keyState.A = true;
+        if (keyState.d) keyState.D = true;
+    }
+    else keyState[key] = true;
+}
+
+function keyReleased()
+{
+    if (key === "Shift")
+    {
+        if (keyState.A)
+        {
+            keyState.A = false;
+            keyState.a = true;
+        }
+        if (keyState.D)
+        {
+            keyState.D = false;
+            keyState.d = true;
+        }
+    }
+    else keyState[key] = false;
 }
 
 /**
