@@ -8,26 +8,42 @@
 
 "use strict";
 
-// Our ball
-const ball = {
-    x: 300,
-    y: 20,
-    width: 10,
-    height: 10,
-    velocity: {
-        x: 0,
-        y: 10
-    }
-};
+function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function getRandomColor() {
+    const r = Math.floor(Math.random() * 256); // Random red value (0-255)
+    const g = Math.floor(Math.random() * 256); // Random green value (0-255)
+    const b = Math.floor(Math.random() * 256); // Random blue value (0-255)
+    return `rgb(${r}, ${g}, ${b})`;
+}
 
 // Our paddle
 const paddle = {
     x: 300,
     y: 280,
-    width: 80,
+    width: 200,
     height: 10
 };
 
+let balls = [];
+
+for (let i = 0; i < 5; i++) {
+    let ball = {
+        x: getRandomInt(200, 400),
+        y: getRandomInt(20, 50),
+        width: 10,
+        height: 10,
+        velocity: {
+            x: 0,
+            y: 10
+        },
+        acceleration: 0,
+        colour: getRandomColor()
+    };
+    balls.push(ball);
+}
 /**
  * Create the canvas
 */
@@ -42,13 +58,16 @@ function setup() {
 function draw() {
     background("#87ceeb");
 
+    
+    for (let i = 0; i < balls.length; i++)
+    {
+        moveBall(balls[i]);
+        handleBounce(balls[i], paddle);
+        drawBall(balls[i]);
+    }
+    
     movePaddle(paddle);
-    moveBall(ball);
-
-    handleBounce(ball, paddle);
-
     drawPaddle(paddle);
-    drawBall(ball);
 }
 
 let keyState = {
@@ -83,8 +102,14 @@ function movePaddle(paddle)
  */
 function keyPressed()
 {
+    if ((keyState.a || keyState.A) && (keyState.d || keyState.D)) return;
     if (key === "Shift")
     {
+        if (keyState.a && keyState.d)
+        {
+            keyState.a = true;
+            keyState.d = false;
+        }
         if (keyState.a) keyState.A = true;
         if (keyState.d) keyState.D = true;
     }
@@ -113,14 +138,20 @@ function keyReleased()
  * Moves the ball passed in as a parameter
  */
 function moveBall(ball) {
-
+    ball.y -= ball.acceleration;
+    ball.acceleration -= 0.2
 }
 
 /**
  * Bounces the provided ball off the provided paddle
  */
 function handleBounce(ball, paddle) {
-
+    if (checkOverlap(ball, paddle))
+    {
+        ball.colour = getRandomColor();
+        ball.acceleration += 0.2
+        ball.acceleration = -ball.acceleration;
+    }
 }
 
 /**
@@ -142,7 +173,7 @@ function drawBall(ball) {
     push();
     rectMode(CENTER);
     noStroke();
-    fill("pink");
+    fill(ball.colour);
     rect(ball.x, ball.y, ball.width, ball.height);
     pop();
 }
