@@ -34,18 +34,20 @@ const frog = {
     }
 };
 
-let flies = [];
+let ghosts = [];
 let lastFlyTime = 0;
 let spawnInterval = 1000;
 
-function makeFly()
+function makeGhost()
 {
     return {
-        x: 0,
+        x: -50,
         y: random(100, 300),
-        size: 10,
+        size: 40,
         speed: 3,
-        toRemove: false
+        toRemove: false,
+        tail: [],
+        wave: random(3, 15)
     }
 }
 /**
@@ -54,30 +56,31 @@ function makeFly()
 function setup() {
     createCanvas(640, 480);
 
-    flies.push(makeFly());
+    ghosts.push(makeGhost());
 }
 
 function draw() {
+    
     background("#87ceeb");
-
-    for (const fly of flies)
+  
+    for (const ghost of ghosts)
     {
-        moveFly(fly);
-        drawFly(fly);
+        moveGhost(ghost);
+        drawGhost(ghost);
     }
 
-    //moveFly();
-    //drawFly();
+    //moveghost();
+    //drawghost();
     moveFrog();
     moveTongue();
     drawFrog();
-    checkTongueFlyOverlap();
+    checkTongueGhostOverlap();
 
-    flies = flies.filter(fly => !fly.toRemove);
+    ghosts = ghosts.filter(ghost => !ghost.toRemove);
 
     const currentTime = millis();  // Get current time in milliseconds
     if (currentTime - lastFlyTime > spawnInterval) {
-        flies.push(makeFly());  // Add a new fly
+        ghosts.push(makeGhost());  // Add a new fly
         lastFlyTime = currentTime;  // Reset the timer
         spawnInterval = random(1000, 3000);
     }
@@ -87,23 +90,38 @@ function draw() {
  * Moves the fly according to its speed
  * Resets the fly if it gets all the way to the right
  */
-function moveFly(fly) {
+function moveGhost(ghost) {
     // Move the fly
-    fly.x += fly.speed;
-    // Handle the fly going off the canvas
-    //if (fly.x > width) {
-        //resetFly();
-    //}
+    ghost.x += ghost.speed;
+    ghost.y += cos(frameCount / ghost.wave);
 }
 
 /**
  * Draws the fly as a black circle
  */
-function drawFly(fly) {
+function drawGhost(ghost) {
     push();
     noStroke();
+    fill("#ffffff");
+    ellipse(ghost.x, ghost.y, ghost.size);
+    ghost.tail.unshift({x: ghost.x, y: ghost.y})
+    if (ghost.tail.length > 30) ghost.tail.pop();
+    // draw the tail
+    for (let i = 0; i < ghost.tail.length; i++)
+    {
+        const tailPoint = ghost.tail[i];
+        const pointSize = ghost.size * (ghost.tail.length - i) / ghost.tail.length;
+        const pointAlpha = 255 * (ghost.tail.length - i) / ghost.tail.length;
+        fill(255, pointAlpha)
+        ellipse(tailPoint.x, tailPoint.y, pointSize)
+    }
+
     fill("#000000");
-    ellipse(fly.x, fly.y, fly.size);
+    ellipse(ghost.x - 8, ghost.y - 3, ghost.size / 4)
+    ellipse(ghost.x + 8, ghost.y - 3, ghost.size / 4)
+    ellipse(ghost.x, ghost.y + 10, ghost.size / 4)
+
+
     pop();
 }
 
@@ -169,19 +187,19 @@ function drawFrog() {
 }
 
 /**
- * Handles the tongue overlapping the fly
+ * Handles the tongue overlapping the ghost
  */
-function checkTongueFlyOverlap() {
-    for (const fly of flies)
+function checkTongueGhostOverlap() {
+    for (const ghost of ghosts)
     {
-        // Get distance from tongue to fly
-        const d = dist(frog.tongue.x, frog.tongue.y, fly.x, fly.y);
+        // Get distance from tongue to ghost
+        const d = dist(frog.tongue.x, frog.tongue.y, ghost.x, ghost.y);
         // Check if it's an overlap
-        const eaten = (d < frog.tongue.size/2 + fly.size/2);
+        const eaten = (d < frog.tongue.size/2 + ghost.size/2);
         if (eaten) {
-            fly.toRemove = true;
-            // Reset the fly
-            //resetFly();
+            ghost.toRemove = true;
+            // Reset the ghost
+            //resetghost();
             // Bring back the tongue
             frog.tongue.state = "inbound";
         }
