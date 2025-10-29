@@ -34,65 +34,77 @@ const frog = {
     }
 };
 
-// Our fly
-// Has a position, size, and speed of horizontal movement
-const fly = {
-    x: 0,
-    y: 200, // Will be random
-    size: 10,
-    speed: 3
-};
+let flies = [];
+let lastFlyTime = 0;
+let spawnInterval = 1000;
 
+function makeFly()
+{
+    return {
+        x: 0,
+        y: random(100, 300),
+        size: 10,
+        speed: 3,
+        toRemove: false
+    }
+}
 /**
  * Creates the canvas and initializes the fly
  */
 function setup() {
     createCanvas(640, 480);
 
-    // Give the fly its first random position
-    resetFly();
+    flies.push(makeFly());
 }
 
 function draw() {
     background("#87ceeb");
-    moveFly();
-    drawFly();
+
+    for (const fly of flies)
+    {
+        moveFly(fly);
+        drawFly(fly);
+    }
+
+    //moveFly();
+    //drawFly();
     moveFrog();
     moveTongue();
     drawFrog();
     checkTongueFlyOverlap();
+
+    flies = flies.filter(fly => !fly.toRemove);
+
+    const currentTime = millis();  // Get current time in milliseconds
+    if (currentTime - lastFlyTime > spawnInterval) {
+        flies.push(makeFly());  // Add a new fly
+        lastFlyTime = currentTime;  // Reset the timer
+        spawnInterval = random(1000, 3000);
+    }
 }
 
 /**
  * Moves the fly according to its speed
  * Resets the fly if it gets all the way to the right
  */
-function moveFly() {
+function moveFly(fly) {
     // Move the fly
     fly.x += fly.speed;
     // Handle the fly going off the canvas
-    if (fly.x > width) {
-        resetFly();
-    }
+    //if (fly.x > width) {
+        //resetFly();
+    //}
 }
 
 /**
  * Draws the fly as a black circle
  */
-function drawFly() {
+function drawFly(fly) {
     push();
     noStroke();
     fill("#000000");
     ellipse(fly.x, fly.y, fly.size);
     pop();
-}
-
-/**
- * Resets the fly to the left with a random y
- */
-function resetFly() {
-    fly.x = 0;
-    fly.y = random(0, 300);
 }
 
 /**
@@ -160,15 +172,19 @@ function drawFrog() {
  * Handles the tongue overlapping the fly
  */
 function checkTongueFlyOverlap() {
-    // Get distance from tongue to fly
-    const d = dist(frog.tongue.x, frog.tongue.y, fly.x, fly.y);
-    // Check if it's an overlap
-    const eaten = (d < frog.tongue.size/2 + fly.size/2);
-    if (eaten) {
-        // Reset the fly
-        resetFly();
-        // Bring back the tongue
-        frog.tongue.state = "inbound";
+    for (const fly of flies)
+    {
+        // Get distance from tongue to fly
+        const d = dist(frog.tongue.x, frog.tongue.y, fly.x, fly.y);
+        // Check if it's an overlap
+        const eaten = (d < frog.tongue.size/2 + fly.size/2);
+        if (eaten) {
+            fly.toRemove = true;
+            // Reset the fly
+            //resetFly();
+            // Bring back the tongue
+            frog.tongue.state = "inbound";
+        }
     }
 }
 
