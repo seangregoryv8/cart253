@@ -44,10 +44,11 @@ function makeGhost()
         x: -50,
         y: random(100, 300),
         size: 40,
-        speed: 3,
+        speed: random(1, 6),
         toRemove: false,
         tail: [],
-        wave: random(3, 15)
+        wave: random(3, 15),
+        movement: random(1, 7)
     }
 }
 /**
@@ -93,7 +94,7 @@ function draw() {
 function moveGhost(ghost) {
     // Move the fly
     ghost.x += ghost.speed;
-    ghost.y += cos(frameCount / ghost.wave);
+    ghost.y += cos(frameCount / ghost.wave) * ghost.movement;
 }
 
 /**
