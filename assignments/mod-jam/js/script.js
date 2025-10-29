@@ -15,18 +15,21 @@
 
 "use strict";
 
+const MAXWIDTH = 640;
+const MAXHEIGHT = 800;
+
 // Our hunter
 const hunter = {
     // The hunter's body has a position and size
     body: {
-        x: 320,
-        y: 520,
+        x: MAXWIDTH / 2,
+        y: MAXHEIGHT + 40,
         size: 100
     },
     // The hunter's tongue has a position, size, speed, and state
     net: {
         x: undefined,
-        y: 480,
+        y: MAXHEIGHT,
         size: 20,
         speed: 20,
         // Determines how the tongue moves each frame
@@ -46,26 +49,26 @@ let keyState = {
     d: false,
 }
 
-const MAXWIDTH = 640;
 
 function makeGhost()
 {
     return {
         x: -50,
-        y: random(100, 300),
+        y: random(100, MAXHEIGHT - 100),
         size: 40,
         speed: random(1, 6),
         toRemove: false,
         tail: [],
         wave: random(3, 15),
-        movement: random(1, 7)
+        movement: random(1, 7),
+        color: random(160, 255)
     }
 }
 /**
  * Creates the canvas and initializes the fly
  */
 function setup() {
-    createCanvas(MAXWIDTH, 480);
+    createCanvas(MAXWIDTH, MAXHEIGHT);
 
     ghosts.push(makeGhost());
 }
@@ -113,8 +116,6 @@ function moveGhost(ghost) {
 function drawGhost(ghost) {
     push();
     noStroke();
-    fill("#ffffff");
-    ellipse(ghost.x, ghost.y, ghost.size);
     ghost.tail.unshift({x: ghost.x, y: ghost.y})
     if (ghost.tail.length > 30) ghost.tail.pop();
     // draw the tail
@@ -123,7 +124,7 @@ function drawGhost(ghost) {
         const tailPoint = ghost.tail[i];
         const pointSize = ghost.size * (ghost.tail.length - i) / ghost.tail.length;
         const pointAlpha = 255 * (ghost.tail.length - i) / ghost.tail.length;
-        fill(255, pointAlpha)
+        fill(ghost.color, pointAlpha)
         ellipse(tailPoint.x, tailPoint.y, pointSize)
     }
 
@@ -141,12 +142,20 @@ function drawGhost(ghost) {
  */
 function keyPressed()
 {
+    console.log(key + " pressed")
+    if (key === "Shift" && event.code === "ShiftLeft")
+        if (hunter.net.state === "idle")
+        hunter.net.state = "outbound";
+    if (key === "a" || key === "A") keyState.a = true;
+    if (key === "d" || key === "D") keyState.d = true;
     keyState[key] = true;
 }
 
 function keyReleased()
 {
-    keyState[key] = false;
+    console.log(key + " released")
+    if (key === "a" || key === "A") keyState.a = false;
+    if (key === "d" || key === "D") keyState.d = false;
 }
 
 /**
@@ -275,14 +284,5 @@ function checkNetGhostOverlap() {
             // Bring back the net
             hunter.net.state = "inbound";
         }
-    }
-}
-
-/**
- * Launch the net on click (if it's not launched yet)
- */
-function mousePressed() {
-    if (hunter.net.state === "idle") {
-        hunter.net.state = "outbound";
     }
 }
