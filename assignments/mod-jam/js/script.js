@@ -1,11 +1,11 @@
 /**
- * Frogfrogfrog
+ * hunterhunterhunter
  * Pippin Barr
  * 
- * A game of catching flies with your frog-tongue
+ * A game of catching flies with your hunter-tongue
  * 
  * Instructions:
- * - Move the frog with your mouse
+ * - Move the hunter with your mouse
  * - Click to launch the tongue
  * - Catch flies
  * 
@@ -15,16 +15,16 @@
 
 "use strict";
 
-// Our frog
-const frog = {
-    // The frog's body has a position and size
+// Our hunter
+const hunter = {
+    // The hunter's body has a position and size
     body: {
         x: 320,
         y: 520,
-        size: 150
+        size: 100
     },
-    // The frog's tongue has a position, size, speed, and state
-    tongue: {
+    // The hunter's tongue has a position, size, speed, and state
+    net: {
         x: undefined,
         y: 480,
         size: 20,
@@ -37,6 +37,16 @@ const frog = {
 let ghosts = [];
 let lastFlyTime = 0;
 let spawnInterval = 1000;
+
+let acceleration = 0;
+let maxAccelertaion = 6;
+
+let keyState = {
+    a: false,
+    d: false,
+}
+
+const MAXWIDTH = 640;
 
 function makeGhost()
 {
@@ -55,7 +65,7 @@ function makeGhost()
  * Creates the canvas and initializes the fly
  */
 function setup() {
-    createCanvas(640, 480);
+    createCanvas(MAXWIDTH, 480);
 
     ghosts.push(makeGhost());
 }
@@ -72,10 +82,10 @@ function draw() {
 
     //moveghost();
     //drawghost();
-    moveFrog();
-    moveTongue();
-    drawFrog();
-    checkTongueGhostOverlap();
+    moveHunter();
+    moveNet();
+    drawHunter();
+    checkNetGhostOverlap();
 
     ghosts = ghosts.filter(ghost => !ghost.toRemove);
 
@@ -127,91 +137,123 @@ function drawGhost(ghost) {
 }
 
 /**
- * Moves the frog to the mouse position on x
+ * This handles when specifically the spacebar is pressed
  */
-function moveFrog() {
-    frog.body.x = mouseX;
+function keyPressed()
+{
+    keyState[key] = true;
+}
+
+function keyReleased()
+{
+    keyState[key] = false;
+}
+
+/**
+ * Moves the hunter to the mouse position on x
+ */
+function moveHunter() {
+    if (keyState.a)
+    {
+        acceleration -= 0.05;
+        if (acceleration >= 0) acceleration -= 0.05
+    }
+    else if (keyState.d)
+    {
+        acceleration += 0.05;
+        if (acceleration <= 0) acceleration += 0.05
+    }
+    else acceleration = (acceleration >= 0) ? acceleration - 0.03 : acceleration + 0.03;
+
+    if (hunter.body.x - hunter.body.size <= 0) acceleration += 0.3;
+    if (hunter.body.x >= MAXWIDTH) acceleration -= 0.3;
+    if (acceleration > maxAccelertaion) acceleration = maxAccelertaion;
+    hunter.body.x += acceleration;
+    //hunter.body.x = mouseX;
 }
 
 /**
  * Handles moving the tongue based on its state
  */
-function moveTongue() {
-    // Tongue matches the frog's x
-    frog.tongue.x = frog.body.x;
-    // If the tongue is idle, it doesn't do anything
-    if (frog.tongue.state === "idle") {
+function moveNet() {
+    // Tongue matches the hunter's x
+    hunter.net.x = hunter.body.x;
+    // If the net is idle, it doesn't do anything
+    if (hunter.net.state === "idle") {
         // Do nothing
     }
-    // If the tongue is outbound, it moves up
-    else if (frog.tongue.state === "outbound") {
-        frog.tongue.y += -frog.tongue.speed;
-        // The tongue bounces back if it hits the top
-        if (frog.tongue.y <= 0) {
-            frog.tongue.state = "inbound";
+    // If the net is outbound, it moves up
+    else if (hunter.net.state === "outbound") {
+        hunter.net.y += -hunter.net.speed;
+        // The net bounces back if it hits the top
+        if (hunter.net.y <= 0) {
+            hunter.net.state = "inbound";
         }
     }
-    // If the tongue is inbound, it moves down
-    else if (frog.tongue.state === "inbound") {
-        frog.tongue.y += frog.tongue.speed;
-        // The tongue stops if it hits the bottom
-        if (frog.tongue.y >= height) {
-            frog.tongue.state = "idle";
+    // If the net is inbound, it moves down
+    else if (hunter.net.state === "inbound") {
+        hunter.net.y += hunter.net.speed;
+        // The net stops if it hits the bottom
+        if (hunter.net.y >= height) {
+            hunter.net.state = "idle";
         }
     }
 }
 
 /**
- * Displays the tongue (tip and line connection) and the frog (body)
+ * Displays the net (tip and line connection) and the hunter (body)
  */
-function drawFrog() {
-    // Draw the tongue tip
+function drawHunter() {
+    // Draw the net tip
     push();
     fill("#ff0000");
     noStroke();
-    ellipse(frog.tongue.x, frog.tongue.y, frog.tongue.size);
+    ellipse(hunter.net.x, hunter.net.y, hunter.net.size);
     pop();
 
-    // Draw the rest of the tongue
+    // Draw the rest of the net
     push();
     stroke("#ff0000");
-    strokeWeight(frog.tongue.size);
-    line(frog.tongue.x, frog.tongue.y, frog.body.x, frog.body.y);
+    strokeWeight(hunter.net.size);
+    line(hunter.net.x, hunter.net.y, hunter.body.x, hunter.body.y);
     pop();
 
-    // Draw the frog's body
+    // Draw the hunter's body
     push();
-    fill("#00ff00");
-    noStroke();
-    ellipse(frog.body.x, frog.body.y, frog.body.size);
+    fill("#ffe2c9");
+    stroke(0);
+    ellipse(hunter.body.x - 50, hunter.body.y, hunter.body.size, 300);
+    ellipse(hunter.body.x - 50, hunter.body.y - hunter.body.size * 1.5, hunter.body.size * 0.75)
+
+    // Draw his funny shirt
     pop();
 }
 
 /**
- * Handles the tongue overlapping the ghost
+ * Handles the net overlapping the ghost
  */
-function checkTongueGhostOverlap() {
+function checkNetGhostOverlap() {
     for (const ghost of ghosts)
     {
-        // Get distance from tongue to ghost
-        const d = dist(frog.tongue.x, frog.tongue.y, ghost.x, ghost.y);
+        // Get distance from net to ghost
+        const d = dist(hunter.net.x, hunter.net.y, ghost.x, ghost.y);
         // Check if it's an overlap
-        const eaten = (d < frog.tongue.size/2 + ghost.size/2);
+        const eaten = (d < hunter.net.size/2 + ghost.size/2);
         if (eaten) {
             ghost.toRemove = true;
             // Reset the ghost
             //resetghost();
-            // Bring back the tongue
-            frog.tongue.state = "inbound";
+            // Bring back the net
+            hunter.net.state = "inbound";
         }
     }
 }
 
 /**
- * Launch the tongue on click (if it's not launched yet)
+ * Launch the net on click (if it's not launched yet)
  */
 function mousePressed() {
-    if (frog.tongue.state === "idle") {
-        frog.tongue.state = "outbound";
+    if (hunter.net.state === "idle") {
+        hunter.net.state = "outbound";
     }
 }
