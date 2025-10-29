@@ -29,8 +29,8 @@ const hunter = {
     // The hunter's tongue has a position, size, speed, and state
     net: {
         x: undefined,
-        y: MAXHEIGHT,
-        size: 20,
+        y: MAXHEIGHT - 300,
+        size: 15,
         speed: 20,
         // Determines how the tongue moves each frame
         state: "idle" // State can be: idle, outbound, inbound
@@ -48,6 +48,8 @@ let keyState = {
     a: false,
     d: false,
 }
+
+let caughtGhost = false;
 
 
 function makeGhost()
@@ -205,6 +207,7 @@ function moveNet() {
         // The net stops if it hits the bottom
         if (hunter.net.y >= height) {
             hunter.net.state = "idle";
+            caughtGhost = false;
         }
     }
 }
@@ -213,19 +216,41 @@ function moveNet() {
  * Displays the net (tip and line connection) and the hunter (body)
  */
 function drawHunter() {
-    // Draw the net tip
-    push();
-    fill("#ff0000");
-    noStroke();
-    ellipse(hunter.net.x, hunter.net.y, hunter.net.size);
-    pop();
 
     // Draw the rest of the net
     push();
-    stroke("#ff0000");
+    stroke("#8a7362");
     strokeWeight(hunter.net.size);
     line(hunter.net.x, hunter.net.y, hunter.body.x, hunter.body.y);
     pop();
+
+    // Draw the net tip
+    push();
+    noStroke();
+    let netOffset = hunter.net.size * 2.3
+    fill(0, 80);
+    ellipse(hunter.net.x + 27, hunter.net.y - netOffset, hunter.net.size * 8, 60);
+
+    stroke("#8a7362");
+    strokeWeight(10);  // Border thickness
+    noFill();  // No fill for the outer circle, it's hollow
+    ellipse(hunter.net.x, hunter.net.y - netOffset, hunter.net.size * 4);
+    pop();
+
+    if (caughtGhost)
+    {
+        noStroke();
+        fill(255);
+        let netGhostX = hunter.net.x;
+        let netGhostY = hunter.net.y - 35;
+        let netGhostSize = hunter.net.size * 2.5;
+        ellipse(netGhostX, netGhostY, netGhostSize);
+        fill(0)
+        ellipse(netGhostX - 8, netGhostY, netGhostSize / 4)
+        ellipse(netGhostX + 8, netGhostY, netGhostSize / 4)
+        ellipse(netGhostX, netGhostY + 10, netGhostSize / 4)
+    }
+
 
     // Draw the hunter's body
     push();
@@ -247,9 +272,9 @@ function drawHunter() {
     let shirtGhostX = hunter.body.x - 55;
     let shirtGhostY = hunter.body.y - 98;
     let shirtGhostSize = hunter.body.size / 4;
-    ellipse(shirtGhostX, shirtGhostY, shirtGhostSize);
     ellipse(shirtGhostX + 10, shirtGhostY + 20, shirtGhostSize);
     rect(shirtGhostX - 10, shirtGhostY + 10, 40, 10);
+    ellipse(shirtGhostX, shirtGhostY, shirtGhostSize);
     fill(0);
     ellipse(shirtGhostX - 6, shirtGhostY, shirtGhostSize / 4)
     ellipse(shirtGhostX + 6, shirtGhostY, shirtGhostSize / 4)
@@ -279,10 +304,9 @@ function checkNetGhostOverlap() {
         const eaten = (d < hunter.net.size/2 + ghost.size/2);
         if (eaten) {
             ghost.toRemove = true;
-            // Reset the ghost
-            //resetghost();
             // Bring back the net
             hunter.net.state = "inbound";
+            caughtGhost = true;
         }
     }
 }
