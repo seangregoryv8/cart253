@@ -220,12 +220,41 @@ function drawHunter() {
 
     // Draw the hunter's body
     push();
-    fill("#ffe2c9");
     stroke(0);
+    fill("#bbbbbb")
     ellipse(hunter.body.x - 50, hunter.body.y, hunter.body.size, 300);
+    fill("#ffe2c9");
     ellipse(hunter.body.x - 50, hunter.body.y - hunter.body.size * 1.5, hunter.body.size * 0.75)
 
     // Draw his funny shirt
+    noStroke();
+    fill("#ff0000")
+    ellipse(hunter.body.x - 50, hunter.body.y - hunter.body.size + 20, hunter.body.size * 0.5);
+    pop();
+
+    push();
+    noStroke();
+    fill(255);
+    let shirtGhostX = hunter.body.x - 55;
+    let shirtGhostY = hunter.body.y - 98;
+    let shirtGhostSize = hunter.body.size / 4;
+    ellipse(shirtGhostX, shirtGhostY, shirtGhostSize);
+    ellipse(shirtGhostX + 10, shirtGhostY + 20, shirtGhostSize);
+    rect(shirtGhostX - 10, shirtGhostY + 10, 40, 10);
+    fill(0);
+    ellipse(shirtGhostX - 6, shirtGhostY, shirtGhostSize / 4)
+    ellipse(shirtGhostX + 6, shirtGhostY, shirtGhostSize / 4)
+    ellipse(shirtGhostX, shirtGhostY + 7, shirtGhostSize / 4)
+    pop();
+
+    push();
+    noStroke();
+    translate(hunter.body.x - 50, hunter.body.y - hunter.body.size + 20)
+    rectMode(CENTER);
+    fill(255);
+    fill("#ff0000");
+    rotate(4);
+    rect(0, 0, 10, 40);
     pop();
 }
 
