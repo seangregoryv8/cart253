@@ -23,13 +23,14 @@ const hunter = {
     // The hunter's body has a position and size
     body: {
         x: MAXWIDTH / 2,
-        y: MAXHEIGHT + 40,
+        y: MAXHEIGHT - 40,
         size: 100
     },
     // The hunter's tongue has a position, size, speed, and state
     net: {
         x: undefined,
-        y: MAXHEIGHT - 300,
+        y: MAXHEIGHT - 100,
+        maxHeight: MAXHEIGHT - 100,
         size: 15,
         speed: 20,
         // Determines how the tongue moves each frame
@@ -56,7 +57,7 @@ function makeGhost()
 {
     return {
         x: -50,
-        y: random(100, MAXHEIGHT - 100),
+        y: random(100, MAXHEIGHT - 200),
         size: 40,
         speed: random(1, 6),
         toRemove: false,
@@ -66,6 +67,8 @@ function makeGhost()
         color: random(160, 255)
     }
 }
+
+let stars = [];
 /**
  * Creates the canvas and initializes the fly
  */
@@ -73,24 +76,53 @@ function setup() {
     createCanvas(MAXWIDTH, MAXHEIGHT);
 
     ghosts.push(makeGhost());
+
+    // Draw 30 stars in the top half of the canvas
+    for (let i = 0; i < 30; i++) {
+        let x = random(width);  // Random x position
+        let y = random(height / 1.5);  // Random y position in the top half of the canvas
+        let size = random(2, 5);  // Random size for each star
+
+        stars.push({x: x, y: y, size: size})
+    }
+  pop();
+}
+
+function drawBackground()
+{
+    push();
+    fill("#87ceeb")
+    for (let i = -60; i <= MAXWIDTH; i += 30)
+    {
+        triangle(i, MAXHEIGHT, i + 90, MAXHEIGHT, i + 45, MAXHEIGHT - 30);
+    }
+    pop();     
 }
 
 function draw() {
-    
-    background("#87ceeb");
-  
-    for (const ghost of ghosts)
+    background(90);
+    push();
+    fill(255);
+    for (const star of stars)
     {
-        moveGhost(ghost);
-        drawGhost(ghost);
+        ellipse(star.x, star.y, star.size)
     }
+    pop();
 
     //moveghost();
     //drawghost();
     moveHunter();
     moveNet();
     drawHunter();
+
+    for (const ghost of ghosts)
+    {
+        moveGhost(ghost);
+        drawGhost(ghost);
+    }
     checkNetGhostOverlap();
+
+    drawBackground();
 
     ghosts = ghosts.filter(ghost => !ghost.toRemove);
 
@@ -205,7 +237,7 @@ function moveNet() {
     else if (hunter.net.state === "inbound") {
         hunter.net.y += hunter.net.speed;
         // The net stops if it hits the bottom
-        if (hunter.net.y >= height) {
+        if (hunter.net.y >= hunter.net.maxHeight) {
             hunter.net.state = "idle";
             caughtGhost = false;
         }
@@ -224,19 +256,6 @@ function drawHunter() {
     line(hunter.net.x, hunter.net.y, hunter.body.x, hunter.body.y);
     pop();
 
-    // Draw the net tip
-    push();
-    noStroke();
-    let netOffset = hunter.net.size * 2.3
-    fill(0, 80);
-    ellipse(hunter.net.x + 27, hunter.net.y - netOffset, hunter.net.size * 8, 60);
-
-    stroke("#8a7362");
-    strokeWeight(10);  // Border thickness
-    noFill();  // No fill for the outer circle, it's hollow
-    ellipse(hunter.net.x, hunter.net.y - netOffset, hunter.net.size * 4);
-    pop();
-
     if (caughtGhost)
     {
         noStroke();
@@ -250,6 +269,19 @@ function drawHunter() {
         ellipse(netGhostX + 8, netGhostY, netGhostSize / 4)
         ellipse(netGhostX, netGhostY + 10, netGhostSize / 4)
     }
+
+    // Draw the net tip
+    push();
+    noStroke();
+    let netOffset = hunter.net.size * 2.3
+    fill(0, 80);
+    ellipse(hunter.net.x + 27, hunter.net.y - netOffset, hunter.net.size * 8, 60);
+
+    stroke("#8a7362");
+    strokeWeight(10);  // Border thickness
+    noFill();  // No fill for the outer circle, it's hollow
+    ellipse(hunter.net.x, hunter.net.y - netOffset, hunter.net.size * 4);
+    pop();
 
 
     // Draw the hunter's body
@@ -290,6 +322,15 @@ function drawHunter() {
     rotate(4);
     rect(0, 0, 10, 40);
     pop();
+
+    noStroke();
+    fill("#8a7362");
+    // Now for the boat
+    let funX = hunter.body.x - 200;
+    let funY = MAXHEIGHT - 60;
+    rect(funX - 1, funY, 305, 70);
+    triangle(funX, funY, funX - 40, funY, funX, funY + 61);
+    triangle(funX + 300, funY, funX + 440, funY, funX + 300, funY + 61);
 }
 
 /**
@@ -301,7 +342,7 @@ function checkNetGhostOverlap() {
         // Get distance from net to ghost
         const d = dist(hunter.net.x, hunter.net.y, ghost.x, ghost.y);
         // Check if it's an overlap
-        const eaten = (d < hunter.net.size/2 + ghost.size/2);
+        const eaten = (d < hunter.net.size / 2 + ghost.size / 2);
         if (eaten) {
             ghost.toRemove = true;
             // Bring back the net
