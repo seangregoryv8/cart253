@@ -23,7 +23,7 @@ body {
 {
   position: absolute;
   top: 0;
-  left: 5%; 
+  left: 2%; 
   margin-inline: auto; 
   width: fit-content;
   text-align: center;
@@ -33,7 +33,7 @@ body {
 {
   position: absolute;
   top: 0;
-  right: 5%; 
+  right: 2%; 
   margin-inline: auto; 
   width: fit-content;
   text-align: center;

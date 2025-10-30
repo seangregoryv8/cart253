@@ -1,13 +1,21 @@
+let waveIndex = 0;
 /**
  * This draws all the waves that the player rides upon
  */
-function drawWaves()
-{
+function drawWaves() {
     push();
-    fill("#87ceeb")
+    fill("#87ceeb");
+
     for (let i = -60; i <= MAXWIDTH; i += 30)
-        triangle(i, MAXHEIGHT, i + 90, MAXHEIGHT, i + 45, MAXHEIGHT - 30);
-    pop();     
+    {
+        let waveX = i + waveIndex;
+        triangle(waveX, MAXHEIGHT, waveX + 90, MAXHEIGHT, waveX + 45, MAXHEIGHT - 30);
+    }
+
+    pop();
+
+    waveIndex -= 0.5;
+    if (waveIndex == -30) waveIndex = 0;
 }
 
 /**
@@ -134,7 +142,28 @@ function drawHunter()
     fill("#bbbbbb")
     ellipse(hunter.body.x - 50, hunter.body.y, hunter.body.size, 300);
     fill("#ffe2c9");
-    ellipse(hunter.body.x - 50, hunter.body.y - hunter.body.size * 1.5, hunter.body.size * 0.75)
+    translate(hunter.body.x - 50, hunter.body.y - hunter.body.size * 1.5)
+    ellipse(0, 0, hunter.body.size * 0.75)
+    fill(255);
+
+    // Now we draw his eyes
+    ellipse(-15, -15, 20, 30)
+    ellipse(15, -15, 20, 30)
+    fill("#1569C7")
+    noStroke();
+    ellipse(-20, -20, 10);
+    ellipse(10, -20, 10);
+    fill(0)
+    noStroke();
+    ellipse(-21, -21, 5);
+    ellipse(9, -21, 5);
+    fill(255)
+    noStroke();
+    ellipse(-20, -21, 2);
+    ellipse(10, -21, 2);
+
+    fill("#ffe2c9");
+    rect(-30, -10, 60, 10)
     pop();
 
     drawGhostbusterLogo();

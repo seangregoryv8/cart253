@@ -127,11 +127,22 @@ function draw()
 
 function spawnGhosts()
 {
+    let grace = 0;
     const currentTime = millis();  // Get current time in milliseconds
-    if (currentTime - lastFlyTime > spawnInterval) {
-        ghosts.push(makeGhost());  // Add a new fly
+    if (currentTime - lastFlyTime > spawnInterval)
+    {
+        let ranNum = Math.round(random(1, 100))
+        if (ranNum === 69)
+            for (let i = 0; i < 50; i++)
+                ghosts.push(makeGhost())
+        do
+        {
+            grace++;
+            ghosts.push(makeGhost());  // Add a new ghost
+            ranNum -= 20
+        } while (ranNum > 20)
         lastFlyTime = currentTime;  // Reset the timer
-        spawnInterval = random(1000, 3000);
+        spawnInterval = random(1000 * grace, 3000 * grace);
     }
 }
 
@@ -156,7 +167,6 @@ function moveGhost(ghost)
  */
 function keyPressed()
 {
-    console.log(key + " pressed")
     if (key === "Shift" && event.code === "ShiftLeft")
         if (hunter.net.state === "idle")
         hunter.net.state = "outbound";
@@ -167,7 +177,6 @@ function keyPressed()
 
 function keyReleased()
 {
-    console.log(key + " released")
     if (key === "a" || key === "A") keyState.a = false;
     if (key === "d" || key === "D") keyState.d = false;
 }
@@ -186,11 +195,13 @@ function moveHunter() {
         acceleration += 0.05;
         if (acceleration <= 0) acceleration += 0.05
     }
-    else acceleration = (acceleration >= 0) ? acceleration - 0.03 : acceleration + 0.03;
+    else acceleration = (acceleration == 0) ? 0 : (acceleration > 0) ? acceleration - 0.03 : acceleration + 0.03;
 
     if (hunter.body.x - hunter.body.size <= 0) acceleration += 0.3;
     if (hunter.body.x >= MAXWIDTH) acceleration -= 0.3;
     if (acceleration > maxAccelertaion) acceleration = maxAccelertaion;
+
+    if (acceleration < 0.05 && acceleration > -0.05) acceleration = 0;
     hunter.body.x += acceleration;
     //hunter.body.x = mouseX;
 }
@@ -202,7 +213,7 @@ function moveNet() {
     // Tongue matches the hunter's x
     hunter.net.x = hunter.body.x;
     // If the net is idle, it doesn't do anything
-    if (hunter.net.state === "idle") {
+    if (hunter.net.state === "idle"){
         // Do nothing
     }
     // If the net is outbound, it moves up
@@ -239,7 +250,7 @@ function checkNetGhostOverlap()
         if (eaten)
         {
             ghost.toRemove = true;
-            scorePlayer(ghost);
+            scorePlayer(ghost, !(hunter.net.state == "inbound"));
             // Bring back the net
             hunter.net.state = "inbound";
             caughtGhost = true;
@@ -266,18 +277,25 @@ function penalizePlayer(ghost)
     document.getElementById("lostGhostInfo").innerText = p
 }
 
-function scorePlayer(ghost)
+function scorePlayer(ghost, headCatch)
 {
     let speedG = Math.round(ghost.speed);
     let waveG = Math.round(ghost.wave);
     let moveG = Math.round(ghost.movement);
+
+    let addedScore = Math.round((speedG * 2) + (waveG * 1.5) + (moveG * 1.5))
+
     let p = "";
     p += "GHOST CAUGHT!\n"
+    if (headCatch)
+    {
+        p += "HEAD CATCH! +10\n"
+        addedScore += 10
+    }
     p += "Speed: " + speedG + "\n"
     p += "Waviness: " + waveG + "\n"
     p += "Jitteryness: " + moveG + "\n"
 
-    let addedScore = Math.round((speedG * 2) + (waveG * 1.5) + (moveG * 1.5))
 
     p += "Quality: " + addedScore
     score += addedScore
