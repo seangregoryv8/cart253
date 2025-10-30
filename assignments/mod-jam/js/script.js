@@ -72,20 +72,21 @@ let stars = [];
 /**
  * Creates the canvas and initializes the fly
  */
-function setup() {
+function setup()
+{
     createCanvas(MAXWIDTH, MAXHEIGHT);
 
     ghosts.push(makeGhost());
 
-    // Draw 30 stars in the top half of the canvas
-    for (let i = 0; i < 30; i++) {
+    // Draw a bunch of stars in the top half of the canvas
+    for (let i = 0; i < 100; i++) {
         let x = random(width);  // Random x position
         let y = random(height / 1.5);  // Random y position in the top half of the canvas
         let size = random(2, 5);  // Random size for each star
 
         stars.push({x: x, y: y, size: size})
     }
-  pop();
+    pop();
 }
 
 function drawBackground()
@@ -101,6 +102,19 @@ function drawBackground()
 
 function draw() {
     background(90);
+
+    fill(255);
+    ellipse(MAXWIDTH - 100, 100, 115)
+    fill(90);
+    ellipse(MAXWIDTH - 120, 100, 115)
+
+    fill("#06402B")
+    ellipse(100, MAXHEIGHT - 60, 600, 300)
+    fill("#2C6B4F")
+    ellipse(MAXWIDTH, MAXHEIGHT - 100, 600, 200)
+    fill("#3B6F41")
+    ellipse(MAXWIDTH / 2, MAXHEIGHT + 40, 600, 300)
+
     push();
     fill(255);
     for (const star of stars)
@@ -342,8 +356,10 @@ function checkNetGhostOverlap() {
         // Get distance from net to ghost
         const d = dist(hunter.net.x, hunter.net.y, ghost.x, ghost.y);
         // Check if it's an overlap
-        const eaten = (d < hunter.net.size / 2 + ghost.size / 2);
+        const eaten = (d < hunter.net.size / 2 + ghost.size);
         if (eaten) {
+            console.log(hunter.net.size / 2 + ghost.size / 2);
+            console.log(d);
             ghost.toRemove = true;
             // Bring back the net
             hunter.net.state = "inbound";
