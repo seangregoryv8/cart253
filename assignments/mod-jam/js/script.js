@@ -52,12 +52,24 @@ let keyState = {
 
 let caughtGhost = false;
 
-
+/**
+ * This returns a new ghost
+ * @returns A new ghost object with:
+ * x: Its X value starting point (always -50 for off-screen)
+ * y: Its Y value, which can be anywhere on screen with a 200 pixel grace area
+ * size: Always 40, size of the circle
+ * speed: how fast it moves off-screen
+ * toRemove: When its caught, it will notify the array when to remove it
+ * tail: a small array for the tail class, that makes 30 instances of the circle to act as the "spooky" tail
+ * wave: the phases between its waves
+ * movement: How much it waves across the screen
+ * color: what shade of gray it is
+ */
 function makeGhost()
 {
     return {
         x: -50,
-        y: random(100, MAXHEIGHT - 200),
+        y: random(200, MAXHEIGHT - 200),
         size: 40,
         speed: random(1, 6),
         toRemove: false,
@@ -68,7 +80,11 @@ function makeGhost()
     }
 }
 
+/**
+ * This is for the stars in the sky
+ */
 let stars = [];
+
 /**
  * Creates the canvas and initializes the fly
  */
@@ -76,58 +92,24 @@ function setup()
 {
     createCanvas(MAXWIDTH, MAXHEIGHT);
 
-    ghosts.push(makeGhost());
-
     // Draw a bunch of stars in the top half of the canvas
-    for (let i = 0; i < 100; i++) {
-        let x = random(width);  // Random x position
-        let y = random(height / 1.5);  // Random y position in the top half of the canvas
-        let size = random(2, 5);  // Random size for each star
+    for (let i = 0; i < 100; i++)
+        stars.push({x: random(width), y: random(height / 1.5), size: random(2, 5)})
 
-        stars.push({x: x, y: y, size: size})
-    }
-    pop();
+    drawMoon();
 }
 
-function drawBackground()
+function draw()
 {
-    push();
-    fill("#87ceeb")
-    for (let i = -60; i <= MAXWIDTH; i += 30)
-    {
-        triangle(i, MAXHEIGHT, i + 90, MAXHEIGHT, i + 45, MAXHEIGHT - 30);
-    }
-    pop();     
-}
-
-function draw() {
     background(90);
 
-    fill(255);
-    ellipse(MAXWIDTH - 100, 100, 115)
-    fill(90);
-    ellipse(MAXWIDTH - 120, 100, 115)
+    drawMoon();
+    drawLandscape();
+    drawStars();
 
-    fill("#06402B")
-    ellipse(100, MAXHEIGHT - 60, 600, 300)
-    fill("#2C6B4F")
-    ellipse(MAXWIDTH, MAXHEIGHT - 100, 600, 200)
-    fill("#3B6F41")
-    ellipse(MAXWIDTH / 2, MAXHEIGHT + 40, 600, 300)
-
-    push();
-    fill(255);
-    for (const star of stars)
-    {
-        ellipse(star.x, star.y, star.size)
-    }
-    pop();
-
-    //moveghost();
-    //drawghost();
+    drawHunter();
     moveHunter();
     moveNet();
-    drawHunter();
 
     for (const ghost of ghosts)
     {
@@ -136,10 +118,15 @@ function draw() {
     }
     checkNetGhostOverlap();
 
-    drawBackground();
+    drawWaves();
 
     ghosts = ghosts.filter(ghost => !ghost.toRemove);
 
+    spawnGhosts();
+}
+
+function spawnGhosts()
+{
     const currentTime = millis();  // Get current time in milliseconds
     if (currentTime - lastFlyTime > spawnInterval) {
         ghosts.push(makeGhost());  // Add a new fly
@@ -156,33 +143,6 @@ function moveGhost(ghost) {
     // Move the fly
     ghost.x += ghost.speed;
     ghost.y += cos(frameCount / ghost.wave) * ghost.movement;
-}
-
-/**
- * Draws the fly as a black circle
- */
-function drawGhost(ghost) {
-    push();
-    noStroke();
-    ghost.tail.unshift({x: ghost.x, y: ghost.y})
-    if (ghost.tail.length > 30) ghost.tail.pop();
-    // draw the tail
-    for (let i = 0; i < ghost.tail.length; i++)
-    {
-        const tailPoint = ghost.tail[i];
-        const pointSize = ghost.size * (ghost.tail.length - i) / ghost.tail.length;
-        const pointAlpha = 255 * (ghost.tail.length - i) / ghost.tail.length;
-        fill(ghost.color, pointAlpha)
-        ellipse(tailPoint.x, tailPoint.y, pointSize)
-    }
-
-    fill("#000000");
-    ellipse(ghost.x - 8, ghost.y - 3, ghost.size / 4)
-    ellipse(ghost.x + 8, ghost.y - 3, ghost.size / 4)
-    ellipse(ghost.x, ghost.y + 10, ghost.size / 4)
-
-
-    pop();
 }
 
 /**
@@ -258,94 +218,6 @@ function moveNet() {
     }
 }
 
-/**
- * Displays the net (tip and line connection) and the hunter (body)
- */
-function drawHunter() {
-
-    // Draw the rest of the net
-    push();
-    stroke("#8a7362");
-    strokeWeight(hunter.net.size);
-    line(hunter.net.x, hunter.net.y, hunter.body.x, hunter.body.y);
-    pop();
-
-    if (caughtGhost)
-    {
-        noStroke();
-        fill(255);
-        let netGhostX = hunter.net.x;
-        let netGhostY = hunter.net.y - 35;
-        let netGhostSize = hunter.net.size * 2.5;
-        ellipse(netGhostX, netGhostY, netGhostSize);
-        fill(0)
-        ellipse(netGhostX - 8, netGhostY, netGhostSize / 4)
-        ellipse(netGhostX + 8, netGhostY, netGhostSize / 4)
-        ellipse(netGhostX, netGhostY + 10, netGhostSize / 4)
-    }
-
-    // Draw the net tip
-    push();
-    noStroke();
-    let netOffset = hunter.net.size * 2.3
-    fill(0, 80);
-    ellipse(hunter.net.x + 27, hunter.net.y - netOffset, hunter.net.size * 8, 60);
-
-    stroke("#8a7362");
-    strokeWeight(10);  // Border thickness
-    noFill();  // No fill for the outer circle, it's hollow
-    ellipse(hunter.net.x, hunter.net.y - netOffset, hunter.net.size * 4);
-    pop();
-
-
-    // Draw the hunter's body
-    push();
-    stroke(0);
-    fill("#bbbbbb")
-    ellipse(hunter.body.x - 50, hunter.body.y, hunter.body.size, 300);
-    fill("#ffe2c9");
-    ellipse(hunter.body.x - 50, hunter.body.y - hunter.body.size * 1.5, hunter.body.size * 0.75)
-
-    // Draw his funny shirt
-    noStroke();
-    fill("#ff0000")
-    ellipse(hunter.body.x - 50, hunter.body.y - hunter.body.size + 20, hunter.body.size * 0.5);
-    pop();
-
-    push();
-    noStroke();
-    fill(255);
-    let shirtGhostX = hunter.body.x - 55;
-    let shirtGhostY = hunter.body.y - 98;
-    let shirtGhostSize = hunter.body.size / 4;
-    ellipse(shirtGhostX + 10, shirtGhostY + 20, shirtGhostSize);
-    rect(shirtGhostX - 10, shirtGhostY + 10, 40, 10);
-    ellipse(shirtGhostX, shirtGhostY, shirtGhostSize);
-    fill(0);
-    ellipse(shirtGhostX - 6, shirtGhostY, shirtGhostSize / 4)
-    ellipse(shirtGhostX + 6, shirtGhostY, shirtGhostSize / 4)
-    ellipse(shirtGhostX, shirtGhostY + 7, shirtGhostSize / 4)
-    pop();
-
-    push();
-    noStroke();
-    translate(hunter.body.x - 50, hunter.body.y - hunter.body.size + 20)
-    rectMode(CENTER);
-    fill(255);
-    fill("#ff0000");
-    rotate(4);
-    rect(0, 0, 10, 40);
-    pop();
-
-    noStroke();
-    fill("#8a7362");
-    // Now for the boat
-    let funX = hunter.body.x - 200;
-    let funY = MAXHEIGHT - 60;
-    rect(funX - 1, funY, 305, 70);
-    triangle(funX, funY, funX - 40, funY, funX, funY + 61);
-    triangle(funX + 300, funY, funX + 440, funY, funX + 300, funY + 61);
-}
 
 /**
  * Handles the net overlapping the ghost
