@@ -222,20 +222,47 @@ function moveNet() {
 /**
  * Handles the net overlapping the ghost
  */
-function checkNetGhostOverlap() {
+function checkNetGhostOverlap()
+{
     for (const ghost of ghosts)
     {
         // Get distance from net to ghost
         const d = dist(hunter.net.x, hunter.net.y, ghost.x, ghost.y);
         // Check if it's an overlap
         const eaten = (d < hunter.net.size / 2 + ghost.size);
-        if (eaten) {
-            console.log(hunter.net.size / 2 + ghost.size / 2);
-            console.log(d);
+        if (eaten)
+        {
             ghost.toRemove = true;
+            scorePlayer(ghost);
             // Bring back the net
             hunter.net.state = "inbound";
             caughtGhost = true;
         }
     }
+}
+
+function scorePlayer(ghost)
+{
+    let speedG = Math.round(ghost.speed);
+    let waveG = Math.round(ghost.wave);
+    let moveG = Math.round(ghost.movement);
+    let p = "";
+    p += "GHOST CAUGHT!\n"
+    p += "Speed: " + speedG + "\n"
+    p += "Waviness: " + waveG + "\n"
+    p += "Jitteryness: " + moveG + "\n"
+
+    let addedScore = Math.round((speedG * 2) + (waveG * 1.5) + (moveG * 1.5))
+
+    p += "Quality: " + addedScore
+    score += addedScore
+    document.getElementById("currentScore").innerText = score;
+    document.getElementById("ghostInfo").innerText = p
+}
+
+let score = 0;
+
+function addScore(addScore)
+{
+
 }

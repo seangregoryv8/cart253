@@ -18,3 +18,24 @@ body {
   height: 100vh; /* Body is the height of the viewport */
   overflow: hidden; /* Hide anything that goes off the window size */
 }
+
+.scoreboard
+{
+  position: absolute;
+  top: 0;
+  left: 5%; 
+  margin-inline: auto; 
+  width: fit-content;
+  text-align: center;
+}
+
+.mainScore
+{
+  position: absolute;
+  bottom: 0;
+  left: 0; 
+  right: 0; 
+  margin-inline: auto; 
+  width: fit-content;
+  text-align: center;
+}
