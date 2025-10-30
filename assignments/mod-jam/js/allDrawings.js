@@ -15,7 +15,7 @@ function drawWaves() {
     pop();
 
     waveIndex -= 0.5;
-    if (waveIndex == -30) waveIndex = 0;
+    if (waveIndex <= -30 || waveIndex >= 30) waveIndex = 0;
 }
 
 /**

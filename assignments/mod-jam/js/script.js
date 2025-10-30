@@ -38,6 +38,26 @@ const hunter = {
     }
 };
 
+// Our hunter
+const hunter2 = {
+    // The hunter's body has a position and size
+    body: {
+        x: MAXWIDTH / 2,
+        y: MAXHEIGHT - 40,
+        size: 100
+    },
+    // The hunter's tongue has a position, size, speed, and state
+    net: {
+        x: undefined,
+        y: MAXHEIGHT - 100,
+        maxHeight: MAXHEIGHT - 100,
+        size: 15,
+        speed: 20,
+        // Determines how the tongue moves each frame
+        state: "idle" // State can be: idle, outbound, inbound
+    }
+};
+
 let ghosts = [];
 let lastFlyTime = 0;
 let spawnInterval = 1000;
@@ -46,11 +66,16 @@ let acceleration = 0;
 let maxAccelertaion = 6;
 
 let keyState = {
+    w: false,
     a: false,
     d: false,
+    i: false,
+    j: false,
+    l: false
 }
 
 let caughtGhost = false;
+let caughtGhost2 = false;
 
 /**
  * This returns a new ghost
@@ -167,9 +192,12 @@ function moveGhost(ghost)
  */
 function keyPressed()
 {
-    if (key === "Shift" && event.code === "ShiftLeft")
+    if ((key === "w" || key === "W") && !keyState.w)
+    {
+        keyState.w = true;
         if (hunter.net.state === "idle")
-        hunter.net.state = "outbound";
+            hunter.net.state = "outbound";
+    }
     if (key === "a" || key === "A") keyState.a = true;
     if (key === "d" || key === "D") keyState.d = true;
     keyState[key] = true;
@@ -177,6 +205,7 @@ function keyPressed()
 
 function keyReleased()
 {
+    if (key === "w" || key === "W") keyState.w = false;
     if (key === "a" || key === "A") keyState.a = false;
     if (key === "d" || key === "D") keyState.d = false;
 }
@@ -202,6 +231,7 @@ function moveHunter() {
     if (acceleration > maxAccelertaion) acceleration = maxAccelertaion;
 
     if (acceleration < 0.05 && acceleration > -0.05) acceleration = 0;
+    waveIndex -= (acceleration / 4)
     hunter.body.x += acceleration;
     //hunter.body.x = mouseX;
 }
