@@ -1,1 +1,0 @@
-let coop = true;

@@ -15,55 +15,29 @@
 
 "use strict";
 
-const MAXWIDTH = 640;
+const MAXWIDTH = 900;
 const MAXHEIGHT = 800;
+let coop = false;
+let gameState = "title";
 
-// Our hunter
-const hunter = {
-    // The hunter's body has a position and size
-    body: {
-        x: MAXWIDTH / 2,
-        y: MAXHEIGHT - 40,
-        size: 100
-    },
-    // The hunter's tongue has a position, size, speed, and state
-    net: {
-        x: undefined,
-        y: MAXHEIGHT - 100,
-        maxHeight: MAXHEIGHT - 100,
-        size: 15,
-        speed: 20,
-        // Determines how the tongue moves each frame
-        state: "idle" // State can be: idle, outbound, inbound
-    }
-};
+const hunter1Controls = {
+    left: 65,
+    right: 68,
+    net: 16
+}
 
-// Our hunter
-const hunter2 = {
-    // The hunter's body has a position and size
-    body: {
-        x: MAXWIDTH / 2,
-        y: MAXHEIGHT - 40,
-        size: 100
-    },
-    // The hunter's tongue has a position, size, speed, and state
-    net: {
-        x: undefined,
-        y: MAXHEIGHT - 100,
-        maxHeight: MAXHEIGHT - 100,
-        size: 15,
-        speed: 20,
-        // Determines how the tongue moves each frame
-        state: "idle" // State can be: idle, outbound, inbound
-    }
-};
+const hunter2Controls = {
+    left: 74,
+    right: 76,
+    net: 73
+}
+
+let hunter;
+let hunter2;
 
 let ghosts = [];
 let lastFlyTime = 0;
 let spawnInterval = 1000;
-
-let acceleration = 0;
-let maxAccelertaion = 6;
 
 let keyState = {
     w: false,
@@ -73,9 +47,6 @@ let keyState = {
     j: false,
     l: false
 }
-
-let caughtGhost = false;
-let caughtGhost2 = false;
 
 /**
  * This returns a new ghost
@@ -116,38 +87,139 @@ let stars = [];
 function setup()
 {
     createCanvas(MAXWIDTH, MAXHEIGHT);
-
     // Draw a bunch of stars in the top half of the canvas
     for (let i = 0; i < 100; i++)
         stars.push({x: random(width), y: random(height / 1.5), size: random(2, 5)})
 
-    drawMoon();
+    if (coop)
+    {
+        hunter = new Hunter(MAXWIDTH - 100, MAXHEIGHT - 40, 100, "P1", hunter1Controls)
+        hunter2 = new Hunter(100, MAXHEIGHT - 40, 100, "P2", hunter2Controls)
+    }
+    else
+        hunter = new Hunter(MAXWIDTH - 100, MAXHEIGHT - 40, 100, "", hunter1Controls)
 }
 
+let fadeIn = 0;
+let objectFadeIn = 0;
+let textFadeIn = {
+    author: 0,
+    title: 0,
+    options: 0
+}
+
+let skipped = false;
+let skipForward = 0;
+
+let mainFont;
+
+function preload()
+{
+    mainFont = loadFont("/assets/fleshandblood.ttf")
+}
 function draw()
 {
-    background(90);
 
-    drawMoon();
-    drawLandscape();
-    drawStars();
-
-    drawHunter();
-    moveHunter();
-    moveNet();
-
-    for (const ghost of ghosts)
+    switch (gameState)
     {
-        moveGhost(ghost);
-        drawGhost(ghost);
+        case "title":
+            background(fadeIn);
+            let sec = millis() / 1000;  // Get current time in milliseconds
+
+            let timing = sec + skipForward
+            console.log(timing);
+            if (key == " " && !skipped)
+            {
+                skipped = true;
+                skipForward = 8 - sec;
+                fadeIn = 90
+                objectFadeIn = 100;
+            }
+            if (timing >= 3 && fadeIn < 90) fadeIn += 0.5;
+            if (timing >= 5 && objectFadeIn != 100) objectFadeIn += 0.5;
+            drawMoon(objectFadeIn);
+            drawLandscape(objectFadeIn);
+            drawStars(objectFadeIn);
+            drawWaves(objectFadeIn);
+
+            if (timing >= 8 && timing < 10)
+            {
+                push();
+                noStroke();
+                translate(MAXWIDTH / 2, MAXHEIGHT / 2);
+                fill("rgba(255, 255, 255, " + textFadeIn.author / 100 + ")")
+                textSize(48);
+                textAlign(CENTER);
+                text("A game by\nSean Gregory", 0, 0);
+                if (textFadeIn.author != 100) textFadeIn.author += 1;
+                pop();
+            }
+
+            if (timing >= 10)
+            {
+                push();
+                noStroke();
+                translate(MAXWIDTH / 2, MAXHEIGHT / 2);
+                fill("rgba(255, 255, 255, " + textFadeIn.author / 100 + ")")
+                textSize(48);
+                textAlign(CENTER);
+                text("A game by\nSean Gregory", 0, 0);
+                if (textFadeIn.author != 0) textFadeIn.author -= 1;
+                pop();
+            }
+
+            if (timing >= 12)
+            {
+                console.log("HI")
+                push();
+                noStroke();
+                translate(MAXWIDTH / 2, MAXHEIGHT / 2);
+                fill("rgba(255, 255, 255, " + textFadeIn.title / 100 + ")")
+                textSize(60);
+                textFont(mainFont)
+                textAlign(CENTER);
+                text("Ground Zero", 0, 0);
+                if (textFadeIn.title != 100) textFadeIn.title += 1;
+                pop();
+            }
+            
+            break;
+        case "play":
+
+            background(90);
+            drawMoon();
+            drawLandscape();
+            drawStars();
+        
+            hunter.draw();
+            hunter.move();
+            hunter.moveNet();
+        
+            if (coop)
+            {
+                hunter2.draw();
+                hunter2.move();
+                hunter2.moveNet();
+            }
+        
+            for (const ghost of ghosts)
+            {
+                moveGhost(ghost);
+                drawGhost(ghost);
+            }
+            hunter.checkNetGhostOverlap();
+            if (coop) hunter2.checkNetGhostOverlap();
+        
+        
+            ghosts = ghosts.filter(ghost => !ghost.toRemove);
+        
+            spawnGhosts();
+            drawWaves(100);
+            break;
+        case "over":
+            break;
     }
-    checkNetGhostOverlap();
 
-    drawWaves();
-
-    ghosts = ghosts.filter(ghost => !ghost.toRemove);
-
-    spawnGhosts();
 }
 
 function spawnGhosts()
@@ -200,6 +272,15 @@ function keyPressed()
     }
     if (key === "a" || key === "A") keyState.a = true;
     if (key === "d" || key === "D") keyState.d = true;
+
+    if ((key === "i" || key === "I") && !keyState.i)
+        {
+            keyState.i = true;
+            if (hunter2.net.state === "idle")
+                hunter2.net.state = "outbound";
+        }
+        if (key === "j" || key === "J") keyState.j = true;
+        if (key === "l" || key === "L") keyState.l = true;
     keyState[key] = true;
 }
 
@@ -208,85 +289,11 @@ function keyReleased()
     if (key === "w" || key === "W") keyState.w = false;
     if (key === "a" || key === "A") keyState.a = false;
     if (key === "d" || key === "D") keyState.d = false;
+    if (key === "i" || key === "I") keyState.i = false;
+    if (key === "j" || key === "J") keyState.j = false;
+    if (key === "l" || key === "L") keyState.l = false;
 }
 
-/**
- * Moves the hunter to the mouse position on x
- */
-function moveHunter() {
-    if (keyState.a)
-    {
-        acceleration -= 0.05;
-        if (acceleration >= 0) acceleration -= 0.05
-    }
-    else if (keyState.d)
-    {
-        acceleration += 0.05;
-        if (acceleration <= 0) acceleration += 0.05
-    }
-    else acceleration = (acceleration == 0) ? 0 : (acceleration > 0) ? acceleration - 0.03 : acceleration + 0.03;
-
-    if (hunter.body.x - hunter.body.size <= 0) acceleration += 0.3;
-    if (hunter.body.x >= MAXWIDTH) acceleration -= 0.3;
-    if (acceleration > maxAccelertaion) acceleration = maxAccelertaion;
-
-    if (acceleration < 0.05 && acceleration > -0.05) acceleration = 0;
-    waveIndex -= (acceleration / 4)
-    hunter.body.x += acceleration;
-    //hunter.body.x = mouseX;
-}
-
-/**
- * Handles moving the tongue based on its state
- */
-function moveNet() {
-    // Tongue matches the hunter's x
-    hunter.net.x = hunter.body.x;
-    // If the net is idle, it doesn't do anything
-    if (hunter.net.state === "idle"){
-        // Do nothing
-    }
-    // If the net is outbound, it moves up
-    else if (hunter.net.state === "outbound") {
-        hunter.net.y += -hunter.net.speed;
-        // The net bounces back if it hits the top
-        if (hunter.net.y <= 0) {
-            hunter.net.state = "inbound";
-        }
-    }
-    // If the net is inbound, it moves down
-    else if (hunter.net.state === "inbound") {
-        hunter.net.y += hunter.net.speed;
-        // The net stops if it hits the bottom
-        if (hunter.net.y >= hunter.net.maxHeight) {
-            hunter.net.state = "idle";
-            caughtGhost = false;
-        }
-    }
-}
-
-
-/**
- * Handles the net overlapping the ghost
- */
-function checkNetGhostOverlap()
-{
-    for (const ghost of ghosts)
-    {
-        // Get distance from net to ghost
-        const d = dist(hunter.net.x, hunter.net.y, ghost.x, ghost.y);
-        // Check if it's an overlap
-        const eaten = (d < hunter.net.size / 2 + ghost.size);
-        if (eaten)
-        {
-            ghost.toRemove = true;
-            scorePlayer(ghost, !(hunter.net.state == "inbound"));
-            // Bring back the net
-            hunter.net.state = "inbound";
-            caughtGhost = true;
-        }
-    }
-}
 
 function penalizePlayer(ghost)
 {

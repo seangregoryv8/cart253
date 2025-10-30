@@ -1,11 +1,12 @@
 class Hunter
 {
-    constructor(x, y, size, controls)
+    constructor(x, y, size, count, controls)
     {
         this.body = {
             x: x,
             y: y,
-            size: size
+            size: size,
+            count: count
         };
         this.net = {
             x: undefined,
@@ -24,6 +25,7 @@ class Hunter
 
     move()
     {
+        console.log(this.controls.left)
         if (keyIsDown(this.controls.left)) {
             this.acceleration -= 0.05;
             if (this.acceleration >= 0) this.acceleration -= 0.05;
@@ -40,7 +42,7 @@ class Hunter
 
         if (this.acceleration < 0.05 && this.acceleration > -0.05) this.acceleration = 0;
 
-        waveIndex -= (acceleration / 4)
+        waveIndex -= (this.acceleration / 4)
         this.body.x += this.acceleration;
     }
 
@@ -65,7 +67,175 @@ class Hunter
     draw()
     {
         this.drawNet();
-        this.drawBody();
+        this.drawHunter();
         this.drawBoat();
+    }
+
+
+    /**
+     * If a ghost is caught, draw it in the little net
+     */
+    drawCaughtGhost()
+    {
+        noStroke();
+        fill(255);
+        push();
+        translate(this.net.x, this.net.y - 35);
+        let netGhostSize = this.net.size * 2.5;
+        ellipse(0, 0, netGhostSize);
+        fill(0)
+        ellipse(-8, 0, netGhostSize / 4)
+        ellipse(8, 0, netGhostSize / 4)
+        ellipse(0, 10, netGhostSize / 4)
+        pop();
+    }
+
+    /**
+     * This draws the net that the hunter wields
+     */
+    drawNet()
+    {
+        // Draw the rest of the net
+        push();
+        stroke("#8a7362");
+        strokeWeight(this.net.size);
+        line(this.net.x, this.net.y, this.body.x, this.body.y);
+        pop();
+
+        if (this.caughtGhost) this.drawCaughtGhost();
+
+        // Draw the net tip
+        push();
+        noStroke();
+        let netOffset = this.net.size * 2.3
+        fill(0, 80);
+        ellipse(this.net.x + 27, this.net.y - netOffset, this.net.size * 8, 60);
+
+        stroke("#8a7362");
+        strokeWeight(10);  // Border thickness
+        noFill();  // No fill for the outer circle, it's hollow
+        ellipse(this.net.x, this.net.y - netOffset, this.net.size * 4);
+        pop();
+    }
+
+    /**
+     * Draws the ghostbusters logo in the guys shirt
+     */
+    drawGhostbusterLogo()
+    {
+        // Draw his funny shirt
+        noStroke();
+        fill("#ff0000")
+        ellipse(this.body.x - 50, this.body.y - this.body.size + 20, this.body.size * 0.5);
+
+        push();
+        noStroke();
+        fill(255);
+        translate(this.body.x - 55, this.body.y - 98)
+        let shirtGhostSize = this.body.size / 4;
+        ellipse(10, 20, shirtGhostSize);
+        rect(-10, 10, 40, 10);
+        ellipse(0, 0, shirtGhostSize);
+        fill(0);
+        ellipse(-6, 0, shirtGhostSize / 4)
+        ellipse(6, 0, shirtGhostSize / 4)
+        ellipse(0, 7, shirtGhostSize / 4)
+        pop();
+
+        push();
+        noStroke();
+        translate(this.body.x - 50, this.body.y - this.body.size + 20)
+        rectMode(CENTER);
+        fill(255);
+        fill("#ff0000");
+        rotate(4);
+        rect(0, 0, 10, 40);
+        pop();
+    }
+
+    /**
+     * Displays the net (tip and line connection) and the hunter (body)
+     */
+    drawHunter()
+    {
+        // Draw the hunter's body
+        push();
+        stroke(0);
+        fill("#bbbbbb")
+        ellipse(this.body.x - (this.body.size / 2), this.body.y, this.body.size, (this.body.size * 3));
+        fill("#ffe2c9");
+        translate(this.body.x - (this.body.size / 2), this.body.y - this.body.size * 1.5)
+        ellipse(0, 0, this.body.size * 0.75)
+        fill(255);
+
+
+        // Now we draw his eyes
+        ellipse(-15, -15, 20, 30)
+        ellipse(15, -15, 20, 30)
+        fill("#1569C7")
+        noStroke();
+        ellipse(-20, -20, 10);
+        ellipse(10, -20, 10);
+        fill(0)
+        noStroke();
+        ellipse(-21, -21, 5);
+        ellipse(9, -21, 5);
+        fill(255)
+        noStroke();
+        ellipse(-20, -21, 2);
+        ellipse(10, -21, 2);
+
+        fill("#ffe2c9");
+        rect(-30, -10, 60, 10)
+
+        fill(0)
+        textSize(24);
+        text(this.body.count, -15, 115)
+
+        pop();
+
+        this.drawGhostbusterLogo();
+
+        this.drawBoat();
+
+    }
+
+    /**
+     * Draws a boat for the hunter to swim in
+     */
+    drawBoat()
+    {
+        push();
+        noStroke();
+        fill("#8a7362");
+        // Now for the boat
+        translate(this.body.x - 200, MAXHEIGHT - 60);
+        rect(-1, 0, 305, 70);
+        triangle(0, 0, -40, 0, 0, 61);
+        triangle(300, 0, 440, 0, 300, 61);
+        pop();
+    }
+
+
+    /**
+     * Handles the net overlapping the ghost
+     */
+    checkNetGhostOverlap()
+    {
+        for (const ghost of ghosts)
+        {
+            // Get distance from net to ghost
+            const d = dist(this.net.x, this.net.y, ghost.x, ghost.y);
+            // Check if it's an overlap
+            const eaten = (d < this.net.size / 2 + ghost.size);
+            if (eaten)
+            {
+                ghost.toRemove = true;
+                scorePlayer(ghost, !(this.net.state == "inbound"));
+                // Bring back the net
+                this.net.state = "inbound";
+                this.caughtGhost = true;
+            }
+        }
     }
 }
