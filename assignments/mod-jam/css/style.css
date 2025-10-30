@@ -29,6 +29,18 @@ body {
   text-align: center;
 }
 
+.lostScoreboard
+{
+  position: absolute;
+  top: 0;
+  right: 5%; 
+  margin-inline: auto; 
+  width: fit-content;
+  text-align: center;
+}
+
+
+
 .mainScore
 {
   position: absolute;

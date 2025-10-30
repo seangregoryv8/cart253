@@ -139,10 +139,16 @@ function spawnGhosts()
  * Moves the fly according to its speed
  * Resets the fly if it gets all the way to the right
  */
-function moveGhost(ghost) {
-    // Move the fly
+function moveGhost(ghost)
+{
     ghost.x += ghost.speed;
     ghost.y += cos(frameCount / ghost.wave) * ghost.movement;
+
+    if (ghost.x >= MAXWIDTH + 50)
+    {
+        ghost.toRemove = true;
+        penalizePlayer(ghost);
+    }
 }
 
 /**
@@ -241,6 +247,25 @@ function checkNetGhostOverlap()
     }
 }
 
+function penalizePlayer(ghost)
+{
+    let speedG = Math.round(ghost.speed);
+    let waveG = Math.round(ghost.wave);
+    let moveG = Math.round(ghost.movement);
+    let p = "";
+    p += "GHOST ESCAPED!\n"
+    p += "Speed: " + speedG + "\n"
+    p += "Waviness: " + waveG + "\n"
+    p += "Jitteryness: " + moveG + "\n"
+
+    let addedScore = Math.round(((speedG * 2) + (waveG * 1.5) + (moveG * 1.5)) / 1.5)
+
+    p += "Deducted: " + addedScore
+    score -= addedScore
+    document.getElementById("currentScore").innerText = score;
+    document.getElementById("lostGhostInfo").innerText = p
+}
+
 function scorePlayer(ghost)
 {
     let speedG = Math.round(ghost.speed);
@@ -260,9 +285,4 @@ function scorePlayer(ghost)
     document.getElementById("ghostInfo").innerText = p
 }
 
-let score = 0;
-
-function addScore(addScore)
-{
-
-}
+let score = 200;
