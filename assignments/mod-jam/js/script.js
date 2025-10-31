@@ -20,6 +20,7 @@ const MAXHEIGHT = 800;
 let coop = false;
 let gameState = "title";
 
+console.log(gameState);
 const hunter1Controls = {
     left: 65,
     right: 68,
@@ -103,6 +104,7 @@ function setup()
 
 let fadeIn = 0;
 let objectFadeIn = 0;
+let objectFadeOut = 255;
 let textFadeIn = {
     author: 0,
     title: 0,
@@ -117,6 +119,24 @@ let skipForward = 0;
 let spaceGrace = 0;
 let mainFont;
 
+let menuSelect = {
+    main: true,
+    single: false,
+    multi: false,
+    instructions: false,
+    options: false
+}
+
+let click = false;
+
+function mousePressed()
+{
+    click = true;
+}
+function mouseReleased()
+{
+    click = false;
+}
 function preload()
 {
     mainFont = loadFont("/assets/fleshandblood.ttf")
@@ -151,9 +171,9 @@ function draw()
 
             background(fadeIn);
             if (timing >= 3 && fadeIn < 90) fadeIn += 0.5;
-            if (timing >= 5 && objectFadeIn != 255) objectFadeIn += 0.5;
+            if (timing >= 5 && objectFadeIn <= 255) objectFadeIn += 1.5;
             drawMoon(objectFadeIn);
-            drawLandscape(objectFadeIn);
+            drawLandscape(objectFadeIn, menuSelect.main ? objectFadeIn : objectFadeOut);
             drawStars(objectFadeIn);
             drawWaves(objectFadeIn);
 
@@ -188,28 +208,64 @@ function draw()
                 push();
                 noStroke();
                 translate(MAXWIDTH / 2, MAXHEIGHT / 2);
-                fill("rgba(255, 255, 255, " + textFadeIn.title / 100 + ")")
                 textSize(60);
                 textFont(mainFont)
                 textAlign(CENTER);
-                text("Ground Zero", 0, 0);
+                // Now we can select options
+
+                fill(255, 255, 255, textFadeIn.title)
+                text("Spiritus Sororis Nostrae", 0, 0);
 
                 textSize(24);
+                
+                let minW = MAXWIDTH / 2 - 100;
+                let maxW = MAXWIDTH / 2 + 100;
+                let avH = MAXHEIGHT / 2
+                
+                let cond = mouseX >= minW && mouseX <= maxW && mouseY >= avH + 80 && mouseY <= avH + 100
+                fill(cond ? 0 : 255, cond ? 0 : 255, cond ? 0 : 255, textFadeIn.title)
                 text("Single Player", 0, 100)
+                if (cond && click)
+                {
+                    menuSelect.single = true;
+                    menuSelect.main = false;
+                }
+
+                cond = mouseX >= minW && mouseX <= maxW && mouseY >= avH + 120 && mouseY <= avH + 140
+                fill(cond ? 0 : 255, cond ? 0 : 255, cond ? 0 : 255, textFadeIn.title)
                 text("Co Op", 0, 140)
+
+                cond = mouseX >= minW && mouseX <= maxW && mouseY >= avH + 160 && mouseY <= avH + 180
+                fill(cond ? 0 : 255, cond ? 0 : 255, cond ? 0 : 255, textFadeIn.title)
                 text("Instructions", 0, 180)
+
+                cond = mouseX >= minW && mouseX <= maxW && mouseY >= avH + 200 && mouseY <= avH + 220
+                fill(cond ? 0 : 255, cond ? 0 : 255, cond ? 0 : 255, textFadeIn.title)
                 text("Options", 0, 220)
-                if (textFadeIn.title != 100) textFadeIn.title += 1;
+
+                if (timing <= 14 && textFadeIn.title <= 255) textFadeIn.title += 3;
                 pop();
             }
             
+            if (menuSelect.single)
+            {
+                textFadeIn.title -= 3;
+                objectFadeOut -= 2.5;
+                //gameState = "play";
+            }
+
+            if (objectFadeOut < 0)
+            {
+                gameState = "play";
+                hunter.body.x = -300
+            }
             break;
         case "play":
 
             background(90);
-            drawMoon();
-            drawLandscape();
-            drawStars();
+            drawMoon(255);
+            drawLandscape(255);
+            drawStars(255);
         
             hunter.draw();
             hunter.move();
@@ -232,8 +288,8 @@ function draw()
         
         
             ghosts = ghosts.filter(ghost => !ghost.toRemove);
-        
-            spawnGhosts();
+            
+            setTimeout(spawnGhosts, 2000);
             drawWaves(100);
             break;
         case "over":

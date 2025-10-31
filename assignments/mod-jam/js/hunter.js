@@ -10,8 +10,8 @@ class Hunter
         };
         this.net = {
             x: undefined,
-            y: MAXHEIGHT - 100,
-            maxHeight: MAXHEIGHT - 100,
+            y: MAXHEIGHT - 150,
+            maxHeight: MAXHEIGHT - 150,
             size: 15,
             speed: 20,
             // Determines how the tongue moves each frame
@@ -25,7 +25,6 @@ class Hunter
 
     move()
     {
-        console.log(this.controls.left)
         if (keyIsDown(this.controls.left)) {
             this.acceleration -= 0.05;
             if (this.acceleration >= 0) this.acceleration -= 0.05;
@@ -80,7 +79,7 @@ class Hunter
         noStroke();
         fill(255);
         push();
-        translate(this.net.x, this.net.y - 35);
+        translate(this.net.x + 20, this.net.y - 35);
         let netGhostSize = this.net.size * 2.5;
         ellipse(0, 0, netGhostSize);
         fill(0)
@@ -99,7 +98,7 @@ class Hunter
         push();
         stroke("#8a7362");
         strokeWeight(this.net.size);
-        line(this.net.x, this.net.y, this.body.x, this.body.y);
+        line(this.net.x + 20, this.net.y, this.body.x + 20, this.body.y);
         pop();
 
         if (this.caughtGhost) this.drawCaughtGhost();
@@ -109,12 +108,12 @@ class Hunter
         noStroke();
         let netOffset = this.net.size * 2.3
         fill(0, 80);
-        ellipse(this.net.x + 27, this.net.y - netOffset, this.net.size * 8, 60);
+        ellipse(this.net.x + 47, this.net.y - netOffset, this.net.size * 8, 60);
 
         stroke("#8a7362");
         strokeWeight(10);  // Border thickness
         noFill();  // No fill for the outer circle, it's hollow
-        ellipse(this.net.x, this.net.y - netOffset, this.net.size * 4);
+        ellipse(this.net.x + 20, this.net.y - netOffset, this.net.size * 4);
         pop();
     }
 
@@ -163,30 +162,31 @@ class Hunter
         stroke(0);
         fill("#bbbbbb")
         ellipse(this.body.x - (this.body.size / 2), this.body.y, this.body.size, (this.body.size * 3));
+        ellipse(this.body.x + 20, this.body.y - 80, this.body.size / 3);
         fill("#ffe2c9");
         translate(this.body.x - (this.body.size / 2), this.body.y - this.body.size * 1.5)
         ellipse(0, 0, this.body.size * 0.75)
+
+        stroke(0);
+
         fill(255);
-
-
+        translate(0, 15)
         // Now we draw his eyes
         ellipse(-15, -15, 20, 30)
         ellipse(15, -15, 20, 30)
         fill("#1569C7")
         noStroke();
-        ellipse(-20, -20, 10);
-        ellipse(10, -20, 10);
+        ellipse(-20, -19, 10);
+        ellipse(10, -19, 10);
         fill(0)
         noStroke();
-        ellipse(-21, -21, 5);
-        ellipse(9, -21, 5);
+        ellipse(-21, -19, 5);
+        ellipse(9, -19, 5);
         fill(255)
         noStroke();
-        ellipse(-20, -21, 2);
-        ellipse(10, -21, 2);
+        ellipse(-20, -19, 2);
+        ellipse(10, -19, 2);
 
-        fill("#ffe2c9");
-        rect(-30, -10, 60, 10)
 
         fill(0)
         textSize(24);

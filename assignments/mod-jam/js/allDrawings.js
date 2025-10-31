@@ -33,7 +33,7 @@ function drawMoon(opacity)
     pop();
 }
 
-function drawLandscape(opacity)
+function drawLandscape(opacity, opacityGuy)
 {
     push();
     noStroke();
@@ -45,7 +45,7 @@ function drawLandscape(opacity)
     ellipse(MAXWIDTH / 2, MAXHEIGHT + 40, 600, 300)
 
     drawHouse(opacity);
-    drawGuy(opacity);
+    if (gameState == "title") drawGuy(opacityGuy);
 
     pop();
 }
@@ -95,7 +95,6 @@ function ranInt(min, max)
 
 function drawHouse(opacity)
 {
-    console.log(opacity)
     push();
     translate(100, 600);
     let size = 75;
