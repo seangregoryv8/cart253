@@ -43,6 +43,10 @@ function drawLandscape(opacity)
     ellipse(MAXWIDTH, MAXHEIGHT - 50, 600, 200)
     fill("rgba(59, 111, 65, " + opacity / 100 + ")");
     ellipse(MAXWIDTH / 2, MAXHEIGHT + 40, 600, 300)
+
+    drawHouse(opacity);
+    drawGuy(opacity);
+
     pop();
 }
 
@@ -81,5 +85,44 @@ function drawGhost(ghost) {
     ellipse(8, -3, ghost.size / 4)
     ellipse(0, 10, ghost.size / 4)
 
+    pop();
+}
+
+function ranInt(min, max)
+{
+    return Math.round(random(min, max))
+}
+
+function drawHouse(opacity)
+{
+    console.log(opacity)
+    push();
+    translate(100, 600);
+    let size = 75;
+    fill(200, 125, 0, opacity);
+    noStroke();
+    rect(0, 0, size, size);
+    fill(50, 50, 50, opacity);
+    noStroke();
+    triangle(-10, 0, size / 2, -(size / 2), size + 10, 0);
+    fill(130, 130, 255, opacity);
+    rect(5, 15, size / 4, size / 4)
+    fill(100, 50, 0, opacity);
+    rect(35, 30, size / 3, size - 30);
+    pop();
+}
+
+function drawGuy(opacity)
+{
+    let mult = 1;
+    push();
+    translate(220, 680);
+    noStroke();
+    fill(187, 187, 187, opacity)
+    arc(0, 0, 30 * mult, 75 * mult, radians(180), 0)
+    fill(255, 226, 201, opacity)
+    circle(0, -45, 25 * mult)
+    circle(-20, -25, 10 * mult)
+    circle(20, -25, 10 * mult)
     pop();
 }

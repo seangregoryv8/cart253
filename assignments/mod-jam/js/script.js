@@ -45,7 +45,8 @@ let keyState = {
     d: false,
     i: false,
     j: false,
-    l: false
+    l: false,
+    space: false,
 }
 
 /**
@@ -108,35 +109,49 @@ let textFadeIn = {
     options: 0
 }
 
-let skipped = false;
+let skipped = {
+    once: false,
+    twice: false,
+};
 let skipForward = 0;
-
+let spaceGrace = 0;
 let mainFont;
 
 function preload()
 {
     mainFont = loadFont("/assets/fleshandblood.ttf")
 }
+
 function draw()
 {
 
     switch (gameState)
     {
         case "title":
-            background(fadeIn);
             let sec = millis() / 1000;  // Get current time in milliseconds
 
             let timing = sec + skipForward
-            console.log(timing);
-            if (key == " " && !skipped)
+            //console.log(timing);
+            if (keyState.space && !skipped.once)
             {
-                skipped = true;
+                spaceGrace++;
+                skipped.once = true;
                 skipForward = 8 - sec;
-                fadeIn = 90
-                objectFadeIn = 100;
+                fadeIn = 90;
+                objectFadeIn = 255;
             }
+            if (!keyState.space && spaceGrace == 1) spaceGrace++;
+
+            if (keyState.space && skipped.once && !skipped.twice && spaceGrace == 2)
+            {
+                textFadeIn.author = 0;
+                skipped.twice = true;
+                skipForward = 12 - sec;
+            }
+
+            background(fadeIn);
             if (timing >= 3 && fadeIn < 90) fadeIn += 0.5;
-            if (timing >= 5 && objectFadeIn != 100) objectFadeIn += 0.5;
+            if (timing >= 5 && objectFadeIn != 255) objectFadeIn += 0.5;
             drawMoon(objectFadeIn);
             drawLandscape(objectFadeIn);
             drawStars(objectFadeIn);
@@ -170,7 +185,6 @@ function draw()
 
             if (timing >= 12)
             {
-                console.log("HI")
                 push();
                 noStroke();
                 translate(MAXWIDTH / 2, MAXHEIGHT / 2);
@@ -179,6 +193,12 @@ function draw()
                 textFont(mainFont)
                 textAlign(CENTER);
                 text("Ground Zero", 0, 0);
+
+                textSize(24);
+                text("Single Player", 0, 100)
+                text("Co Op", 0, 140)
+                text("Instructions", 0, 180)
+                text("Options", 0, 220)
                 if (textFadeIn.title != 100) textFadeIn.title += 1;
                 pop();
             }
@@ -264,6 +284,7 @@ function moveGhost(ghost)
  */
 function keyPressed()
 {
+    if (key === " ") keyState.space = true;
     if ((key === "w" || key === "W") && !keyState.w)
     {
         keyState.w = true;
@@ -292,6 +313,7 @@ function keyReleased()
     if (key === "i" || key === "I") keyState.i = false;
     if (key === "j" || key === "J") keyState.j = false;
     if (key === "l" || key === "L") keyState.l = false;
+    if (key === " ") keyState.space = false;
 }
 
 
