@@ -446,7 +446,7 @@ function draw()
             setTimeout(spawnGhosts, 2000);
             drawWaves();
 
-            if (score >= 300 && !winTriggered)
+            if (score >= 3000 && !winTriggered)
             {
                 triggerWin("reunion");
                 gameState = "win";
