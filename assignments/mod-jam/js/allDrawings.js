@@ -2,10 +2,10 @@ let waveIndex = 0;
 /**
  * This draws all the waves that the player rides upon
  */
-function drawWaves(opacity) {
+function drawWaves(opacity = 255) {
     push();
     noStroke();
-    fill("rgba(135, 206, 235, " + opacity / 100 + ")");
+    fill(135, 206, 235, opacity);
 
     for (let i = -60; i <= MAXWIDTH; i += 30)
     {
@@ -22,13 +22,13 @@ function drawWaves(opacity) {
 /**
  * This draws the little moon in the night sky
  */
-function drawMoon(opacity)
+function drawMoon(opacity = 255)
 {
     push();
     noStroke();
-    fill("rgba(255, 255, 255, " + opacity / 100 + ")");
+    fill(255, 255, 255, opacity);
     ellipse(MAXWIDTH - 100, 100, 115);
-    fill("rgba(90, 90, 90, " + opacity / 100 + ")");
+    fill(90, 90, 90, opacity);
     ellipse(MAXWIDTH - 120, 100, 115);
     pop();
 }
@@ -37,11 +37,11 @@ function drawLandscape(opacity, opacityGuy)
 {
     push();
     noStroke();
-    fill("rgba(6, 64, 43, " + opacity / 100 + ")");
+    fill(6, 64, 43, opacity);
     ellipse(100, MAXHEIGHT - 20, 600, 300)
-    fill("rgba(44, 107, 79, " + opacity / 100 + ")");
+    fill(44, 107, 79, opacity)
     ellipse(MAXWIDTH, MAXHEIGHT - 50, 600, 200)
-    fill("rgba(59, 111, 65, " + opacity / 100 + ")");
+    fill(59, 111, 65, opacity)
     ellipse(MAXWIDTH / 2, MAXHEIGHT + 40, 600, 300)
 
     drawHouse(opacity);
@@ -50,11 +50,11 @@ function drawLandscape(opacity, opacityGuy)
     pop();
 }
 
-function drawStars(opacity)
+function drawStars(opacity = 255)
 {
     push();
     noStroke();
-    fill("rgba(255, 255, 255, " + opacity / 100 + ")");
+    fill(255, 255, 255, opacity);
     for (const star of stars)
         ellipse(star.x, star.y, star.size)
     pop();
