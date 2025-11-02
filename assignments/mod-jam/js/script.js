@@ -242,6 +242,12 @@ function draw()
                 cond = mouseX >= minW && mouseX <= maxW && mouseY >= avH + 160 && mouseY <= avH + 180
                 fill(cond ? 0 : 255, cond ? 0 : 255, cond ? 0 : 255, textFadeIn.title)
                 text(cond ? "Instructions" : "Instructiones", 0, 180)
+                if (cond && click && textFadeIn.title >= 255)
+                {
+                    menuSelect.instructions = true;
+                    menuSelect.main = false;
+                    gameState = "instructions";
+                }
 
                 cond = mouseX >= minW && mouseX <= maxW && mouseY >= avH + 200 && mouseY <= avH + 220
                 fill(cond ? 0 : 255, cond ? 0 : 255, cond ? 0 : 255, textFadeIn.title)
@@ -286,6 +292,48 @@ function draw()
                 fill(180, 180, 180, fadeBeforeGameStart)
                 text("Sophia...\nWhere are you...", 0, 80);
                 pop();
+            }
+            break;
+        case "instructions":
+            background(90);
+            drawMoon();
+            drawLandscape(255, 255);
+            drawStars();
+            drawWaves();
+
+            fill(0, 0, 0, 150);
+            noStroke();
+            rect(50, 50, MAXWIDTH - 100, MAXHEIGHT - 100);
+            
+            push();
+            noStroke();
+            translate(MAXWIDTH / 2, MAXHEIGHT / 2);
+            textSize(50);
+            textFont(mainFont)
+            textAlign(CENTER);
+            fill(255, 255, 255)
+            text("How to play", 0, -200);
+
+            textSize(18);
+            let instructionsText = "You are a spirit reaper, trying to find your deceased sister.\n\n"
+            instructionsText += "Catch as many ghosts as you can with your spectral net\n"
+            instructionsText += "Each ghost you catch will give you points based on how difficult it was to catch\n"
+            instructionsText += "If a ghost escapes off the right side of the screen, you will lose points\n\n"
+            instructionsText += "Launch the net using the W key\n"
+            instructionsText += "Move your hunter left and right using the A and D keys\n"
+
+            instructionsText += "In multiplayer mode, Player 2, your brother, uses the I, J, and L keys respectively\n\n"
+
+            instructionsText += "Good luck finding your sister...\n\n"
+            instructionsText += "Press SPACE to return to the main menu"
+            text(instructionsText, 0, -100);
+            pop();
+
+            if (keyState.space)
+            {
+                gameState = "title";
+                menuSelect.instructions = false;
+                menuSelect.main = true;
             }
             break;
         case "play":

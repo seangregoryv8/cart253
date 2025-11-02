@@ -45,7 +45,7 @@ function drawLandscape(opacity, opacityGuy)
     ellipse(MAXWIDTH / 2, MAXHEIGHT + 40, 600, 300)
 
     drawHouse(opacity);
-    if (gameState == "title") drawGuy(opacityGuy);
+    drawGuy(opacityGuy);
 
     pop();
 }
