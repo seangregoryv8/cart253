@@ -33,7 +33,7 @@ function drawMoon(opacity = 255)
     pop();
 }
 
-function drawLandscape(opacity, opacityGuy)
+function drawLandscape(opacity = 255, opacityGuy = 0, opacityGuy2 = 0)
 {
     push();
     noStroke();
@@ -44,8 +44,10 @@ function drawLandscape(opacity, opacityGuy)
     fill(59, 111, 65, opacity)
     ellipse(MAXWIDTH / 2, MAXHEIGHT + 40, 600, 300)
 
-    drawHouse(opacity);
-    drawGuy(opacityGuy);
+    drawHouse(100, 600, opacity);
+    drawHouse(MAXWIDTH - 100, 630, opacity);
+    drawGuy(220, 680, opacityGuy);
+    drawGuy(MAXWIDTH - 160, 720, opacityGuy2);
 
     pop();
 }
@@ -93,10 +95,10 @@ function ranInt(min, max)
     return Math.round(random(min, max))
 }
 
-function drawHouse(opacity)
+function drawHouse(x, y, opacity)
 {
     push();
-    translate(100, 600);
+    translate(x, y);
     let size = 75;
     fill(200, 125, 0, opacity);
     noStroke();
@@ -111,11 +113,11 @@ function drawHouse(opacity)
     pop();
 }
 
-function drawGuy(opacity)
+function drawGuy(x, y, opacity)
 {
     let mult = 1;
     push();
-    translate(220, 680);
+    translate(x, y);
     noStroke();
     fill(187, 187, 187, opacity)
     arc(0, 0, 30 * mult, 75 * mult, radians(180), 0)

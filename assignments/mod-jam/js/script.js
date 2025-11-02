@@ -93,13 +93,8 @@ function setup()
     for (let i = 0; i < 100; i++)
         stars.push({x: random(width), y: random(height / 1.5), size: random(2, 5)})
 
-    if (coop)
-    {
-        hunter = new Hunter(MAXWIDTH - 100, MAXHEIGHT - 40, 100, "P1", hunter1Controls)
-        hunter2 = new Hunter(100, MAXHEIGHT - 40, 100, "P2", hunter2Controls)
-    }
-    else
-        hunter = new Hunter(MAXWIDTH - 100, MAXHEIGHT - 40, 100, "", hunter1Controls)
+    hunter = new Hunter(MAXWIDTH - 100, MAXHEIGHT - 40, 100, "P1", hunter1Controls)
+    hunter2 = new Hunter(100, MAXHEIGHT - 40, 100, "P2", hunter2Controls)
 }
 
 let fadeIn = 0;
@@ -145,6 +140,8 @@ function preload()
 
 let fadeBeforeGameStart = 0;
 let gameStartTriggered = false;
+let startPlayTimeoutSet = false;
+let startTriggerTimeoutSet = false;
 
 function draw()
 {
@@ -176,7 +173,7 @@ function draw()
             if (timing >= 3 && fadeIn < 90) fadeIn += 0.5;
             if (timing >= 5 && objectFadeIn <= 255) objectFadeIn += 1.5;
             drawMoon(objectFadeIn);
-            drawLandscape(objectFadeIn, menuSelect.main ? objectFadeIn : objectFadeOut);
+            drawLandscape(objectFadeIn, menuSelect.main ? objectFadeIn : objectFadeOut, menuSelect.main ? objectFadeIn : coop ? objectFadeOut : 255);
             drawStars(objectFadeIn);
             drawWaves(objectFadeIn);
 
@@ -238,6 +235,12 @@ function draw()
                 cond = mouseX >= minW && mouseX <= maxW && mouseY >= avH + 120 && mouseY <= avH + 140
                 fill(cond ? 0 : 255, cond ? 0 : 255, cond ? 0 : 255, textFadeIn.title)
                 text(cond ? "Multiplayer" : "Lusoribus", 0, 140)
+                if (cond && click && textFadeIn.title >= 255)
+                {
+                    menuSelect.single = true;
+                    menuSelect.main = false;
+                    coop = true;
+                }
 
                 cond = mouseX >= minW && mouseX <= maxW && mouseY >= avH + 160 && mouseY <= avH + 180
                 fill(cond ? 0 : 255, cond ? 0 : 255, cond ? 0 : 255, textFadeIn.title)
@@ -267,16 +270,28 @@ function draw()
             {
                 if (!gameStartTriggered)
                 {
-                    if (fadeBeforeGameStart >= 255) setTimeout(() => { gameStartTriggered = true; }, 3000);
+                    if (fadeBeforeGameStart >= 255)
+                    {
+                        if (!startTriggerTimeoutSet) {
+                            startTriggerTimeoutSet = true;
+                            setTimeout(() => { gameStartTriggered = true; }, 3000);
+                        }
+                    }
                     else fadeBeforeGameStart += 3;
                 }
                 else
                 {
                     fadeBeforeGameStart -= 3;
-                    setTimeout(() => {
-                        gameState = "play";
-                        hunter.body.x = -300
-                    }, 3000);
+
+                    // schedule entering play state only once
+                    if (!startPlayTimeoutSet) {
+                        startPlayTimeoutSet = true;
+                        setTimeout(() => {
+                            gameState = "play";
+                            hunter.body.x = -300;
+                            if (coop) hunter2.body.x = MAXWIDTH + 150;
+                        }, 1000);
+                    }
                 }
                 push();
                 noStroke();
@@ -339,7 +354,7 @@ function draw()
         case "play":
             background(90);
             drawMoon();
-            drawLandscape();
+            drawLandscape(255, 0, !coop ? 255 : 0);
             drawStars();
         
             hunter.draw();
@@ -360,7 +375,6 @@ function draw()
             }
             hunter.checkNetGhostOverlap();
             if (coop) hunter2.checkNetGhostOverlap();
-        
         
             ghosts = ghosts.filter(ghost => !ghost.toRemove);
             
