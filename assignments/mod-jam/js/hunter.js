@@ -58,7 +58,7 @@ class Hunter
             this.net.y += this.net.speed;
             if (this.net.y >= this.net.maxHeight) {
                 this.net.state = "idle";
-                this.caughtGhost = false;
+                if (gameState != "win") this.caughtGhost = false;
             }
         }
     }

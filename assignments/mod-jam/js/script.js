@@ -20,7 +20,6 @@ const MAXHEIGHT = 800;
 let coop = false;
 let gameState = "title";
 
-console.log(gameState);
 const hunter1Controls = {
     left: 65,
     right: 68,
@@ -112,7 +111,7 @@ let skipped = {
 };
 let skipForward = 0;
 let spaceGrace = 0;
-let mainFont;
+var mainFont;
 
 let menuSelect = {
     main: true,
@@ -123,6 +122,41 @@ let menuSelect = {
 }
 
 let click = false;
+
+function resetAll()
+{
+    fadeIn = 0;
+    objectFadeIn = 0;
+    objectFadeOut = 255;
+    textFadeIn = {
+        author: 0,
+        title: 0,
+        options: 0
+    }
+
+    skipped = {
+        once: false,
+        twice: false,
+    };
+    skipForward = 0;
+    spaceGrace = 0;
+
+    menuSelect = {
+        main: true,
+        single: false,
+        multi: false,
+        instructions: false,
+        options: false
+    }
+
+    click = false;
+
+    gameStartTriggered = false;
+    startPlayTimeoutSet = false;
+    startTriggerTimeoutSet = false;
+
+    score = 200;
+}
 
 function mousePressed()
 {
@@ -143,14 +177,41 @@ let gameStartTriggered = false;
 let startPlayTimeoutSet = false;
 let startTriggerTimeoutSet = false;
 
+let winTriggered = false;
+let winStartTime = 0;
+let winEndingType = "reunion"; // "reunion", "bittersweet", "lost"
+let winProgress = 0; // 0..1
+// ...existing code...
+
+function triggerWin(type = "reunion")
+{
+    if (winTriggered) return;
+    winTriggered = true;
+    winStartTime = millis();
+    winEndingType = type;
+    // stop spawning and freeze gameplay inputs if needed
+    // e.g. clear ghosts, or set a flag used by draw()
+    // optional: play a sound here
+    console.log("WIN TRIGGERED:", type);
+    // switch to win state to run cutscene
+    gameState = "win";
+}
+
+let titleStartTime = 0;
+
 function draw()
 {
+    if (gameState == "win") titleStartTime = 0;
+
     switch (gameState)
     {
         case "title":
-            let sec = millis() / 1000;  // Get current time in milliseconds
+            if (titleStartTime === 0) titleStartTime = millis();
+            let sec = (millis() - titleStartTime) / 1000;  // Get current time in milliseconds
 
             let timing = sec + skipForward
+            console.log(timing);
+            console.log(sec);
             //console.log(timing);
             if (keyState.space && !skipped.once)
             {
@@ -252,7 +313,7 @@ function draw()
                     gameState = "instructions";
                 }
 
-                cond = mouseX >= minW && mouseX <= maxW && mouseY >= avH + 200 && mouseY <= avH + 220
+                cond = mouseX >= minW && mouseX < maxW && mouseY >= avH + 200 && mouseY <= avH + 220
                 fill(cond ? 0 : 255, cond ? 0 : 255, cond ? 0 : 255, textFadeIn.title)
                 text(cond ? "Options" : "Optiones", 0, 220)
 
@@ -290,6 +351,10 @@ function draw()
                             gameState = "play";
                             hunter.body.x = -300;
                             if (coop) hunter2.body.x = MAXWIDTH + 150;
+                            skipped.once = false;
+                            skipped.twice = false;
+                            skipForward = 0;
+                            spaceGrace = 0;
                         }, 1000);
                     }
                 }
@@ -380,8 +445,47 @@ function draw()
             
             setTimeout(spawnGhosts, 2000);
             drawWaves();
+
+            if (score >= 300 && !winTriggered)
+            {
+                triggerWin("reunion");
+                gameState = "win";
+            }
             break;
         case "over":
+            break;
+        case "win":
+            // simple timed cutscene: 0..10 seconds
+            background(20);
+            let elapsed = (millis() - winStartTime) / 1000; // seconds
+            winProgress = constrain(elapsed / 10, 0, 1);
+
+            // subtle zoom effect by scaling around centre
+            push();
+            translate(MAXWIDTH / 2, MAXHEIGHT / 2);
+            let zoom = 1 + winProgress * 0.4;
+            scale(zoom);
+            translate(-MAXWIDTH / 2, -MAXHEIGHT / 2);
+
+            // dim scene and draw environment faintly
+            drawMoon(255);
+            drawLandscape(255, 0, 0);
+            drawStars(255);
+
+            // draw hunter slowly moving to centre
+            let targetX = MAXWIDTH / 2;
+            hunter.body.x = lerp(hunter.body.x, targetX, 0.02 + winProgress * 0.02);
+            hunter.draw();
+            hunter.moveNet();
+
+            // epilogue text after cutscene
+            if (elapsed >= 10)
+            {
+                startEnding();
+                // unlock example: if high score, set an unlock flag
+                // wait for space to go back
+            }
+            pop();
             break;
     }
 
