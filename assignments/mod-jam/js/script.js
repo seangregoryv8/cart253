@@ -19,6 +19,7 @@ const MAXWIDTH = 900;
 const MAXHEIGHT = 800;
 let coop = false;
 let gameState = "title";
+let difficulty = "hard";
 
 const hunter1Controls = {
     left: 65,
@@ -68,17 +69,11 @@ function makeGhost()
         x: -50,
         y: random(200, MAXHEIGHT - 200),
         size: 40,
-        speed: random(1, 6),
-        minSpeed: 1,
-        maxSpeed: 6,
+        speed: random(gameOptions[difficulty].minSpeed, gameOptions[difficulty].maxSpeed),
         toRemove: false,
         tail: [],
-        wave: random(3, 15),
-        minWave: 3,
-        maxWave: 15,
-        movement: random(1, 7),
-        minMovement: 1,
-        maxMovement: 7,
+        wave: random(gameOptions[difficulty].minWave, gameOptions[difficulty].maxWave),
+        movement: random(gameOptions[difficulty].minMovement, gameOptions[difficulty].maxMovement),
         color: random(160, 255)
     }
 }
@@ -139,6 +134,8 @@ function triggerWin(type = "reunion")
     gameState = "win";
 }
 
+
+
 function draw()
 {
     if (gameState == "win") titleStartTime = 0;
@@ -191,6 +188,10 @@ function draw()
             }
             break;
         case "options":
+
+        // What to add:
+        // - Difficulty slider
+        // - Points to win for multiplayer
             background(90);
             drawMoon();
             drawLandscape(255, 255);
@@ -208,7 +209,7 @@ function draw()
             textFont(mainFont)
             textAlign(CENTER);
             fill(255, 255, 255)
-            text("How to play", 0, -200);
+            text("OPTIONS", 0, -200);
 
             textSize(18);
             let optionsText = "You are a spirit reaper, trying to find your deceased sister.\n\n"
@@ -383,9 +384,10 @@ function keyReleased()
 
 function judgeGhost(ghost)
 {
-    let avgSpeed = ghost.maxSpeed - ghost.minSpeed;
-    let avgWave = ghost.maxWave - ghost.minWave;
-    let avgMovement = ghost.maxMovement - ghost.minMovement;
+    let d = gameOptions[difficulty]
+    let avgSpeed = d.maxSpeed - d.minSpeed;
+    let avgWave = d.maxWave - d.minWave;
+    let avgMovement = d.maxMovement - d.minMovement;
 
     let ghostStats = {
         speed: "",
@@ -399,17 +401,17 @@ function judgeGhost(ghost)
     // Average speed: 4-6
     // High speed: 7-10
 
-    if (ghost.speed <= ghost.minSpeed + (avgSpeed / 3)) ghostStats.speed = "Slow";
-    else if (ghost.speed > ghost.minSpeed + (avgSpeed / 3) && ghost.speed <= ghost.minSpeed + (2 * (avgSpeed / 3))) ghostStats.speed = "Medium";
-    else if (ghost.speed > ghost.minSpeed + (2 * (avgSpeed / 3))) ghostStats.speed = "Fast";
+    if (ghost.speed <= d.minSpeed + (avgSpeed / 3)) ghostStats.speed = "Slow";
+    else if (ghost.speed > d.minSpeed + (avgSpeed / 3) && ghost.speed <= d.minSpeed + (2 * (avgSpeed / 3))) ghostStats.speed = "Medium";
+    else if (ghost.speed > d.minSpeed + (2 * (avgSpeed / 3))) ghostStats.speed = "Fast";
 
-    if (ghost.wave <= ghost.minWave + (avgWave / 3)) ghostStats.wave = "Jittery";
-    else if (ghost.wave > ghost.minWave + (avgWave / 3) && ghost.wave <= ghost.minWave + (2 * (avgWave / 3))) ghostStats.wave = "Floaty";
-    else if (ghost.wave > ghost.minWave + (2 * (avgWave / 3))) ghostStats.wave = "Calm";
+    if (ghost.wave <= d.minWave + (avgWave / 3)) ghostStats.wave = "Jittery";
+    else if (ghost.wave > d.minWave + (avgWave / 3) && ghost.wave <= d.minWave + (2 * (avgWave / 3))) ghostStats.wave = "Floaty";
+    else if (ghost.wave > d.minWave + (2 * (avgWave / 3))) ghostStats.wave = "Calm";
 
-    if (ghost.movement <= ghost.minMovement + (avgMovement / 3)) ghostStats.movement = "Static";
-    else if (ghost.movement > ghost.minMovement + (avgMovement / 3) && ghost.movement <= ghost.minMovement + (2 * (avgMovement / 3))) ghostStats.movement = "Wiggly";
-    else if (ghost.movement > ghost.minMovement + (2 * (avgMovement / 3))) ghostStats.movement = "Sine Master";
+    if (ghost.movement <= d.minMovement + (avgMovement / 3)) ghostStats.movement = "Static";
+    else if (ghost.movement > d.minMovement + (avgMovement / 3) && ghost.movement <= d.minMovement + (2 * (avgMovement / 3))) ghostStats.movement = "Wiggly";
+    else if (ghost.movement > d.minMovement + (2 * (avgMovement / 3))) ghostStats.movement = "Sine Master";
 
     return ghostStats;
 }
@@ -422,7 +424,7 @@ function penalizePlayer(ghost)
 
     let stats = judgeGhost(ghost);
 
-    let addedScore = Math.round((speedG * 1.5) + (waveG * 1.25) + (moveG * 1.25) * 0.75)
+    let addedScore = Math.round((speedG * 1.5) + (waveG * 1.25) + (moveG * 1.25) * gameOptions[difficulty].penalize)
 
     let p = "";
     p += "GHOST ESCAPED\n\n"

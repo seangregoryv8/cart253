@@ -1,5 +1,13 @@
 class Hunter
 {
+    /**
+     * 
+     * @param {BigInteger} x 
+     * @param {BigInteger} y 
+     * @param {BigInteger} size 
+     * @param {string} count 
+     * @param {object} controls 
+     */
     constructor(x, y, size, count, controls)
     {
         this.body = {
@@ -21,7 +29,7 @@ class Hunter
         this.maxAcceleration = 6;
         this.controls = controls;
         this.caughtGhost = false;
-        this.score = 100;
+        this.score = gameOptions[difficulty].startScore;
     }
 
     move()
