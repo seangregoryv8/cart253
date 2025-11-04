@@ -18,7 +18,7 @@
 const MAXWIDTH = 900;
 const MAXHEIGHT = 800;
 let coop = false;
-let gameState = "title";
+let gameState = "play";
 
 const hunter1Controls = {
     left: 65,
@@ -69,10 +69,16 @@ function makeGhost()
         y: random(200, MAXHEIGHT - 200),
         size: 40,
         speed: random(1, 6),
+        minSpeed: 1,
+        maxSpeed: 6,
         toRemove: false,
         tail: [],
         wave: random(3, 15),
+        minWave: 3,
+        maxWave: 15,
         movement: random(1, 7),
+        minMovement: 1,
+        maxMovement: 7,
         color: random(160, 255)
     }
 }
@@ -209,10 +215,7 @@ function draw()
             if (titleStartTime === 0) titleStartTime = millis();
             let sec = (millis() - titleStartTime) / 1000;  // Get current time in milliseconds
 
-            let timing = sec + skipForward
-            console.log(timing);
-            console.log(sec);
-            //console.log(timing);
+            let timing = sec + skipForward;
             if (keyState.space && !skipped.once)
             {
                 spaceGrace++;
@@ -421,6 +424,8 @@ function draw()
             drawMoon();
             drawLandscape(255, 0, !coop ? 255 : 0);
             drawStars();
+
+            createUI();
         
             hunter.draw();
             hunter.move();
@@ -446,7 +451,7 @@ function draw()
             setTimeout(spawnGhosts, 2000);
             drawWaves();
 
-            if (score >= 3000 && !winTriggered)
+            if (mainScore >= 3000 && !winTriggered)
             {
                 triggerWin("reunion");
                 gameState = "win";
@@ -565,24 +570,58 @@ function keyReleased()
     if (key === " ") keyState.space = false;
 }
 
+function judgeGhost(ghost)
+{
+    let avgSpeed = ghost.maxSpeed - ghost.minSpeed;
+    let avgWave = ghost.maxWave - ghost.minWave;
+    let avgMovement = ghost.maxMovement - ghost.minMovement;
+
+    let ghostStats = {
+        speed: "",
+        wave: "",
+        movement: ""
+    }
+    
+    // If the speed is low, medium, or high
+    // avgSpeed: 9 (if min 1 and max 10)
+    // Slow speed: 1-3
+    // Average speed: 4-6
+    // High speed: 7-10
+
+    if (ghost.speed <= ghost.minSpeed + (avgSpeed / 3)) ghostStats.speed = "Slow";
+    else if (ghost.speed > ghost.minSpeed + (avgSpeed / 3) && ghost.speed <= ghost.minSpeed + (2 * (avgSpeed / 3))) ghostStats.speed = "Medium";
+    else if (ghost.speed > ghost.minSpeed + (2 * (avgSpeed / 3))) ghostStats.speed = "Fast";
+
+    if (ghost.wave <= ghost.minWave + (avgWave / 3)) ghostStats.wave = "Jittery";
+    else if (ghost.wave > ghost.minWave + (avgWave / 3) && ghost.wave <= ghost.minWave + (2 * (avgWave / 3))) ghostStats.wave = "Floaty";
+    else if (ghost.wave > ghost.minWave + (2 * (avgWave / 3))) ghostStats.wave = "Calm";
+
+    if (ghost.movement <= ghost.minMovement + (avgMovement / 3)) ghostStats.movement = "Static";
+    else if (ghost.movement > ghost.minMovement + (avgMovement / 3) && ghost.movement <= ghost.minMovement + (2 * (avgMovement / 3))) ghostStats.movement = "Wiggly";
+    else if (ghost.movement > ghost.minMovement + (2 * (avgMovement / 3))) ghostStats.movement = "Sine Master";
+
+    return ghostStats;
+}
 
 function penalizePlayer(ghost)
 {
     let speedG = Math.round(ghost.speed);
     let waveG = Math.round(ghost.wave);
     let moveG = Math.round(ghost.movement);
-    let p = "";
-    p += "GHOST ESCAPED!\n"
-    p += "Speed: " + speedG + "\n"
-    p += "Waviness: " + waveG + "\n"
-    p += "Jitteryness: " + moveG + "\n"
 
-    let addedScore = Math.round(((speedG * 2) + (waveG * 1.5) + (moveG * 1.5)) / 1.5)
+    let stats = judgeGhost(ghost);
+
+    let addedScore = Math.round((speedG * 1.5) + (waveG * 1.25) + (moveG * 1.25) * 0.75)
+
+    let p = "";
+    p += "GHOST ESCAPED\n\n"
+    p += "Speed: " + stats.speed + "\n"
+    p += "Waviness: " + stats.wave + "\n"
+    p += "Jitteryness: " + stats.movement + "\n"
 
     p += "Deducted: " + addedScore
-    score -= addedScore
-    document.getElementById("currentScore").innerText = score;
-    document.getElementById("lostGhostInfo").innerText = p
+    mainScore -= addedScore
+    setEscapedGhost(p);
 }
 
 function scorePlayer(ghost, headCatch)
@@ -591,24 +630,22 @@ function scorePlayer(ghost, headCatch)
     let waveG = Math.round(ghost.wave);
     let moveG = Math.round(ghost.movement);
 
-    let addedScore = Math.round((speedG * 2) + (waveG * 1.5) + (moveG * 1.5))
+    let stats = judgeGhost(ghost);
+
+    let addedScore = Math.round((speedG * 1.5) + (waveG * 1.25) + (moveG * 1.25))
 
     let p = "";
-    p += "GHOST CAUGHT!\n"
+    p += "GHOST CAUGHT\n\n"
     if (headCatch)
     {
-        p += "HEAD CATCH! +10\n"
+        p += "HEAD CATCH\n"
         addedScore += 10
     }
-    p += "Speed: " + speedG + "\n"
-    p += "Waviness: " + waveG + "\n"
-    p += "Jitteryness: " + moveG + "\n"
-
+    p += "Speed: " + stats.speed + "\n"
+    p += "Waviness: " + stats.wave + "\n"
+    p += "Jitteryness: " + stats.movement + "\n"
 
     p += "Quality: " + addedScore
-    score += addedScore
-    document.getElementById("currentScore").innerText = score;
-    document.getElementById("ghostInfo").innerText = p
+    mainScore += addedScore;
+    setCaughtGhost(p);
 }
-
-let score = 200;
