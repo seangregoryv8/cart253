@@ -430,7 +430,7 @@ function spawnGhosts()
     if (currentTime - lastFlyTime > spawnInterval)
     {
         let ranNum = Math.round(random(1, 100))
-        //if (ranNum === 69)
+        if (ranNum === 69)
         {
             for (let i = 0; i < gameOptions[difficulty].insaneGhosts; i++)
                 ghosts.push(makeGhost())
