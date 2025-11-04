@@ -1,11 +1,10 @@
-let mainScore = 100;
 let caughtGhost = "";
 let escapedGhost = "";
 
-let lastCaught = 0;
-let lastEscaped = 0;
-
 const scoreTimeout = 2000;
+
+let lastCaught = -scoreTimeout;
+let lastEscaped = -scoreTimeout;
 
 function setCaughtGhost(text)
 {
@@ -30,10 +29,16 @@ function createUI()
     textAlign(CENTER);
 
     let now = millis();
-    let lastActivity = Math.max(lastCaught, lastEscaped);
-    text("SCORE", 0, 0);
+
+    fill(0, 0, 0, 100);
+    noStroke();
+    rect(-95, -50, 200, coop ? 200 : 100);
+    fill(255);
+    text("P1 SCORE", 0, 0);
+    if (coop) text("P2 SCORE", 0, 100);
     textFont("Courier New");
-    text(mainScore, 0, 40);
+    text(hunter.score, 0, 40);
+    if (coop) text(hunter2.score, 0, 140);
     translate(-300, 100);
     textSize(20);
 

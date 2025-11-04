@@ -6,7 +6,7 @@ class Hunter
             x: x,
             y: y,
             size: size,
-            count: count
+            count: count,
         };
         this.net = {
             x: undefined,
@@ -21,6 +21,7 @@ class Hunter
         this.maxAcceleration = 6;
         this.controls = controls;
         this.caughtGhost = false;
+        this.score = 100;
     }
 
     move()
@@ -231,7 +232,9 @@ class Hunter
             if (eaten)
             {
                 ghost.toRemove = true;
-                scorePlayer(ghost, !(this.net.state == "inbound"));
+                let addedScore = scorePlayer(ghost, !(this.net.state == "inbound"));
+                this.score += addedScore;
+                console.log(addedScore);
                 // Bring back the net
                 this.net.state = "inbound";
                 this.caughtGhost = true;
