@@ -158,17 +158,18 @@ function startIntro()
         {
             fadeBeforeGameStart -= 3;
             // schedule entering play state only once
-            if (!startPlayTimeoutSet) {
+            if (!startPlayTimeoutSet)
+            {
                 startPlayTimeoutSet = true;
                 setTimeout(() => {
-                    gameState = "play";
+                    gameState = "options";
                     hunter.body.x = -300;
                     if (coop) hunter2.body.x = MAXWIDTH + 150;
                     skipped.once = false;
                     skipped.twice = false;
                     skipForward = 0;
                     spaceGrace = 0;
-                }, 1000);
+                }, 1200);
             }
         }
         push();

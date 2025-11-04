@@ -33,6 +33,8 @@ const hunter2Controls = {
     net: 73
 }
 
+let ending = "regular";
+
 let hunter;
 let hunter2;
 
@@ -47,7 +49,7 @@ let keyState = {
     i: false,
     j: false,
     l: false,
-    space: false,
+    space: false
 }
 
 /**
@@ -134,8 +136,11 @@ function triggerWin(type = "reunion")
     gameState = "win";
 }
 
+let gameOverVideo = null;
+let gameOverMutedForAutoplay = true;
 
-
+let choiceSelected = false;
+let mouseHover = 1;
 function draw()
 {
     if (gameState == "win") titleStartTime = 0;
@@ -144,6 +149,10 @@ function draw()
     {
         case "title":
             startIntro();
+            // Here's where we'll put the difficulty slider
+            break;
+        case "difficulty":
+            console.log("HI")
             break;
         case "instructions":
             background(90);
@@ -209,25 +218,82 @@ function draw()
             textFont(mainFont)
             textAlign(CENTER);
             fill(255, 255, 255)
-            text("OPTIONS", 0, -200);
+            
+            text("CHOOSE DIFFICULTY", 0, -200);
+            textSize(24);
+            let avgX = 250; // Increments by 200
+            let avgY = 285;
+            mouseHover = (mouseX < avgX + 50 && mouseX > avgX - 50 && mouseY < avgY + 15 && mouseY > avgY - 15)
+            fill(mouseHover ? 150 : 255);
+            text("EASY", -200, -100)
+            if (mouseHover) difficulty = "easy";
+            avgX += 200;
+            mouseHover = (mouseX < avgX + 50 && mouseX > avgX - 50 && mouseY < avgY + 15 && mouseY > avgY - 15)
+            fill(mouseHover ? 150 : 255);
+            text("MEDIUM", 0, -100)
+            if (mouseHover) difficulty = "medium";
+            avgX += 200;
+            mouseHover = (mouseX < avgX + 50 && mouseX > avgX - 50 && mouseY < avgY + 15 && mouseY > avgY - 15)
+            fill(mouseHover ? 150 : 255);
+            text("HARD", 200, -100)
+            if (mouseHover) difficulty = "hard";
 
+            fill(255);
             textSize(18);
-            let optionsText = "You are a spirit reaper, trying to find your deceased sister.\n\n"
-            optionsText += "Catch as many ghosts as you can with your spectral net\n"
-            optionsText += "Each ghost you catch will give you points based on how difficult it was to catch\n"
-            optionsText += "If a ghost escapes off the right side of the screen, you will lose points\n\n"
-            optionsText += "Launch the net using the W key\n"
-            optionsText += "Move your hunter left and right using the A and D keys\n"
-            optionsText += "In multiplayer mode, Player 2, your brother, uses the I, J, and L keys respectively\n\n"
-            optionsText += "Good luck finding your sister...\n\n"
-            optionsText += "Press SPACE to return to the main menu"
-            text(optionsText, 0, -100);
+            textFont("Calibri")
+            let optionsText;
+            switch (difficulty)
+            {
+                case "easy":
+                    optionsText = "Looking for a more casual ghost experience\n\n"
+                    optionsText += "- Slower ghost spawn time (Between 2-4 seconds)\n"
+                    optionsText += "- More lenient ghost horde\n"
+                    optionsText += "- Generally slower ghosts that don't move around as much\n"
+                    optionsText += "- 0.75 less penalization for missing a ghost\n"
+                    break;
+                case "medium":
+                    optionsText = "Slight bit of challenge, but nothing supernatural yet\n\n"
+                    optionsText += "- Regular ghost spawn time (Between 1-3 seconds)\n"
+                    optionsText += "- Standard ghost horde\n"
+                    optionsText += "- Run-of-the-mill ghosts\n"
+                    optionsText += "- Regular penalization for missing a ghost\n"
+                    break;
+                case "hard":
+                    optionsText = "A true undead fan, and a tough one at that\n\n"
+                    optionsText += "- Faster ghost spawn time (Between 0.5-2 seconds)\n"
+                    optionsText += "- Good luck with the ghost horde\n"
+                    optionsText += "- Faster ghosts, more jittery and wavy\n"
+                    optionsText += "- 50% more penalization for missing a ghost\n"
+                    break;
+            }
+            if (!coop)
+            {
+                optionsText += "\n- "
+                if (difficulty == "easy") optionsText += "2000 points needed to win"
+                if (difficulty == "medium") optionsText += "3000 points needed to win"
+                if (difficulty == "hard") optionsText += "5000 points needed to win"
+            }
+
+            if (coop)
+            {
+                optionsText += "\n- "
+                if (difficulty == "easy") optionsText += "First to 2000 points wins!"
+                if (difficulty == "medium") optionsText += "First to 3000 points wins!"
+                if (difficulty == "hard") optionsText += "First to 5000 points wins!"
+            }
+
+            optionsText += "\n\n"
+            text(optionsText, 0, 0);
+            textSize(24);
+            text("Happy with your selection? Press SPACE to go ghost hunting...", 0, 300)
             pop();
 
             if (keyState.space)
             {
-                gameState = "title";
-                menuSelect.instructions = false;
+                hunter.setScore();
+                if (coop) hunter2.setScore();
+                gameState = "play";
+                menuSelect.options = false;
                 menuSelect.main = true;
             }
             break;
@@ -263,13 +329,62 @@ function draw()
             setTimeout(spawnGhosts, 2000);
             drawWaves();
 
-            if (!coop && hunter.score >= 300 && !winTriggered)
+            if (!coop && hunter.score >= gameOptions[difficulty].pointsToWin && !winTriggered)
             {
                 triggerWin("reunion");
                 gameState = "win";
             }
+
+            // Hidden not-so-hidden ending
+            if (hunter.score < 0)
+            {
+                if (ghostHordeFunny) ending = "funny";
+                gameState = "over";
+            }
             break;
         case "over":
+            if (ending == "funny")
+            {
+                // create and start the video once (remove ghostHordeFunny guard so video always shows on game over)
+                if (!gameOverVideo) {
+                    
+                    gameOverVideo = createVideo(['assets/hordeMessage.mov','assets/hordeMessage.mp4']);
+                    gameOverVideo.hide();
+                    gameOverVideo.volume(1);
+                    gameOverVideo.elt.muted = false;
+
+                    gameOverVideo.elt.oncanplay = () => {
+                        gameOverVideo.play();
+                        attachVideoFrameUpdate(gameOverVideo);
+                        noLoop(); // only draw when frame changes
+                    };
+                
+                    gameOverVideo.elt.onended = () => {
+                        gameState = "title";
+                        resetAll();
+                        try { gameOverVideo.stop(); } catch(e){}
+                        gameOverVideo.remove();
+                        gameOverVideo = null;
+                        loop(); // resume normal drawing
+                    };
+                }
+
+                // draw current video frame when available; otherwise show fallback text
+                if (gameOverVideo && gameOverVideo.elt.readyState >= 2) {
+                    gameOverVideo.loadPixels();
+                    image(gameOverVideo, 0, 0, MAXWIDTH, MAXHEIGHT);
+                } else {
+                    // fallback while loading / if unsupported
+                    push();
+                    fill(255);
+                    textAlign(CENTER, CENTER);
+                    textSize(48);
+                    text("GAME OVER", MAXWIDTH/2, MAXHEIGHT/2);
+                    textSize(18);
+                    text("Loading video...", MAXWIDTH/2, MAXHEIGHT/2 + 60);
+                    pop();
+                }
+            }
             break;
         case "win":
             // simple timed cutscene: 0..10 seconds
@@ -294,20 +409,20 @@ function draw()
             hunter.body.x = lerp(hunter.body.x, targetX, 0.02 + winProgress * 0.02);
             hunter.draw();
             hunter.moveNet();
-
-            // epilogue text after cutscene
             if (elapsed >= 10)
-            {
                 startEnding();
-                // unlock example: if high score, set an unlock flag
-                // wait for space to go back
-            }
             pop();
             break;
     }
-
+}
+function attachVideoFrameUpdate(v) {
+    v.elt.requestVideoFrameCallback(() => {
+        redraw();
+        attachVideoFrameUpdate(v);
+    });
 }
 
+let ghostHordeFunny = false;
 function spawnGhosts()
 {
     let grace = 0;
@@ -315,9 +430,13 @@ function spawnGhosts()
     if (currentTime - lastFlyTime > spawnInterval)
     {
         let ranNum = Math.round(random(1, 100))
-        if (ranNum === 69)
-            for (let i = 0; i < 50; i++)
+        //if (ranNum === 69)
+        {
+            for (let i = 0; i < gameOptions[difficulty].insaneGhosts; i++)
                 ghosts.push(makeGhost())
+            ghostHordeFunny = true;
+            setTimeout(() => ghostHordeFunny = false, 5000)
+        }
         do
         {
             grace++;
@@ -325,7 +444,7 @@ function spawnGhosts()
             ranNum -= 20
         } while (ranNum > 20)
         lastFlyTime = currentTime;  // Reset the timer
-        spawnInterval = random(1000 * grace, 3000 * grace);
+        spawnInterval = random(gameOptions[difficulty].minSpawn * grace, gameOptions[difficulty].maxSpawn * grace);
     }
 }
 

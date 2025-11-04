@@ -32,6 +32,11 @@ class Hunter
         this.score = gameOptions[difficulty].startScore;
     }
 
+    setScore()
+    {
+        this.score = gameOptions[difficulty].startScore;
+    }
+
     move()
     {
         if (keyIsDown(this.controls.left)) {
@@ -242,7 +247,6 @@ class Hunter
                 ghost.toRemove = true;
                 let addedScore = scorePlayer(ghost, !(this.net.state == "inbound"));
                 this.score += addedScore;
-                console.log(addedScore);
                 // Bring back the net
                 this.net.state = "inbound";
                 this.caughtGhost = true;
