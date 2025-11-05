@@ -69,12 +69,20 @@ let gameOptions =
     }
 }
 
+// What the dimensions of the canvas will be
 const MAXWIDTH = 900;
 const MAXHEIGHT = 800;
-let coop = false;
-let gameState = "title";
-let difficulty = "hard";
 
+// Whether you choose multiplayer or not
+let coop = false;
+// What state you're in (title, instructions, options, over, win)
+let gameState = "title";
+// What difficulty you chose
+let difficulty = "hard";
+// The type of ending you get
+let ending = "regular";
+
+// The control schemes for both hunters
 const hunter1Controls = {
     left: 65,
     right: 68,
@@ -87,7 +95,7 @@ const hunter2Controls = {
     net: 73
 }
 
-let ending = "regular";
+// A couple extra effect modifiers
 let sadTwitchState = {
     nextTwitchAt: 0,
     endAt: 0,
@@ -101,3 +109,59 @@ let staticPulseUntil = 0;
 let pupilSize = 0.15;
 let eyeShake = 0
 let eyeShakeDecay = 0.9;
+
+/**
+ * I had to look up how videos function for this to work (autoplay needs to be turned on)
+ * Basically, this makes your video, turns it to max volume, autoplays it, and kicks you back to the main screen when its finished.
+ * Meant for the two joke endings in the game
+ * @param {*} srcs 
+ * @param {*} onEndCallback 
+ * @returns 
+ */
+function createVideoHandler(srcs, onEndCallback)
+{
+    let vid = createVideo(srcs);
+    vid.hide();
+    vid.volume(1);
+    vid.elt.muted = false;
+    vid.elt.oncanplay = () => {
+        vid.play();
+        attachVideoFrameUpdate(vid);
+        noLoop();
+    };
+    vid.elt.onended = () => {
+        onEndCallback();
+        try { vid.stop(); } catch (e) {}
+        vid.remove();
+        loop();
+    };
+    
+    return vid;
+}
+
+/**
+ * This is a fallback function for when anything might happen to the video
+ * @param {*} vid 
+ */
+function checkVideoFallback(vid)
+{
+
+    // draw current video frame when available; otherwise show fallback text
+    if (vid && vid.elt.readyState >= 2)
+    {
+        vid.loadPixels();
+        image(vid, 0, 0, MAXWIDTH, MAXHEIGHT);
+    }
+    else
+    {
+        // fallback while loading / if unsupported
+        push();
+        fill(255);
+        textAlign(CENTER, CENTER);
+        textSize(48);
+        text("GAME OVER", MAXWIDTH/2, MAXHEIGHT/2);
+        textSize(18);
+        text("Loading video...", MAXWIDTH/2, MAXHEIGHT/2 + 60);
+        pop();
+    }
+}

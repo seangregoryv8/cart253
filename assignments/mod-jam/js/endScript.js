@@ -71,9 +71,9 @@ const lossTimeline = [
     { start: 35, action: () => triggers.trigger7 = true },
     { start: 38, action: () => triggers.trigger8 = true },
     { start: 42, action: () => triggers.trigger9 = true },
-    { start: 45, end: 46, speaker: 'hunter', text: "...you..." },
-    { start: 46, end: 47, speaker: 'hunter', text: "...you are..." },
-    { start: 47, end: 48, speaker: 'hunter', text: "...you are not..." },
+    { start: 45, end: 46, speaker: 'hunter', text: "...you" },
+    { start: 46, end: 47, speaker: 'hunter', text: "...you are" },
+    { start: 47, end: 48, speaker: 'hunter', text: "...you are not" },
     { start: 48, end: 54, speaker: 'hunter', text: "...you are not Sophie..." },
     { start: 57, action: () => textSpawn = min(textSpawn + 3, 255) },
 ]

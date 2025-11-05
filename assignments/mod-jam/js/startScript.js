@@ -34,7 +34,6 @@ function startIntro()
     let sec = (millis() - titleStartTime) / 1000;  // Get current time in milliseconds
     let timing = sec + skipForward;
 
-    console.log(timing);
     if (keyState.space && !skipped.once)
     {
         spaceGrace++;
@@ -129,15 +128,6 @@ function startIntro()
             menuSelect.main = false;
             gameState = "instructions";
         }
-        cond = mouseX >= minW && mouseX < maxW && mouseY >= avH + 200 && mouseY <= avH + 220
-        fill(cond ? 0 : 255, cond ? 0 : 255, cond ? 0 : 255, textFadeIn.title)
-        text(cond ? "Options" : "Optiones", 0, 220)
-        if (cond && click && textFadeIn.title >= 255)
-        {
-            menuSelect.options = true;
-            menuSelect.main = false;
-            gameState = "options";
-        }
         if (timing <= 14 && textFadeIn.title <= 255) textFadeIn.title += 3;
         pop();
     }
@@ -231,4 +221,7 @@ function resetAll()
     hunter2.score = 100;
 
     titleStartTime = 0;
+
+    ghosts = [];
+    lastFlyTime = millis();
 }

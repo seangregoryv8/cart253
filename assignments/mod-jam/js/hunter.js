@@ -220,6 +220,7 @@ class Hunter
         this.drawGhostbusterLogo();
     }
 
+
     /**
      * Draws a boat for the hunter to swim in
      */
@@ -233,9 +234,24 @@ class Hunter
         rect(-1, 0, 305, 70);
         triangle(0, 0, -40, 0, 0, 61);
         triangle(300, 0, 440, 0, 300, 61);
+        triangle(300, 0, 360, 0, 360, -40);
+        rect(360, -40, 80, 40)
+
+        fill("#5e4b3c");
+        translate(400, -190);
+        rect(0, 0, 10, 150)
+        rect(0, 0, 100, 10)
+
+        stroke("#5e4b3c");
+        strokeWeight(10);  // Border thickness
+        noFill();  // No fill for the outer circle, it's hollow
+        ellipse(100, 20, 30);
+
+        noStroke();
+        fill(255);
+        triangle(50, 0, 140, 0, 0, 61);
         pop();
     }
-
 
     /**
      * Handles the net overlapping the ghost

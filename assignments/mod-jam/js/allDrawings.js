@@ -33,6 +33,12 @@ function drawMoon(opacity = 255)
     pop();
 }
 
+/**
+ * 
+ * @param {The opacity of the biome (used for the fade in)} opacity 
+ * @param {The opacity of the first guy (used for the fade in)} opacityGuy 
+ * @param {The opacity of the first guy (used for the fade in and changes if coop is selected)} opacityGuy2 
+ */
 function drawLandscape(opacity = 255, opacityGuy = 0, opacityGuy2 = 0)
 {
     push();
@@ -46,12 +52,16 @@ function drawLandscape(opacity = 255, opacityGuy = 0, opacityGuy2 = 0)
 
     drawHouse(100, 600, opacity);
     drawHouse(MAXWIDTH - 100, 630, opacity);
-    drawGuy(220, 680, opacityGuy);
-    drawGuy(MAXWIDTH - 160, 720, opacityGuy2);
+    drawGuy(220, 680, opacityGuy, hunter.color);
+    drawGuy(MAXWIDTH - 160, 720, opacityGuy2, hunter2.color);
 
     pop();
 }
 
+/**
+ * This draws all the stars in the sky in a beautiful fashion
+ * @param {*} opacity 
+ */
 function drawStars(opacity = 255)
 {
     push();
@@ -90,11 +100,23 @@ function drawGhost(ghost) {
     pop();
 }
 
+/**
+ * Little function I made to make a random integer
+ * @param {*} min 
+ * @param {*} max 
+ * @returns 
+ */
 function ranInt(min, max)
 {
     return Math.round(random(min, max))
 }
 
+/**
+ * Taken directly from my first challenge, this draws the exact house that I drew back then
+ * @param {*} x 
+ * @param {*} y 
+ * @param {*} opacity 
+ */
 function drawHouse(x, y, opacity)
 {
     push();
@@ -113,7 +135,14 @@ function drawHouse(x, y, opacity)
     pop();
 }
 
-function drawGuy(x, y, opacity)
+/**
+ * Taken directly from my first challenge, this draws the same guy from last time, this time
+ * with an opacity for fade in and a color to detect which hunter it is
+ * @param {*} x 
+ * @param {*} y 
+ * @param {*} opacity 
+ */
+function drawGuy(x, y, opacity, color1)
 {
     let mult = 1;
     push();
@@ -121,7 +150,8 @@ function drawGuy(x, y, opacity)
     noStroke();
     fill(187, 187, 187, opacity)
     arc(0, 0, 30 * mult, 75 * mult, radians(180), 0)
-    fill(255, 226, 201, opacity)
+    let c = color(color1)
+    fill(red(c), green(c), blue(c), opacity)
     circle(0, -45, 25 * mult)
     circle(-20, -25, 10 * mult)
     circle(20, -25, 10 * mult)
