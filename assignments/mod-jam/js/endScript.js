@@ -66,7 +66,7 @@ const lossTimeline = [
     { start: 46, end: 47, speaker: 'hunter', text: "...you are..." },
     { start: 47, end: 48, speaker: 'hunter', text: "...you are not..." },
     { start: 48, end: 54, speaker: 'hunter', text: "...you are not Sophie..." },
-    { start: 2, action: () => textSpawn = min(textSpawn + 3, 255) },
+    { start: 57, action: () => textSpawn = min(textSpawn + 3, 255) },
 ]
 const endingTimeline = [
     { start: 2, end: 4, action: () => ghostSpawn = min(ghostSpawn + 3, 255) },
@@ -173,7 +173,6 @@ function startLoss()
     if (frozenTimer === 0) frozenTimer = millis();
 
     endTimer = (millis() - frozenTimer) / 1000;
-    endTimer *= 4;
 
     background(0);
 

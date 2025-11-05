@@ -72,7 +72,7 @@ let gameOptions =
 const MAXWIDTH = 900;
 const MAXHEIGHT = 800;
 let coop = false;
-let gameState = "over";
+let gameState = "title";
 let difficulty = "hard";
 
 const hunter1Controls = {
@@ -87,7 +87,7 @@ const hunter2Controls = {
     net: 73
 }
 
-let ending = "sad";
+let ending = "regular";
 let sadTwitchState = {
     nextTwitchAt: 0,
     endAt: 0,

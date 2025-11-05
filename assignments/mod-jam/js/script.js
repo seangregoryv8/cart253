@@ -431,7 +431,8 @@ function draw()
                 let angle = radians(tiltDeg + wobble);
 
                 // schedule twitches: small head jolt every so often
-                if (millis() > sadTwitchState.nextTwitchAt) {
+                if (millis() > sadTwitchState.nextTwitchAt)
+                {
                     // next twitch in 200..1400ms
                     sadTwitchState.duration = Math.round(random(80, 220));
                     sadTwitchState.offsetX = random(-10, 10) * (0.3 + loseProgress * 1.2);
@@ -442,18 +443,14 @@ function draw()
                 }
 
                 // occasional white flash (very brief) to punctuate horror
-                if (millis() > whiteFlashUntil && elapsed > 0.6 && elapsed < 9) {
-                    if (random() < 0.025 + loseProgress * 0.08) {
+                if (millis() > whiteFlashUntil && elapsed > 0.6 && elapsed < 9)
+                    if (random() < 0.025 + loseProgress * 0.08)
                         whiteFlashUntil = millis() + Math.round(random(40, 150)); // ms
-                    }
-                }
 
                 // occasional static pulse (grain / inverted wash)
-                if (millis() > staticPulseUntil && elapsed > 1 && elapsed < 9) {
-                    if (random() < 0.015 + loseProgress * 0.05) {
+                if (millis() > staticPulseUntil && elapsed > 1 && elapsed < 9)
+                    if (random() < 0.015 + loseProgress * 0.05)
                         staticPulseUntil = millis() + Math.round(random(60, 220));
-                    }
-                }
 
                 // subtle zoom + rotation around centre
                 push();
@@ -473,22 +470,23 @@ function draw()
                 hunter.body.x = lerp(hunter.body.x, targetX, 0.02 + loseProgress * 0.02);
 
                 // if twitch is active, draw hunter with local jitter/rotation
-                if (millis() < sadTwitchState.endAt) {
+                if (millis() < sadTwitchState.endAt)
+                {
                     push();
                     // move to hunter body origin, apply local twitch, then draw
                     translate(sadTwitchState.offsetX, sadTwitchState.offsetY);
                     rotate(sadTwitchState.rot);
                     hunter.draw();
                     pop();
-                } else {
-                    hunter.draw();
                 }
+                else hunter.draw();
 
                 // keep net animating so scene feels alive
                 hunter.moveNet();
 
                 // draw quick ghostly silhouettes during pulses
-                if (millis() < staticPulseUntil) {
+                if (millis() < staticPulseUntil)
+                {
                     push();
                     blendMode(ADD);
                     noStroke();
@@ -499,7 +497,8 @@ function draw()
                 }
 
                 // white flash overlay (short, jarring)
-                if (millis() < whiteFlashUntil) {
+                if (millis() < whiteFlashUntil)
+                {
                     push();
                     noStroke();
                     fill(255, 255, 255, map(whiteFlashUntil - millis(), 0, 150, 0, 220));
@@ -508,22 +507,20 @@ function draw()
                 }
 
                 // film-grain / subtle static drawn on top while later in cutscene
-                if (loseProgress > 0.35) {
+                if (loseProgress > 0.35)
+                {
                     push();
                     noStroke();
                     fill(255, 30);
-                    for (let i = 0; i < 60 * loseProgress; i++) {
+                    for (let i = 0; i < 60 * loseProgress; i++)
                         rect(random(MAXWIDTH), random(MAXHEIGHT), random(1,3), random(1,3));
-                    }
                     pop();
                 }
                 pop();
 
                 // finalise: when full 10s elapsed, proceed
-                if (elapsed >= 2)
-                {
+                if (elapsed >= 10)
                     startLoss();
-                }
 
                 pop(); // end main rotate/scale transform
             }
@@ -547,7 +544,8 @@ function draw()
                     fill(255, 255, 255)
                     pop();
                 }
-                if (ending === "p1wins" || ending === "p2wins") {
+                if (ending === "p1wins" || ending === "p2wins")
+                {
                     drawStars();
 
                     const winner = ending === "p1wins" ? "Player 1" : "Player 2";
@@ -600,10 +598,13 @@ function draw()
                     }
 
                     // draw current video frame when available; otherwise show fallback text
-                    if (bothLoseVideo && bothLoseVideo.elt.readyState >= 2) {
+                    if (bothLoseVideo && bothLoseVideo.elt.readyState >= 2)
+                    {
                         bothLoseVideo.loadPixels();
                         image(bothLoseVideo, 0, 0, MAXWIDTH, MAXHEIGHT);
-                    } else {
+                    }
+                    else
+                    {
                         // fallback while loading / if unsupported
                         push();
                         fill(255);
@@ -616,7 +617,8 @@ function draw()
                     }
                 }
                 else 
-                if (ending === "p1lose" || ending === "p2lose") {
+                if (ending === "p1lose" || ending === "p2lose")
+                {
                     drawStars();
 
                     const winner = ending === "p2lose" ? "Player 1" : "Player 2";
