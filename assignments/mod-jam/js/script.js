@@ -95,9 +95,9 @@ function mouseReleased()
 let smileImage;
 function preload()
 {
-    mainFont = loadFont("./assets/fleshandblood.ttf")
-    horrorFont = loadFont("./assets/whoAsksSatan.ttf")
-    smileImage = loadImage('./assets/images/smile.png');
+    mainFont = loadFont("/cart253/assignments/mod-jam/assets/fleshandblood.ttf")
+    horrorFont = loadFont("/cart253/assignments/mod-jam/assets/whoAsksSatan.ttf")
+    smileImage = loadImage('/cart253/assignments/mod-jam/assets/images/smile.png');
 }
 
 let winTriggered = false;
