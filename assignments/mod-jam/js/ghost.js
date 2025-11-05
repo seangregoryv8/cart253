@@ -29,12 +29,10 @@ function makeGhost()
 let ghostHordeFunny = false;
 function spawnGhosts()
 {
-    console.log("HI")
     let grace = 0;
     const currentTime = millis();  // Get current time in milliseconds
     if (currentTime - lastFlyTime > spawnInterval)
     {
-        console.log(currentTime - lastFlyTime)
         let ranNum = Math.round(random(1, 100))
         if (ranNum === 69)
         {

@@ -131,7 +131,15 @@ function createVideoHandler(srcs, onEndCallback)
     };
     vid.elt.onended = () => {
         onEndCallback();
-        try { vid.stop(); } catch (e) {}
+        try {
+            vid.stop();
+            vid.elt.pause();
+            vid.elt.currentTime = 0;
+            vid.elt.src = "";
+            vid.remove();
+          } catch (e) {
+            console.warn("Could not fully clean up video:", e);
+          }
         vid.remove();
         loop();
     };
