@@ -136,13 +136,6 @@ function draw()
     }
 }
 
-function attachVideoFrameUpdate(v) {
-    v.elt.requestVideoFrameCallback(() => {
-        redraw();
-        attachVideoFrameUpdate(v);
-    });
-}
-
 
 /**
  * This handles when specifically the spacebar is pressed
@@ -173,6 +166,9 @@ function keyPressed()
     keyState[key] = true;
 }
 
+/**
+ * Sees when a key has been released.
+ */
 function keyReleased()
 {
     if (key === "w" || key === "W") keyState.w = false;
@@ -185,6 +181,10 @@ function keyReleased()
     if (keyCode === ESCAPE) keyState.escape = false;
 }
 
+/**
+ * Main system to penalize the player based on missing a ghost.
+ * @param {*} ghost 
+ */
 function penalizePlayer(ghost)
 {
     let speedG = Math.round(ghost.speed);
@@ -207,6 +207,10 @@ function penalizePlayer(ghost)
     setEscapedGhost(p);
 }
 
+/**
+ * Main system to reward the player based on capturing a ghost.
+ * @param {*} ghost 
+ */
 function scorePlayer(ghost, headCatch)
 {
     let speedG = Math.round(ghost.speed);

@@ -3,8 +3,12 @@ let escapePressed = false;
 
 let pauseStart = 0;
 
-var pauseDuration
+var pauseDuration = 0;
 
+/**
+ * This deals with the pause feature, that should work on its own.
+ * Only works in play, and will allow you to return to the main menu if you wish.
+ */
 function pauseGame()
 {
     if (keyState.escape && !escapePressed)
@@ -27,9 +31,28 @@ function pauseGame()
     {
         pauseDuration = millis();
         drawPauseOverlay();
-        return;
+    }
+
+    if (gamePaused)
+    {
+        if (!keyState.space && spacePressed)
+        {
+            gameState = "title";
+            gamePaused = false;
+            winTriggered = false;
+            reset();
+            resetAll();
+        }
+        if (keyState.space)
+        {
+            spacePressed = true;
+        }
     }
 }
+
+/**
+ * Draws a simple overlay for the pause. Nothing special
+ */
 function drawPauseOverlay()
 {
     push();
@@ -37,7 +60,11 @@ function drawPauseOverlay()
     rect(0, 0, width, height);
     fill(255);
     textAlign(CENTER, CENTER);
+    textFont(mainFont);
     textSize(48);
-    text("PAUSED", width / 2, height / 2);
+    text("GAME PAUSED", width / 2, height / 2);
+    textSize(24);
+    text("To resume, press ESC", width / 2, height / 2 + 100)
+    text("To go back to the title screen, press SPACE", width / 2, height / 2 + 150)
     pop();
 }

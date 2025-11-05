@@ -6,6 +6,7 @@ const scoreTimeout = 2000;
 let lastCaught = -scoreTimeout;
 let lastEscaped = -scoreTimeout;
 
+
 function setCaughtGhost(text)
 {
     caughtGhost = text;
@@ -18,6 +19,10 @@ function setEscapedGhost(text)
     lastEscaped = millis();
 }
 
+/**
+ * Nicely-made UI that showcases both the score of each player as well as the most recently-caught ghost or recently-escaped ghost
+ * A unique quirk of this is the fact that the box wil disappear after a bit of inactivity to prevent screen clutter.
+ */
 function createUI()
 {
     // Create a div to hold the scoreboard

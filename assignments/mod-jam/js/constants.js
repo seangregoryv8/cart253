@@ -173,3 +173,14 @@ function checkVideoFallback(vid)
         pop();
     }
 }
+
+/**
+ * Redraws the video if it fails to load at times.
+ * @param {*} v 
+ */
+function attachVideoFrameUpdate(v) {
+    v.elt.requestVideoFrameCallback(() => {
+        redraw();
+        attachVideoFrameUpdate(v);
+    });
+}

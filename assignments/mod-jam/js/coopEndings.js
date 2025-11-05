@@ -1,3 +1,8 @@
+/**
+ * This draws out the two ending scenes of a hunter winning depending on who won.
+ * @param {*} hunter 
+ * @param {*} hunter2 
+ */
 function playerWins(hunter, hunter2)
 {
     // Draw the hunter's body
@@ -19,7 +24,11 @@ function playerWins(hunter, hunter2)
         spacePressed = true;
     }
 }
-
+/**
+ * This draws out the two ending scenes of a hunter winning depending on who was disqualified.
+ * @param {*} hunter 
+ * @param {*} hunter2 
+ */
 function playerDefaultWins(hunter, hunter2)
 {
     let x = MAXWIDTH / 2 - 50;
@@ -40,6 +49,14 @@ function playerDefaultWins(hunter, hunter2)
     }
 }
 
+/**
+ * Since I like reusability, this changes the hunters (specifically for both disqualification endings) depending on whether they won or lost.
+ * @param {*} x 
+ * @param {*} y 
+ * @param {*} size 
+ * @param {*} hunter 
+ * @param {*} won 
+ */
 function fedUpHunter(x, y, size, hunter, won)
 {
     push();
@@ -131,6 +148,14 @@ function fedUpHunter(x, y, size, hunter, won)
     pop();
 }
 
+/**
+ * Since I like reusability, this changes the hunters (specifically for both winning endings) depending on whether they won or lost.
+ * @param {*} x 
+ * @param {*} y 
+ * @param {*} size 
+ * @param {*} hunter 
+ * @param {*} won 
+ */
 function happyHunter(x, y, size, hunter, won)
 {
     push();

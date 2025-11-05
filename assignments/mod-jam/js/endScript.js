@@ -17,6 +17,9 @@ let spacePressed = false;
 
 let textSpawn = 0;
 
+/**
+ * Simple reset feature
+ */
 function reset()
 {
     frozenTimer = 0;
@@ -43,6 +46,9 @@ function reset()
     triggers.trigger9 = false
 }
 
+/**
+ * All the triggers for the scary ending
+ */
 let triggers = {
     trigger1: false,
     trigger2: false,
@@ -55,19 +61,18 @@ let triggers = {
     trigger9: false
 }
 
+/**
+ * This is an object class of arrays that's needed to make my life a ton easier in terms of drawing cutscenes.
+ */
 const lossTimeline = [
     { start: 5, action: () => triggers.trigger1 = true },
     { start: 8, end: 10, speaker: 'hunter', text: "Sophie..." },
     { start: 13, action: () => triggers.trigger2 = true },
     { start: 14, end: 16, speaker: 'hunter', text: "Sophie?..." },
     { start: 18, action: () => triggers.trigger3 = true },
-    { start: 20, end: 22, speaker: 'hunter', text: "Sophie?" },
-    { start: 23, action: () => triggers.trigger4 = true },
-    { start: 25, end: 27, speaker: 'hunter', text: "Sophie?" },
-    { start: 26, action: () => triggers.trigger5 = true },
-    { start: 29, end: 30, speaker: 'hunter', text: "Sophie?" },
-    { start: 30, action: () => triggers.trigger6 = true },
-    { start: 31, end: 33, speaker: 'hunter', text: "Sophie?" },
+    { start: 20, action: () => triggers.trigger4 = true },
+    { start: 22, action: () => triggers.trigger5 = true },
+    { start: 33, action: () => triggers.trigger6 = true },
     { start: 35, action: () => triggers.trigger7 = true },
     { start: 38, action: () => triggers.trigger8 = true },
     { start: 42, action: () => triggers.trigger9 = true },
@@ -108,9 +113,8 @@ const endingTimeline = [
 ];
 
 /**
- * Handles the ending cutscene drawing
+ * Handles the ending cutscene drawing for the reunion ending, by cycling through the timeline array above, then drawing the end screen.
  */
-
 function startEnding()
 {
     if (frozenTimer === 0) frozenTimer = millis();
@@ -177,6 +181,9 @@ function startEnding()
     }
 }
 
+/**
+ * Handles the ending cutscene drawing for the eerie loss ending, by cycling through the timeline array above, then drawing the end screen.
+ */
 function startLoss()
 {
     if (frozenTimer === 0) frozenTimer = millis();
@@ -260,6 +267,11 @@ function startLoss()
     }
 }
 
+/**
+ * Simple dialogue box that helps out with the cutscene dialogue.
+ * @param {*} dialogue 
+ * @param {*} hunterSpeak 
+ */
 function sayDialogue(dialogue, hunterSpeak = true)
 {
     if (triggers.trigger9) translate(100, -300)
@@ -297,6 +309,14 @@ function drawWalkingHunter(elapsed, targetX, y, size)
     return p >= 1;
 }
 
+/**
+ * Since I really like reusability, I used this to draw the hunter in both the eerie loss ending and reunion ending through out the entire cutscene.
+ * It uses the variety of triggers or some values of headHanging or ghostSpawning to showcase the storytelling on display.
+ * @param {*} x 
+ * @param {*} y 
+ * @param {*} size 
+ * @param {*} gx 
+ */
 function drawEndHunter(x, y, size, gx = 0)
 {
     // Draw the hunter's body
@@ -452,6 +472,14 @@ function drawEndHunter(x, y, size, gx = 0)
 function easeOutCubic(t) {
     return 1 - pow(1 - t, 3);
 }
+
+/**
+ * This draws the spooky realistic eyes. Only function in the code that I used chatGPT for since I wanted as realistic eyes as humanly possible.
+ * @param {*} x 
+ * @param {*} y 
+ * @param {*} w 
+ * @param {*} h 
+ */
 function drawRealisticEye(x, y, w, h) {
     push();
     translate(x, y);

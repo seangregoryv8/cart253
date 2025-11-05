@@ -28,6 +28,10 @@ function makeGhost()
 
 let ghostHordeFunny = false;
 
+/**
+ * This spawns out the ghosts. It changes the grace period depending on how many ghosts spawned, whether the pause button was detected, etc.
+ * It also controls a funny variable to get a secret little ending.
+ */
 function spawnGhosts()
 {
     let grace = 0;
@@ -76,6 +80,11 @@ function moveGhost(ghost)
     }
 }
 
+/**
+ * This is my main judging program to determine how many points you score based on the ghost you catch.
+ * @param {*} ghost 
+ * @returns 
+ */
 function judgeGhost(ghost)
 {
     let d = gameOptions[difficulty]
