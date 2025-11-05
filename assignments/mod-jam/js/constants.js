@@ -54,7 +54,7 @@ let gameOptions =
     },
     hard:
     {
-        startScore: 0,
+        startScore: 50,
         pointsToWin: 5000,
         minSpawn: 500,
         maxSpawn: 2000,
@@ -68,3 +68,23 @@ let gameOptions =
         penalize: 1.5
     }
 }
+
+const MAXWIDTH = 900;
+const MAXHEIGHT = 800;
+let coop = true;
+let gameState = "play";
+let difficulty = "medium";
+
+const hunter1Controls = {
+    left: 65,
+    right: 68,
+    net: 16
+}
+
+const hunter2Controls = {
+    left: 74,
+    right: 76,
+    net: 73
+}
+
+let ending = "sad";

@@ -8,7 +8,7 @@ class Hunter
      * @param {string} count 
      * @param {object} controls 
      */
-    constructor(x, y, size, count, controls)
+    constructor(x, y, size, count, controls, color, eyeColor)
     {
         this.body = {
             x: x,
@@ -30,6 +30,8 @@ class Hunter
         this.controls = controls;
         this.caughtGhost = false;
         this.score = gameOptions[difficulty].startScore;
+        this.color = color;
+        this.eyeColor = eyeColor;
     }
 
     setScore()
@@ -79,7 +81,6 @@ class Hunter
 
     draw()
     {
-        this.drawNet();
         this.drawHunter();
         this.drawBoat();
     }
@@ -171,13 +172,15 @@ class Hunter
      */
     drawHunter()
     {
+        this.drawNet();
+        let twisted = gameState == "over" && ending == "sad";
         // Draw the hunter's body
         push();
         stroke(0);
         fill("#bbbbbb")
         ellipse(this.body.x - (this.body.size / 2), this.body.y, this.body.size, (this.body.size * 3));
-        ellipse(this.body.x + 20, this.body.y - 80, this.body.size / 3);
-        fill("#ffe2c9");
+        if (!twisted) ellipse(this.body.x + 20, this.body.y - 80, this.body.size / 3);
+        fill(this.color);
         translate(this.body.x - (this.body.size / 2), this.body.y - this.body.size * 1.5)
         ellipse(0, 0, this.body.size * 0.75)
 
@@ -188,7 +191,7 @@ class Hunter
         // Now we draw his eyes
         ellipse(-15, -15, 20, 30)
         ellipse(15, -15, 20, 30)
-        fill("#1569C7")
+        fill(this.eyeColor)
         noStroke();
         ellipse(-20, -19, 10);
         ellipse(10, -19, 10);
@@ -200,7 +203,13 @@ class Hunter
         noStroke();
         ellipse(-20, -19, 2);
         ellipse(10, -19, 2);
-
+        
+        if (twisted)
+        {
+            fill(0);
+            ellipse(-15, -15, 20, 30)
+            ellipse(15, -15, 20, 30)
+        }
 
         fill(0)
         textSize(24);
@@ -209,9 +218,6 @@ class Hunter
         pop();
 
         this.drawGhostbusterLogo();
-
-        this.drawBoat();
-
     }
 
     /**

@@ -3,6 +3,7 @@ let endTimer = 0;
 let startEndTimer = 0;
 let endArrived = false;
 
+let hunterSpawn = 0;
 let ghostSpawn = 0;
 let sadSpawn = 0;
 let gx = 0;
@@ -32,6 +33,36 @@ function reset()
     spacePressed = false;
     textSpawn = 0;
 }
+
+const lossTimeline = [
+    { start: 2, end: 4, action: () => hunterSpawn = min(ghostSpawn + 3, 255) },
+    { start: 4, end: 6, action: () => sadSpawn = min(sadSpawn + 3, 255) },
+    { start: 8, end: 10, speaker: 'hunter', text: "Sophie... is that you" },
+    { start: 12, end: 14, speaker: 'ghost', text: "..." },
+    { start: 14, end: 16, speaker: 'ghost', text: "Felix..." },
+    { start: 16, end: 18, speaker: 'hunter', text: "I miss you so much...", action: () => gx = 50 },
+    { start: 18, end: 20, speaker: 'ghost', text: "Felix..." },
+    { start: 20, end: 22, speaker: 'ghost', text: "It was not your fault..." },
+    { start: 22, end: 24, speaker: 'hunter', text: "Sophie... I could not protect you..." },
+    { start: 24, end: 26, speaker: 'ghost', text: "Felix... you protected me all my life..." },
+    { start: 26, end: 29, speaker: 'ghost', text: "This was not your fault...\nWe both know you could not have\ngotten there in time..." },
+    { time: 30, action: () => hangHead = true },
+    { start: 31, end: 34, speaker: 'ghost', text: "You did everything you could...\nYou need to move on...\nFrom me..." },
+    { start: 36, end: 38, speaker: 'hunter', text: "...I do not know if I can..." },
+    { start: 40, end: 42, speaker: 'ghost', text: "You will...\nFor both of us..." },
+    { time: 44, action: () => ghostSmile = true },
+    { start: 44, end: 46, speaker: 'ghost', text: "I will always be with you..." },
+    { start: 46, end: 48, speaker: 'ghost', text: "I love you, Felix..." },
+    { time: 50, action: () => { headRaise = true; hangHead = false; } },
+    { start: 52, end: 54, speaker: 'hunter', text: "I love you too, Sophie..." },
+    { start: 56, end: 58, speaker: 'hunter', text: "Goodbye..." },
+    { start: 58, end: 60, speaker: 'ghost', text: "I never liked goodbye..." },
+    { start: 62, end: 64, speaker: 'ghost', text: "How about...\nsee you later..." },
+    { time: 67, action: () => hunterSmile = true },
+    { start: 68, end: 70, speaker: 'hunter', text: "Yeah... See you later..." },
+    { start: 72, end: 74, action: () => ghostSpawn = max(ghostSpawn - 3, 0) },
+    { start: 78, action: () => textSpawn = min(textSpawn + 3, 255) },
+]
 const endingTimeline = [
     { start: 2, end: 4, action: () => ghostSpawn = min(ghostSpawn + 3, 255) },
     { start: 4, end: 6, action: () => sadSpawn = min(sadSpawn + 3, 255) },
@@ -67,6 +98,72 @@ const endingTimeline = [
  */
 
 function startEnding()
+{
+    if (frozenTimer === 0) frozenTimer = millis();
+
+    endTimer = (millis() - frozenTimer) / 1000;
+
+    background(0);
+
+    let x = MAXWIDTH / 2 - 50;
+    let y = MAXHEIGHT / 2 + 100;
+    let size = 100;
+
+    let arrived;
+
+    if (!endArrived) arrived = drawWalkingHunter((endTimer * 1000) - startEndTimer, x, y, size);
+    else
+    {
+        endTimer = Math.round(endTimer);
+        
+        // Process timeline events
+        for (const event of endingTimeline)
+        {
+            const start = event.start ?? event.time;
+            const end = event.end; // may be undefined
+
+            const isActive = endTimer >= start && (end === undefined || endTimer < end);
+
+            if (isActive)
+            {
+                if (event.action) event.action();
+                if (event.text) sayDialogue(event.text, event.speaker === 'hunter');
+            }
+        }
+        drawEndHunter(x, y, size, gx);
+        
+        push();
+        
+        fill(255, 255, 255, textSpawn);
+        textSize(50);
+        textFont(mainFont)
+        textAlign(CENTER);
+        text("THE END", MAXWIDTH / 2, 250);
+
+        textSize(18);
+        text("Press SPACE to return to menu.", MAXWIDTH / 2, MAXHEIGHT / 2 + 200);
+        pop();
+
+        if (!keyState.space && spacePressed)
+        {
+            gameState = "title";
+            winTriggered = false;
+            reset();
+            resetAll();
+        }
+        if (keyState.space && textSpawn >= 255)
+        {
+            spacePressed = true;
+        }
+    }
+    if (arrived)
+    {
+        frozenTimer = millis();
+        endArrived = true;
+    }
+}
+
+function startLoss()
 {
     if (frozenTimer === 0) frozenTimer = millis();
 

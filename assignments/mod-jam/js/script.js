@@ -15,26 +15,6 @@
 
 "use strict";
 
-const MAXWIDTH = 900;
-const MAXHEIGHT = 800;
-let coop = false;
-let gameState = "title";
-let difficulty = "hard";
-
-const hunter1Controls = {
-    left: 65,
-    right: 68,
-    net: 16
-}
-
-const hunter2Controls = {
-    left: 74,
-    right: 76,
-    net: 73
-}
-
-let ending = "regular";
-
 let hunter;
 let hunter2;
 
@@ -95,8 +75,8 @@ function setup()
     for (let i = 0; i < 100; i++)
         stars.push({x: random(width), y: random(height / 1.5), size: random(2, 5)})
 
-    hunter = new Hunter(MAXWIDTH - 100, MAXHEIGHT - 40, 100, "P1", hunter1Controls)
-    hunter2 = new Hunter(100, MAXHEIGHT - 40, 100, "P2", hunter2Controls)
+    hunter = new Hunter(MAXWIDTH - 100, MAXHEIGHT - 40, 100, "P1", hunter1Controls, "#ffe2c9", "#1569C7")
+    hunter2 = new Hunter(100, MAXHEIGHT - 40, 100, "P2", hunter2Controls, "#472a16", "#3dff98")
 }
 
 var mainFont;
@@ -137,7 +117,7 @@ function triggerWin(type = "reunion")
 }
 
 let gameOverVideo = null;
-let gameOverMutedForAutoplay = true;
+let bothLoseVideo = null;
 
 let choiceSelected = false;
 let mouseHover = 1;
@@ -201,6 +181,7 @@ function draw()
         // What to add:
         // - Difficulty slider
         // - Points to win for multiplayer
+            ending = "regular";
             background(90);
             drawMoon();
             drawLandscape(255, 255);
@@ -304,7 +285,7 @@ function draw()
             drawStars();
 
             createUI();
-        
+
             hunter.draw();
             hunter.move();
             hunter.moveNet();
@@ -334,11 +315,40 @@ function draw()
                 triggerWin("reunion");
                 gameState = "win";
             }
+            else if (coop)
+            {
+                if (hunter.score >= gameOptions[difficulty].pointsToWin)
+                {
+                    ending = "p1wins"
+                    gameState = "win";
+                }
+                else if (hunter2.score >= gameOptions[difficulty].pointsToWin)
+                {
+                    ending = "p2wins"
+                    gameState = "win";
+                }
+                else if (hunter.score < 0 && hunter2.score < 0)
+                {
+                    ending = "bothlose";
+                    gameState = "win";
+                }
+                else if (hunter.score < 0)
+                {
+                    ending = "p1lose";
+                    gameState = "win";
+                }
+                else if (hunter2.score < 0)
+                {
+                    ending = "p2lose";
+                    gameState = "win";
+                }
+            }
 
             // Hidden not-so-hidden ending
-            if (hunter.score < 0)
+            if (!coop && hunter.score < 0)
             {
                 if (ghostHordeFunny) ending = "funny";
+                else ending = "sad";
                 gameState = "over";
             }
             break;
@@ -385,33 +395,179 @@ function draw()
                     pop();
                 }
             }
+            else if (ending == "sad")
+            {
+                console.log("HI");
+                // simple timed cutscene: 0..10 seconds
+                background(20);
+                let elapsed = (millis() - winStartTime) / 1000; // seconds
+                winProgress = constrain(elapsed / 10, 0, 1);
+                   
+                // subtle zoom effect by scaling around centre
+                push();
+                translate(MAXWIDTH / 2, MAXHEIGHT / 2);
+                let zoom = 1 + winProgress * 0.4;
+                scale(zoom);
+                translate(-MAXWIDTH / 2, -MAXHEIGHT / 2);
+                   
+                // dim scene and draw environment faintly
+                drawMoon(255);
+                drawLandscape(255, 0, 0);
+                drawStars(255);
+                   
+                // draw hunter slowly moving to centre
+                let targetX = MAXWIDTH / 2;
+                hunter.body.x = lerp(hunter.body.x, targetX, 0.02 + winProgress * 0.02);
+                hunter.draw();
+                hunter.moveNet();
+                if (elapsed >= 10)
+                    startLoss();
+                pop();
+            }
             break;
         case "win":
-            // simple timed cutscene: 0..10 seconds
-            background(20);
-            let elapsed = (millis() - winStartTime) / 1000; // seconds
-            winProgress = constrain(elapsed / 10, 0, 1);
+            if (coop)
+            {
+                if (ending != "bothlose")
+                {
+                    push();
+                    background(90);
+                    noStroke();
+                    fill(59, 111, 65)
+                    ellipse(MAXWIDTH / 2, MAXHEIGHT + 40, 1500, 600)
+                    push();
+                    noStroke();
+                    translate(MAXWIDTH / 2, MAXHEIGHT / 2);
+                    textSize(50);
+                    textFont(mainFont)
+                    textAlign(CENTER);
+                    fill(255, 255, 255)
+                    pop();
+                }
+                if (ending === "p1wins" || ending === "p2wins") {
+                    drawStars();
 
-            // subtle zoom effect by scaling around centre
-            push();
-            translate(MAXWIDTH / 2, MAXHEIGHT / 2);
-            let zoom = 1 + winProgress * 0.4;
-            scale(zoom);
-            translate(-MAXWIDTH / 2, -MAXHEIGHT / 2);
+                    const winner = ending === "p1wins" ? "Player 1" : "Player 2";
+                    const loser  = ending === "p1wins" ? "Player 2" : "Player 1";
+                    const winHunter = ending === "p1wins" ? hunter : hunter2;
+                    const loseHunter = ending === "p1wins" ? hunter2 : hunter;
 
-            // dim scene and draw environment faintly
-            drawMoon(255);
-            drawLandscape(255, 0, 0);
-            drawStars(255);
+                    fill(0, 0, 0, 100);
+                    noStroke();
+                    rect(MAXWIDTH / 4, 30, MAXWIDTH / 2, 230);
 
-            // draw hunter slowly moving to centre
-            let targetX = MAXWIDTH / 2;
-            hunter.body.x = lerp(hunter.body.x, targetX, 0.02 + winProgress * 0.02);
-            hunter.draw();
-            hunter.moveNet();
-            if (elapsed >= 10)
-                startEnding();
-            pop();
+                    textFont(mainFont);
+                    textAlign(CENTER);
+                    textSize(50);
+                    fill(255);
+                    text(`${winner} Wins`, MAXWIDTH / 2, 100);
+
+                    textFont("Calibri");
+                    textSize(24);
+                    text(`${winner} Score: ${winHunter.score}`, MAXWIDTH / 2, 200);
+                    text(`${loser} Score: ${loseHunter.score}`, MAXWIDTH / 2, 230);
+
+                    pop();
+                    playerWins(winHunter, loseHunter);
+                }
+                else if (ending == "bothlose")
+                {
+                    // create and start the video once (remove ghostHordeFunny guard so video always shows on game over)
+                    if (!bothLoseVideo) {
+
+                        bothLoseVideo = createVideo(['assets/bothLose.mov']);
+                        bothLoseVideo.hide();
+                        bothLoseVideo.volume(1);
+                        bothLoseVideo.elt.muted = false;
+
+                        bothLoseVideo.elt.oncanplay = () => {
+                            bothLoseVideo.play();
+                            attachVideoFrameUpdate(bothLoseVideo);
+                            noLoop(); // only draw when frame changes
+                        };
+                    
+                        bothLoseVideo.elt.onended = () => {
+                            gameState = "title";
+                            resetAll();
+                            try { bothLoseVideo.stop(); } catch(e){}
+                            bothLoseVideo.remove();
+                            bothLoseVideo = null;
+                            loop(); // resume normal drawing
+                        };
+                    }
+
+                    // draw current video frame when available; otherwise show fallback text
+                    if (bothLoseVideo && bothLoseVideo.elt.readyState >= 2) {
+                        bothLoseVideo.loadPixels();
+                        image(bothLoseVideo, 0, 0, MAXWIDTH, MAXHEIGHT);
+                    } else {
+                        // fallback while loading / if unsupported
+                        push();
+                        fill(255);
+                        textAlign(CENTER, CENTER);
+                        textSize(48);
+                        text("GAME OVER", MAXWIDTH/2, MAXHEIGHT/2);
+                        textSize(18);
+                        text("Loading video...", MAXWIDTH/2, MAXHEIGHT/2 + 60);
+                        pop();
+                    }
+                }
+                else 
+                if (ending === "p1lose" || ending === "p2lose") {
+                    drawStars();
+
+                    const winner = ending === "p2lose" ? "Player 1" : "Player 2";
+                    const loser  = ending === "p2lose" ? "Player 2" : "Player 1";
+                    const winHunter = ending === "p2lose" ? hunter : hunter2;
+                    const loseHunter = ending === "p2lose" ? hunter2 : hunter;
+
+                    fill(0, 0, 0, 100);
+                    noStroke();
+                    rect(MAXWIDTH / 6, 30, MAXWIDTH * 2 / 3, 230);
+
+                    textFont(mainFont);
+                    textAlign(CENTER);
+                    textSize(50);
+                    fill(255);
+                    text(`${loser} Disqualified.\n${winner} Wins`, MAXWIDTH / 2, 100);
+
+                    textFont("Calibri");
+                    textSize(24);
+                    text(`${winner} Score: ${winHunter.score}`, MAXWIDTH / 2, 220);
+                    text(`${loser} Score: ${loseHunter.score}`, MAXWIDTH / 2, 250);
+
+                    pop();
+                    playerDefaultWins(winHunter, loseHunter);
+                }
+            }
+            else
+            {
+                // simple timed cutscene: 0..10 seconds
+                background(20);
+                let elapsed = (millis() - winStartTime) / 1000; // seconds
+                winProgress = constrain(elapsed / 10, 0, 1);
+                   
+                // subtle zoom effect by scaling around centre
+                push();
+                translate(MAXWIDTH / 2, MAXHEIGHT / 2);
+                let zoom = 1 + winProgress * 0.4;
+                scale(zoom);
+                translate(-MAXWIDTH / 2, -MAXHEIGHT / 2);
+                   
+                // dim scene and draw environment faintly
+                drawMoon(255);
+                drawLandscape(255, 0, 0);
+                drawStars(255);
+                   
+                // draw hunter slowly moving to centre
+                let targetX = MAXWIDTH / 2;
+                hunter.body.x = lerp(hunter.body.x, targetX, 0.02 + winProgress * 0.02);
+                hunter.draw();
+                hunter.moveNet();
+                if (elapsed >= 10)
+                    startEnding();
+                pop();
+            }
             break;
     }
 }

@@ -33,6 +33,8 @@ function startIntro()
     if (titleStartTime === 0) titleStartTime = millis();
     let sec = (millis() - titleStartTime) / 1000;  // Get current time in milliseconds
     let timing = sec + skipForward;
+
+    console.log(timing);
     if (keyState.space && !skipped.once)
     {
         spaceGrace++;
@@ -63,7 +65,9 @@ function startIntro()
         fill(255, 255, 255, textFadeIn.author)
         textSize(48);
         textAlign(CENTER);
-        text("A game by\nSean Gregory", 0, 0);
+        text(ending == "funny" ? "Lol\nLmao even" : "A game by\nSean Gregory", 0, 0);
+        textSize(20);
+        text("Please allow autoplay in your browser for the best experience", 0, 200)
         if (textFadeIn.author <= 255) textFadeIn.author += 3;
         pop();
     }
@@ -75,7 +79,9 @@ function startIntro()
         fill(255, 255, 255, textFadeIn.author)
         textSize(48);
         textAlign(CENTER);
-        text("A game by\nSean Gregory", 0, 0);
+        text(ending == "funny" ? "Lol\nLmao even" : "A game by\nSean Gregory", 0, 0);
+        textSize(20);
+        text("Please allow autoplay in your browser for the best experience", 0, 200)
         if (textFadeIn.author >= 0) textFadeIn.author -= 3;
         pop();
     }
@@ -223,4 +229,6 @@ function resetAll()
 
     hunter.score = 100;
     hunter2.score = 100;
+
+    titleStartTime = 0;
 }
