@@ -1,7 +1,7 @@
 class Hunter
 {
     /**
-     * 
+     * Main constructor for the hunter class.
      * @param {BigInteger} x 
      * @param {BigInteger} y 
      * @param {BigInteger} size 
@@ -34,11 +34,17 @@ class Hunter
         this.eyeColor = eyeColor;
     }
 
+    /**
+     * Sets its score
+     */
     setScore()
     {
         this.score = gameOptions[difficulty].startScore;
     }
 
+    /**
+     * Responsible for the ice physics kinda movement that you can do in this game.
+     */
     move()
     {
         if (keyIsDown(this.controls.left)) {
@@ -61,6 +67,9 @@ class Hunter
         this.body.x += this.acceleration;
     }
 
+    /**
+     * Main net feature, kept completely intact from frogfrogfrog
+     */
     moveNet()
     {
         this.net.x = this.body.x;
@@ -79,6 +88,9 @@ class Hunter
         }
     }
 
+    /**
+     * Draws both the hunter and his boat.
+     */
     draw()
     {
         this.drawHunter();
