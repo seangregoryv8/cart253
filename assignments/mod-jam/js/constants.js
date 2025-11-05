@@ -74,9 +74,9 @@ const MAXWIDTH = 900;
 const MAXHEIGHT = 800;
 
 // Whether you choose multiplayer or not
-let coop = false;
+let coop = true;
 // What state you're in (title, instructions, options, over, win)
-let gameState = "title";
+let gameState = "play";
 // What difficulty you chose
 let difficulty = "hard";
 // The type of ending you get

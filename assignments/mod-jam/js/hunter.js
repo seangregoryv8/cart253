@@ -248,8 +248,18 @@ class Hunter
         ellipse(100, 20, 30);
 
         noStroke();
-        fill(255);
-        triangle(50, 0, 140, 0, 0, 61);
+        fill("#B87333");
+        scale(0.75)
+        translate(32.5, 12.5)
+        triangle(100, 30, 120, 70, 80, 70);
+        rect(60, 65, 80, 100, 30)
+        fill("#e25822")
+        ellipse(100, 115, 60, 60, 30)
+        fill("#B87333");
+        rect(95, 70, 10, 80)
+        rect(75, 70, 10, 80)
+        rect(115, 70, 10, 80)
+        scale(1);
         pop();
     }
 
