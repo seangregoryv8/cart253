@@ -97,7 +97,6 @@ function startEnding()
     if (frozenTimer === 0) frozenTimer = millis();
 
     endTimer = (millis() - frozenTimer) / 1000;
-    endTimer *= 10;
 
     background(0);
 
@@ -164,7 +163,7 @@ function startLoss()
     if (frozenTimer === 0) frozenTimer = millis();
 
     endTimer = (millis() - frozenTimer) / 1000;
-    endTimer *= 20;
+    endTimer *= 4;
 
     background(0);
 
@@ -297,6 +296,12 @@ function drawEndHunter(x, y, size, gx = 0)
     translate(hangHead ? 15 : 0, hangHead ? 15 : 0);
     ellipse(0, 0, size * 0.75)
 
+    if (gameState == "over")
+    {
+        stroke(0);
+        fill(255);
+        translate(0, 15)
+    }
     if (hunterSmile)
     {
         push();
@@ -316,8 +321,22 @@ function drawEndHunter(x, y, size, gx = 0)
             translate(-10, -10);
             rotate(radians(45))
         }
-        ellipse(25, -15, 20, 30)
-        ellipse(-5, -15, 20, 30)
+        if (triggers.trigger2)
+        {
+            // occasionally twitch pupil size for creepy realism
+            if (random() < 0.005) {
+                eyeShake = max(eyeShake, 1)
+                pupilSize = random(0.08, 0.20);
+            }
+        }
+        if (triggers.trigger5)
+        {
+            eyeShake = 2;
+        }
+        console.log(pupilSize)
+        drawRealisticEye(25, -15, 20, 30, mouseX, mouseY, pupilSize);
+        drawRealisticEye(-5, -15, 20, 30, mouseX, mouseY, pupilSize);
+
         pop();
     }
     else if (gameState == "over")
@@ -325,13 +344,15 @@ function drawEndHunter(x, y, size, gx = 0)
         ellipse(20, -15, 20, 30)
     }
 
-    if (!hangHead)
+    if (gameState == "win" && !hangHead)
     {
         stroke(0);
         fill(255);
         translate(0, 15)
         // Now we draw his eyes
         ellipse(20, -15, 20, 30)
+        if (!triggers.trigger1)
+        {
         fill("#1569C7")
         noStroke();
         ellipse(25, -15, 10);
@@ -344,6 +365,7 @@ function drawEndHunter(x, y, size, gx = 0)
         circle(15, -30, size / 4);
         fill(255, 226, 201, sadSpawn);
         ellipse(12, -33, size / 4);
+        }
     }
 
     if ((gameState == "over" && !endArrived) || (gameState == "win" && !hangHead))
@@ -384,4 +406,47 @@ function drawEndHunter(x, y, size, gx = 0)
 /* easing helper */
 function easeOutCubic(t) {
     return 1 - pow(1 - t, 3);
+}
+function drawRealisticEye(x, y, w, h) {
+  push();
+  translate(x, y);
+
+  // random shake — both position and internal elements
+  let shakeX = random(-eyeShake, eyeShake);
+  let shakeY = random(-eyeShake, eyeShake);
+  translate(shakeX, shakeY);
+
+  // outer white
+  noStroke();
+  fill(255);
+  ellipse(0, 0, w, h);
+
+  // iris (blue gradient that shakes too)
+  push();
+  let irisShakeX = random(-eyeShake * 0.6, eyeShake * 0.6);
+  let irisShakeY = random(-eyeShake * 0.6, eyeShake * 0.6);
+  translate(irisShakeX, irisShakeY);
+  for (let r = w * 0.25; r > 0; r -= 1) {
+    let c = color(40, 120 + r * 2, 255 - r * 2);
+    fill(c);
+    ellipse(0, 0, r * 2);
+  }
+
+  // pupil
+  fill(0);
+  ellipse(0, 0, w * 0.15);
+
+  // highlight
+  fill(255, 255, 255, 180);
+  ellipse(-w * 0.05, -h * 0.05, w * 0.08);
+  pop();
+
+  // faint glow
+  fill(255, 255, 255, 30);
+  ellipse(0, 0, w * 1.1, h * 1.1);
+
+  pop();
+
+  // decay the shake so it settles over time
+  eyeShake *= eyeShakeDecay;
 }

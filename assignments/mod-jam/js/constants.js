@@ -72,7 +72,7 @@ let gameOptions =
 const MAXWIDTH = 900;
 const MAXHEIGHT = 800;
 let coop = false;
-let gameState = "win";
+let gameState = "over";
 let difficulty = "hard";
 
 const hunter1Controls = {
@@ -87,7 +87,7 @@ const hunter2Controls = {
     net: 73
 }
 
-let ending = "reunion";
+let ending = "sad";
 let sadTwitchState = {
     nextTwitchAt: 0,
     endAt: 0,
@@ -98,3 +98,6 @@ let sadTwitchState = {
 };
 let whiteFlashUntil = 0;
 let staticPulseUntil = 0;
+let pupilSize = 0.15;
+let eyeShake = 0
+let eyeShakeDecay = 0.9;
