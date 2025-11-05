@@ -26,7 +26,8 @@ let keyState = {
     i: false,
     j: false,
     l: false,
-    space: false
+    space: false,
+    escape: false,
 }
 
 /**
@@ -159,13 +160,16 @@ function keyPressed()
     if (key === "d" || key === "D") keyState.d = true;
 
     if ((key === "i" || key === "I") && !keyState.i)
-        {
-            keyState.i = true;
-            if (hunter2.net.state === "idle")
-                hunter2.net.state = "outbound";
-        }
-        if (key === "j" || key === "J") keyState.j = true;
-        if (key === "l" || key === "L") keyState.l = true;
+    {
+        keyState.i = true;
+        if (hunter2.net.state === "idle")
+            hunter2.net.state = "outbound";
+    }
+    if (key === "j" || key === "J") keyState.j = true;
+    if (key === "l" || key === "L") keyState.l = true;
+
+    if (keyCode === ESCAPE) keyState.escape = true;
+    
     keyState[key] = true;
 }
 
@@ -178,6 +182,7 @@ function keyReleased()
     if (key === "j" || key === "J") keyState.j = false;
     if (key === "l" || key === "L") keyState.l = false;
     if (key === " ") keyState.space = false;
+    if (keyCode === ESCAPE) keyState.escape = false;
 }
 
 function penalizePlayer(ghost)

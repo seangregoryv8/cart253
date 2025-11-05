@@ -18,19 +18,19 @@ function drawPlay()
     createUI();
 
     hunter.draw();
-    hunter.move();
-    hunter.moveNet();
+    if (!gamePaused) hunter.move();
+    if (!gamePaused) hunter.moveNet();
 
     if (coop)
     {
         hunter2.draw();
-        hunter2.move();
-        hunter2.moveNet();
+        if (!gamePaused) hunter2.move();
+        if (!gamePaused) hunter2.moveNet();
     }
 
     for (const ghost of ghosts)
     {
-        moveGhost(ghost);
+        if (!gamePaused) moveGhost(ghost);
         drawGhost(ghost);
     }
     hunter.checkNetGhostOverlap();
@@ -86,4 +86,6 @@ function drawPlay()
         }
         gameState = "over";
     }
+
+    pauseGame();
 }

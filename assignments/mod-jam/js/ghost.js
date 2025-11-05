@@ -27,28 +27,36 @@ function makeGhost()
 }
 
 let ghostHordeFunny = false;
+
 function spawnGhosts()
 {
     let grace = 0;
-    const currentTime = millis();  // Get current time in milliseconds
+
+    // Adjust current time to account for paused time
+    const currentTime = millis() - (pauseDuration || 0);
+
     if (currentTime - lastFlyTime > spawnInterval)
     {
-        let ranNum = Math.round(random(1, 100))
+        let ranNum = Math.round(random(1, 100));
         if (ranNum === 69)
         {
             for (let i = 0; i < gameOptions[difficulty].insaneGhosts; i++)
-                ghosts.push(makeGhost())
+                ghosts.push(makeGhost());
             ghostHordeFunny = true;
-            setTimeout(() => ghostHordeFunny = false, 5000)
+            setTimeout(() => ghostHordeFunny = false, 5000);
         }
+
         do
         {
             grace++;
-            ghosts.push(makeGhost());  // Add a new ghost
-            ranNum -= 20
-        } while (ranNum > 20)
-        lastFlyTime = currentTime;  // Reset the timer
+            ghosts.push(makeGhost());
+            ranNum -= 20;
+        } while (ranNum > 20);
+
+        lastFlyTime = currentTime;
         spawnInterval = random(gameOptions[difficulty].minSpawn * grace, gameOptions[difficulty].maxSpawn * grace);
+        console.log("Next spawn in ms:", spawnInterval);
+        pauseDuration = 0;
     }
 }
 

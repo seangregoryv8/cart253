@@ -109,6 +109,7 @@ function startIntro()
         {
             menuSelect.single = true;
             menuSelect.main = false;
+            coop = false;
         }
         cond = mouseX >= minW && mouseX <= maxW && mouseY >= avH + 120 && mouseY <= avH + 140
         fill(cond ? 0 : 255, cond ? 0 : 255, cond ? 0 : 255, textFadeIn.title)
