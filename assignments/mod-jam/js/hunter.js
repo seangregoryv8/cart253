@@ -172,8 +172,8 @@ class Hunter
      */
     drawHunter()
     {
-        this.drawNet();
         let twisted = gameState == "over" && ending == "sad";
+        if (!twisted) this.drawNet();
         // Draw the hunter's body
         push();
         stroke(0);

@@ -34,33 +34,28 @@ function reset()
     textSpawn = 0;
 }
 
+let triggers = {
+    trigger1: false,
+    trigger2: false,
+    trigger3: false,
+    trigger4: false,
+    trigger5: false,
+    trigger6: false
+}
+
 const lossTimeline = [
-    { start: 2, end: 4, action: () => hunterSpawn = min(ghostSpawn + 3, 255) },
-    { start: 4, end: 6, action: () => sadSpawn = min(sadSpawn + 3, 255) },
-    { start: 8, end: 10, speaker: 'hunter', text: "Sophie... is that you" },
-    { start: 12, end: 14, speaker: 'ghost', text: "..." },
-    { start: 14, end: 16, speaker: 'ghost', text: "Felix..." },
-    { start: 16, end: 18, speaker: 'hunter', text: "I miss you so much...", action: () => gx = 50 },
-    { start: 18, end: 20, speaker: 'ghost', text: "Felix..." },
-    { start: 20, end: 22, speaker: 'ghost', text: "It was not your fault..." },
-    { start: 22, end: 24, speaker: 'hunter', text: "Sophie... I could not protect you..." },
-    { start: 24, end: 26, speaker: 'ghost', text: "Felix... you protected me all my life..." },
-    { start: 26, end: 29, speaker: 'ghost', text: "This was not your fault...\nWe both know you could not have\ngotten there in time..." },
-    { time: 30, action: () => hangHead = true },
-    { start: 31, end: 34, speaker: 'ghost', text: "You did everything you could...\nYou need to move on...\nFrom me..." },
-    { start: 36, end: 38, speaker: 'hunter', text: "...I do not know if I can..." },
-    { start: 40, end: 42, speaker: 'ghost', text: "You will...\nFor both of us..." },
-    { time: 44, action: () => ghostSmile = true },
-    { start: 44, end: 46, speaker: 'ghost', text: "I will always be with you..." },
-    { start: 46, end: 48, speaker: 'ghost', text: "I love you, Felix..." },
-    { time: 50, action: () => { headRaise = true; hangHead = false; } },
-    { start: 52, end: 54, speaker: 'hunter', text: "I love you too, Sophie..." },
-    { start: 56, end: 58, speaker: 'hunter', text: "Goodbye..." },
-    { start: 58, end: 60, speaker: 'ghost', text: "I never liked goodbye..." },
-    { start: 62, end: 64, speaker: 'ghost', text: "How about...\nsee you later..." },
-    { time: 67, action: () => hunterSmile = true },
-    { start: 68, end: 70, speaker: 'hunter', text: "Yeah... See you later..." },
-    { start: 72, end: 74, action: () => ghostSpawn = max(ghostSpawn - 3, 0) },
+    { start: 5, action: () => triggers.trigger1 = true },
+    { start: 8, end: 10, speaker: 'hunter', text: "Sophie..." },
+    { start: 13, action: () => triggers.trigger2 = true },
+    { start: 14, end: 16, speaker: 'hunter', text: "Sophie?..." },
+    { start: 18, action: () => triggers.trigger3 = true },
+    { start: 20, end: 22, speaker: 'hunter', text: "Sophie?" },
+    { start: 23, action: () => triggers.trigger4 = true },
+    { start: 25, end: 27, speaker: 'hunter', text: "Sophie?" },
+    { start: 26, action: () => triggers.trigger5 = true },
+    { start: 29, end: 30, speaker: 'hunter', text: "Sophie?" },
+    { start: 30, action: () => triggers.trigger6 = true },
+    { start: 31, end: 33, speaker: 'hunter', text: "Sophie?" },
     { start: 78, action: () => textSpawn = min(textSpawn + 3, 255) },
 ]
 const endingTimeline = [
@@ -102,6 +97,7 @@ function startEnding()
     if (frozenTimer === 0) frozenTimer = millis();
 
     endTimer = (millis() - frozenTimer) / 1000;
+    endTimer *= 10;
 
     background(0);
 
@@ -168,6 +164,7 @@ function startLoss()
     if (frozenTimer === 0) frozenTimer = millis();
 
     endTimer = (millis() - frozenTimer) / 1000;
+    endTimer *= 20;
 
     background(0);
 
@@ -177,13 +174,13 @@ function startLoss()
 
     let arrived;
 
-    if (!endArrived) arrived = drawWalkingHunter((endTimer * 1000) - startEndTimer, x, y, size);
+    if (!endArrived) arrived = drawWalkingHunter((endTimer * 700) - startEndTimer, x, y, size);
     else
     {
         endTimer = Math.round(endTimer);
         
         // Process timeline events
-        for (const event of endingTimeline)
+        for (const event of lossTimeline)
         {
             const start = event.start ?? event.time;
             const end = event.end; // may be undefined
@@ -202,7 +199,7 @@ function startLoss()
         
         fill(255, 255, 255, textSpawn);
         textSize(50);
-        textFont(mainFont)
+        textFont(triggers.trigger2 ? horrorFont : mainFont)
         textAlign(CENTER);
         text("THE END", MAXWIDTH / 2, 250);
 
@@ -232,8 +229,8 @@ function startLoss()
 function sayDialogue(dialogue, hunterSpeak = true)
 {
     fill(255);
-    textSize(18);
-    textFont(mainFont)
+    textSize(triggers.trigger2 ? 28 : 18);
+    textFont(triggers.trigger2 ? horrorFont : mainFont)
     textAlign(CENTER);
     text(dialogue, hunterSpeak ? MAXWIDTH / 2 - 100 + gx : MAXWIDTH / 2 + 125, MAXHEIGHT / 2 + 150);
 }
@@ -254,8 +251,9 @@ function drawWalkingHunter(elapsed, targetX, y, size)
     let startX = -size * 2;
     let x = lerp(startX, targetX, eased);
 
-    let bobAmp = 10;
+    let bobAmp = gameState == "over" ? 100 : 10;
     let bob = sin(elapsed * 0.008) * bobAmp * (1 - eased * 0.8);
+    if (gameState == "over") bob *= 0;
 
     drawEndHunter(x, y + bob, size);
 
@@ -265,6 +263,28 @@ function drawWalkingHunter(elapsed, targetX, y, size)
 function drawEndHunter(x, y, size, gx = 0)
 {
     // Draw the hunter's body
+    push();
+    
+    if (triggers.trigger3)
+    {
+        scale(1.5);
+        translate(-125, -125)
+    }
+    if (triggers.trigger4)
+    {
+        scale(1.5);
+        translate(-120, -125)
+    }
+    if (triggers.trigger5)
+    {
+        scale(1.5);
+        translate(-105, -125)
+    }
+    if (triggers.trigger6)
+    {
+        scale(1.5);
+        translate(-100, -75)
+    }
     push();
     
     stroke(0);
@@ -288,6 +308,23 @@ function drawEndHunter(x, y, size, gx = 0)
         pop();
     }
 
+    if (triggers.trigger1)
+    {
+        push();
+        if (triggers.trigger2)
+        {
+            translate(-10, -10);
+            rotate(radians(45))
+        }
+        ellipse(25, -15, 20, 30)
+        ellipse(-5, -15, 20, 30)
+        pop();
+    }
+    else if (gameState == "over")
+    {
+        ellipse(20, -15, 20, 30)
+    }
+
     if (!hangHead)
     {
         stroke(0);
@@ -303,6 +340,21 @@ function drawEndHunter(x, y, size, gx = 0)
         fill(255)
         ellipse(27, -15, 2);
 
+        fill(0, 0, 0, sadSpawn);
+        circle(15, -30, size / 4);
+        fill(255, 226, 201, sadSpawn);
+        ellipse(12, -33, size / 4);
+    }
+
+    if ((gameState == "over" && !endArrived) || (gameState == "win" && !hangHead))
+    {
+        fill("#1569C7")
+        noStroke();
+        ellipse(25, -15, 10);
+        fill(0)
+        ellipse(27, -15, 5);
+        fill(255)
+        ellipse(27, -15, 2);
         fill(0, 0, 0, sadSpawn);
         circle(15, -30, size / 4);
         fill(255, 226, 201, sadSpawn);

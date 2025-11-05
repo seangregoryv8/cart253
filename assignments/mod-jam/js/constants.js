@@ -71,9 +71,9 @@ let gameOptions =
 
 const MAXWIDTH = 900;
 const MAXHEIGHT = 800;
-let coop = true;
-let gameState = "play";
-let difficulty = "medium";
+let coop = false;
+let gameState = "win";
+let difficulty = "hard";
 
 const hunter1Controls = {
     left: 65,
@@ -87,4 +87,14 @@ const hunter2Controls = {
     net: 73
 }
 
-let ending = "sad";
+let ending = "reunion";
+let sadTwitchState = {
+    nextTwitchAt: 0,
+    endAt: 0,
+    offsetX: 0,
+    offsetY: 0,
+    rot: 0,
+    duration: 0
+};
+let whiteFlashUntil = 0;
+let staticPulseUntil = 0;
