@@ -13,8 +13,10 @@
  */
 function makeGhost()
 {
+    let randomDir = ranInt(1, 2) == 2 ? "left" : "right"
     return {
-        x: -50,
+        direction: randomDir,
+        x: randomDir == "left" ? -50 : MAXWIDTH + 50,
         y: random(200, MAXHEIGHT - 200),
         size: 40,
         speed: random(gameOptions[difficulty].minSpeed, gameOptions[difficulty].maxSpeed),
@@ -70,10 +72,10 @@ function spawnGhosts()
  */
 function moveGhost(ghost)
 {
-    ghost.x += ghost.speed;
+    ghost.x = ghost.direction == "left" ? ghost.x + ghost.speed : ghost.x - ghost.speed;
     ghost.y += cos(frameCount / ghost.wave) * ghost.movement;
 
-    if (ghost.x >= MAXWIDTH + 50)
+    if ((ghost.direction == "left" && ghost.x >= MAXWIDTH + 50) || (ghost.direction == "right" && ghost.x <= -50))
     {
         ghost.toRemove = true;
         penalizePlayer(ghost);
