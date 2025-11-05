@@ -7,6 +7,17 @@ function playerWins(hunter, hunter2)
     let size = 100;
     happyHunter(x, y, size, hunter, true);
     happyHunter(x + 200, y, size, hunter2, false);
+        if (!keyState.space && spacePressed)
+        {
+            gameState = "title";
+            winTriggered = false;
+            reset();
+            resetAll();
+        }
+        if (keyState.space)
+        {
+            spacePressed = true;
+        }
 }
 
 function playerDefaultWins(hunter, hunter2)
@@ -16,6 +27,17 @@ function playerDefaultWins(hunter, hunter2)
     let size = 100;
     fedUpHunter(x, y, size, hunter, true);
     fedUpHunter(x + 200, y, size, hunter2, false);
+        if (!keyState.space && spacePressed)
+        {
+            gameState = "title";
+            winTriggered = false;
+            reset();
+            resetAll();
+        }
+        if (keyState.space)
+        {
+            spacePressed = true;
+        }
 }
 
 function fedUpHunter(x, y, size, hunter, won)

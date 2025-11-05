@@ -32,6 +32,15 @@ function reset()
     hunterSmile = false;
     spacePressed = false;
     textSpawn = 0;
+    triggers.trigger1 = false
+    triggers.trigger2 = false
+    triggers.trigger3 = false
+    triggers.trigger4 = false
+    triggers.trigger5 = false
+    triggers.trigger6 = false
+    triggers.trigger7 = false
+    triggers.trigger8 = false
+    triggers.trigger9 = false
 }
 
 let triggers = {
