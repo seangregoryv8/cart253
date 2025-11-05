@@ -92,10 +92,12 @@ function mouseReleased()
 {
     click = false;
 }
+let smileImage;
 function preload()
 {
     mainFont = loadFont("/assets/fleshandblood.ttf")
     horrorFont = loadFont("/assets/whoAsksSatan.ttf")
+    smileImage = loadImage('/assets/images/smile.png');
 }
 
 let winTriggered = false;

@@ -40,7 +40,10 @@ let triggers = {
     trigger3: false,
     trigger4: false,
     trigger5: false,
-    trigger6: false
+    trigger6: false,
+    trigger7: false,
+    trigger8: false,
+    trigger9: false
 }
 
 const lossTimeline = [
@@ -56,7 +59,14 @@ const lossTimeline = [
     { start: 29, end: 30, speaker: 'hunter', text: "Sophie?" },
     { start: 30, action: () => triggers.trigger6 = true },
     { start: 31, end: 33, speaker: 'hunter', text: "Sophie?" },
-    { start: 78, action: () => textSpawn = min(textSpawn + 3, 255) },
+    { start: 35, action: () => triggers.trigger7 = true },
+    { start: 38, action: () => triggers.trigger8 = true },
+    { start: 42, action: () => triggers.trigger9 = true },
+    { start: 45, end: 46, speaker: 'hunter', text: "...you..." },
+    { start: 46, end: 47, speaker: 'hunter', text: "...you are..." },
+    { start: 47, end: 48, speaker: 'hunter', text: "...you are not..." },
+    { start: 48, end: 54, speaker: 'hunter', text: "...you are not Sophie..." },
+    { start: 2, action: () => textSpawn = min(textSpawn + 3, 255) },
 ]
 const endingTimeline = [
     { start: 2, end: 4, action: () => ghostSpawn = min(ghostSpawn + 3, 255) },
@@ -194,17 +204,34 @@ function startLoss()
         }
         drawEndHunter(x, y, size, gx);
         
-        push();
-        
-        fill(255, 255, 255, textSpawn);
-        textSize(50);
-        textFont(triggers.trigger2 ? horrorFont : mainFont)
-        textAlign(CENTER);
-        text("THE END", MAXWIDTH / 2, 250);
+        if (gameState == "win")
+        {
+            push();
+            
+            fill(255, 255, 255, textSpawn);
+            textSize(50);
+            textFont(triggers.trigger2 ? horrorFont : mainFont)
+            textAlign(CENTER);
+            text("THE END", MAXWIDTH / 2, 250);
 
-        textSize(18);
-        text("Press SPACE to return to menu.", MAXWIDTH / 2, MAXHEIGHT / 2 + 200);
-        pop();
+            textSize(18);
+            text("Press SPACE to return to menu.", MAXWIDTH / 2, MAXHEIGHT / 2 + 200);
+            pop();
+        }
+        else
+        {
+            push();
+            
+            fill(255, 255, 255, textSpawn);
+            textSize(24);
+            textFont(triggers.trigger2 ? horrorFont : mainFont)
+            textAlign(CENTER);
+            text("SLEEP WELL...", MAXWIDTH / 2 - 100, 275);
+
+            textSize(12);
+            text("Press SPACE to return to menu.", MAXWIDTH / 2 - 100, 300);
+            pop();
+        }
 
         if (!keyState.space && spacePressed)
         {
@@ -227,11 +254,14 @@ function startLoss()
 
 function sayDialogue(dialogue, hunterSpeak = true)
 {
+    if (triggers.trigger9) translate(100, -300)
     fill(255);
-    textSize(triggers.trigger2 ? 28 : 18);
+    textSize(triggers.trigger9 ? 36 : triggers.trigger2 ? 28 : 18);
     textFont(triggers.trigger2 ? horrorFont : mainFont)
     textAlign(CENTER);
+    fill(255, triggers.trigger9 ? 0 : 255, triggers.trigger9 ? 0 : 255)
     text(dialogue, hunterSpeak ? MAXWIDTH / 2 - 100 + gx : MAXWIDTH / 2 + 125, MAXHEIGHT / 2 + 150);
+    if (triggers.trigger9) translate(-100, 300)
 }
 
 /**
@@ -289,12 +319,12 @@ function drawEndHunter(x, y, size, gx = 0)
     stroke(0);
     fill("#bbbbbb")
     translate(gx, 0);
-    arc(x - (size / 2), y, size, size * 2.5, radians(180), 0)
-    ellipse(x - 40 + (!headRaise ? gx : 0), y - 80 + (hangHead ? 30 : 0), size / 3);
+    if (!triggers.trigger7) arc(x - (size / 2), y, size, size * 2.5, radians(180), 0)
+    if (!triggers.trigger7) ellipse(x - 40 + (!headRaise ? gx : 0), y - 80 + (hangHead ? 30 : 0), size / 3);
     fill("#ffe2c9");
     translate(x - (size / 2), y - size * 1.5)
     translate(hangHead ? 15 : 0, hangHead ? 15 : 0);
-    ellipse(0, 0, size * 0.75)
+    if (!triggers.trigger7) ellipse(0, 0, size * 0.75)
 
     if (gameState == "over")
     {
@@ -333,7 +363,6 @@ function drawEndHunter(x, y, size, gx = 0)
         {
             eyeShake = 2;
         }
-        console.log(pupilSize)
         drawRealisticEye(25, -15, 20, 30, mouseX, mouseY, pupilSize);
         drawRealisticEye(-5, -15, 20, 30, mouseX, mouseY, pupilSize);
 
@@ -342,6 +371,14 @@ function drawEndHunter(x, y, size, gx = 0)
     else if (gameState == "over")
     {
         ellipse(20, -15, 20, 30)
+    }
+
+    if (triggers.trigger9)
+    {
+        push();
+        rotate(radians(45))
+        image(smileImage, -65, -50, 125, 125);
+        pop();
     }
 
     if (gameState == "win" && !hangHead)
@@ -408,45 +445,45 @@ function easeOutCubic(t) {
     return 1 - pow(1 - t, 3);
 }
 function drawRealisticEye(x, y, w, h) {
-  push();
-  translate(x, y);
-
-  // random shake — both position and internal elements
-  let shakeX = random(-eyeShake, eyeShake);
-  let shakeY = random(-eyeShake, eyeShake);
-  translate(shakeX, shakeY);
-
-  // outer white
-  noStroke();
-  fill(255);
-  ellipse(0, 0, w, h);
-
-  // iris (blue gradient that shakes too)
-  push();
-  let irisShakeX = random(-eyeShake * 0.6, eyeShake * 0.6);
-  let irisShakeY = random(-eyeShake * 0.6, eyeShake * 0.6);
-  translate(irisShakeX, irisShakeY);
-  for (let r = w * 0.25; r > 0; r -= 1) {
-    let c = color(40, 120 + r * 2, 255 - r * 2);
-    fill(c);
-    ellipse(0, 0, r * 2);
-  }
-
-  // pupil
-  fill(0);
-  ellipse(0, 0, w * 0.15);
-
-  // highlight
-  fill(255, 255, 255, 180);
-  ellipse(-w * 0.05, -h * 0.05, w * 0.08);
-  pop();
-
-  // faint glow
-  fill(255, 255, 255, 30);
-  ellipse(0, 0, w * 1.1, h * 1.1);
-
-  pop();
-
-  // decay the shake so it settles over time
-  eyeShake *= eyeShakeDecay;
+    push();
+    translate(x, y);
+    
+    // random shake — both position and internal elements
+    let shakeX = (triggers.trigger7) ? 0 : random(-eyeShake, eyeShake);
+    let shakeY = (triggers.trigger7) ? 0 : random(-eyeShake, eyeShake);
+    translate(shakeX, shakeY);
+    
+    // outer white
+    noStroke();
+    fill(255);
+    if (!triggers.trigger8) ellipse(0, 0, w, h);
+    
+    // iris (blue gradient that shakes too)
+    push();
+    let irisShakeX = (triggers.trigger8) ? 0 : random(-eyeShake * 0.6, eyeShake * 0.6);
+    let irisShakeY = (triggers.trigger8) ? 0 : random(-eyeShake * 0.6, eyeShake * 0.6);
+    translate(irisShakeX, irisShakeY);
+    for (let r = w * 0.25; r > 0; r -= 1) {
+      let c = color(40, 120 + r * 2, 255 - r * 2);
+      fill(c);
+      ellipse(0, 0, r * 2);
+    }
+  
+    // pupil
+    fill(0);
+    ellipse(0, 0, w * 0.15);
+  
+    // highlight
+    fill(255, 255, 255, 180);
+    ellipse(-w * 0.05, -h * 0.05, w * 0.08);
+    pop();
+  
+    // faint glow
+    fill(255, 255, 255, 30);
+    ellipse(0, 0, w * 1.1, h * 1.1);
+  
+    pop();
+  
+    // decay the shake so it settles over time
+    eyeShake *= eyeShakeDecay;
 }
