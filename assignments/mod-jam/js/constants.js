@@ -74,13 +74,13 @@ const MAXWIDTH = 900;
 const MAXHEIGHT = 800;
 
 // Whether you choose multiplayer or not
-let coop = false;
+let coop = true;
 // What state you're in (title, instructions, options, over, win)
-let gameState = "title";
+let gameState = "win";
 // What difficulty you chose
 let difficulty = "easy";
 // The type of ending you get
-let ending = "regular";
+let ending = "p2wins";
 
 // The control schemes for both hunters
 const hunter1Controls = {
