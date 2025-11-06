@@ -77,9 +77,9 @@ function drawOptions()
     if (!coop)
     {
         optionsText += "\n- "
-        if (difficulty == "easy") optionsText += "2000 points needed to win"
-        if (difficulty == "medium") optionsText += "3000 points needed to win"
-        if (difficulty == "hard") optionsText += "5000 points needed to win"
+        if (difficulty == "easy") optionsText += "750 points needed to win"
+        if (difficulty == "medium") optionsText += "1500 points needed to win"
+        if (difficulty == "hard") optionsText += "2250 points needed to win"
     }
 
     if (coop)

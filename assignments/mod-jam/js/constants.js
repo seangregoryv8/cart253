@@ -25,7 +25,7 @@ let gameOptions =
     easy:
     {
         startScore: 200,
-        pointsToWin: 2000,
+        pointsToWin: 750,
         minSpawn: 2000,
         maxSpawn: 4000,
         insaneGhosts: 10,
@@ -40,7 +40,7 @@ let gameOptions =
     medium:
     {
         startScore: 100,
-        pointsToWin: 3000,
+        pointsToWin: 1500,
         minSpawn: 1000,
         maxSpawn: 3000,
         insaneGhosts: 30,
@@ -55,7 +55,7 @@ let gameOptions =
     hard:
     {
         startScore: 50,
-        pointsToWin: 5000,
+        pointsToWin: 2250,
         minSpawn: 500,
         maxSpawn: 2000,
         insaneGhosts: 50,
@@ -74,9 +74,9 @@ const MAXWIDTH = 900;
 const MAXHEIGHT = 800;
 
 // Whether you choose multiplayer or not
-let coop = true;
+let coop = false;
 // What state you're in (title, instructions, options, over, win)
-let gameState = "win";
+let gameState = "title";
 // What difficulty you chose
 let difficulty = "easy";
 // The type of ending you get
