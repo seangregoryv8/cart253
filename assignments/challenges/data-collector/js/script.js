@@ -23,11 +23,11 @@ let carName = "Click to generate a car name.";
  * Load the car and dinosaur data
  */
 function preload() {
-    fetch("./assets/data/cars.json")
+    fetch("../../assets/data/cars.json")
         .then(response => response.json())
         .then(data => carData = data.cars )
         
-    fetch("./assets/data/dinosaurs.json")
+    fetch("../../assets/data/dinosaurs.json")
         .then(response => response.json())
         .then(data => dinosaurData = data.dinosaurs )
 }
