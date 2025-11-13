@@ -23,7 +23,13 @@ let carName = "Click to generate a car name.";
  * Load the car and dinosaur data
  */
 function preload() {
-
+    fetch("../assets/data/cars.json")
+        .then(response => response.json())
+        .then(data => carData = data.cars )
+        
+    fetch("../assets/data/dinosaurs.json")
+        .then(response => response.json())
+        .then(data => dinosaurData = data.dinosaurs )
 }
 
 /**
@@ -31,6 +37,8 @@ function preload() {
 */
 function setup() {
     createCanvas(600, 400);
+    console.log(carData)
+    console.log(dinosaurData)
 }
 
 /**
@@ -51,5 +59,19 @@ function draw() {
  * Generate a new car name
  */
 function mousePressed() {
+    let newName = "";
+    newName += carData[ranInt(0, carData.length - 1)]
+    newName += " " + dinosaurData[ranInt(0, dinosaurData.length - 1)]
+    carName = newName;
+}
 
+/**
+ * Little function I made to make a random integer
+ * @param {*} min 
+ * @param {*} max 
+ * @returns 
+ */
+function ranInt(min, max)
+{
+    return Math.round(random(min, max))
 }
