@@ -9,8 +9,8 @@
 "use strict";
 
 let enemies = []
-let WIDTH = 600;
-let HEIGHT = 1000;
+let WIDTH = 300;
+let HEIGHT = 400;
 
 /**
  * OH LOOK I DIDN'T DESCRIBE SETUP!!
@@ -28,7 +28,6 @@ function setup() {
 function draw()
 {
     drawGrid();
-    movePaddle();
     drawPaddle();
     drawBall();
 
@@ -38,17 +37,33 @@ function draw()
         ball.directionY = directions.UP;
         ball.directionX = ranInt(0, 1) == 0 ? directions.LEFT : directions.RIGHT;
     }
-
-    moveBall();
-
-    ballPaddleCollision();
-
     for (let enemy of enemies)
     {
         drawEnemy(enemy);
     }
-    ballEnemyCollision();
-    ballWallCollision();
+
+    if (TESTSTOP == 0)
+    {
+        movePaddle();
+        moveBall();
+    
+        ballPaddleCollision();
+    
+        ballEnemyCollision();
+        ballWallCollision();
+    }
+    else
+    {
+        TESTSTOP--;
+    }
+
+    if (keyState.escape)
+    {
+        TESTSTOP++;
+    }
+
+    if (ball.invincible > 0)
+        ball.invincible--;
 }
 
 let directions = {
@@ -75,29 +90,36 @@ function drawEnemy(enemy)
             fill(0, 0, 255);
             break;
     }
-    rect(enemy.x - px(1), enemy.y, enemy.size, px(1))
+    rect(enemy.x, enemy.y, enemy.width, enemy.height)
 }
+
+let TESTONEENEMY = false;
 function drawLevel()
 {
     noStroke();
     fill(60);
-    for (let x = px(1); x <= WIDTH; x += px(3))
+    for (let x = px(5); x <= WIDTH; x += px(3))
     {
         for (let y = 0; y <= HEIGHT - px(10); y += px(1))
         {
-            if (ranInt(0, 100) > 60)
+           // if (!TESTONEENEMY)
+            if (ranInt(0, 100) > 50)
             {
                 enemies.push({
                     health: ranInt(1, 3),
                     maxHealth: ranInt(1, 3),
-                    x: x,
+                    x: x - px(1),
                     y: y,
-                    size: px(3)
+                    width: px(3),
+                    height: px(1)
                 })
+             //   TESTONEENEMY = true;
             }
         }
     }
 }
+
+let TESTSTOP = 0;
 
 let ballState = {
     START: "start",
@@ -111,10 +133,12 @@ let paddle = {
 let ball = {
     x: WIDTH / 2 + px(2),
     y: HEIGHT - px(2),
+    size: px(1),
     state: ballState.START,
     directionX: "",
     directionY: "",
-    speed: 3
+    speed: 2,
+    invincible: 0
 }
 
 function drawPaddle()
@@ -162,25 +186,22 @@ let enemy = {
     maxHealth: ranInt(1, 3),
     x: x,
     y: y,
-    size: px(3)
+    width: px(3),
+    height: px(1)
 }
 
 function ballWallCollision()
 {
-    console.log(ball.x);
     if (ball.x <= 0)
     {
-        console.log("HI")
         ball.directionX = directions.RIGHT;
     }
     if (ball.x + px(1) >= WIDTH)
     {
-        ball.x = WIDTH - px(1);
         ball.directionX = directions.LEFT;
     }
     if (ball.y <= 0)
     {
-        ball.y = 0;
         ball.directionY = directions.DOWN;
     }
 }
@@ -190,23 +211,49 @@ function ballEnemyCollision()
     for (let i = 0; i < enemies.length; i++)
     {
         let enemy = enemies[i];
+    
+        let ballXLeft = ball.x;
+        let ballXRight = ball.x + ball.size;
+        let ballXHalf = ball.x + (ball.size / 2)
         
-        // Check if the ball is within the bounds of the enemy
-        if (ball.x + px(1) >= enemy.x && ball.x <= enemy.x + px(3) && ball.y + px(1) >= enemy.y && ball.y <= enemy.y + px(1)) {
-            // Ball hits enemy, reduce health
+        let enemyXLeft = enemy.x;
+        let enemyXRight = enemy.x + enemy.width;
+        let enemyXHalf = enemy.x + (enemy.width / 2);
+
+        let ballYUp = ball.y;
+        let ballYDown = ball.y + ball.size;
+        let ballYHalf = ball.y + (ball.size / 2)
+
+        let enemyYUp = enemy.y;
+        let enemyYDown = enemy.y + enemy.height;
+        let enemyYHalf = enemy.y + (enemy.height / 2);
+
+        let detectionX = ballXRight >= enemyXLeft && ballXLeft <= enemyXRight;
+        let detectionY = ballYDown >= enemyYUp && ballYUp <= enemyYDown;
+
+        if (detectionX && detectionY && ball.invincible == 0)
+        {
+            ball.invincible = 5;
             enemy.health--;
-
-            // Change ball direction based on where it hit the enemy
-            if (ball.directionY === directions.UP || ball.directionY === directions.DOWN) {
-                ball.directionY = (ball.directionY === directions.UP) ? directions.DOWN : directions.UP;
-            } else {
-                ball.directionX = (ball.directionX === directions.LEFT) ? directions.RIGHT : directions.LEFT;
+            if (ballXHalf >= enemyXHalf)
+            {
+                //console.log("HIT FROM RIGHT")
+                ball.directionX = directions.RIGHT;
             }
-
-            // If the enemy's health is zero, remove the enemy from the game
-            if (enemy.health <= 0) {
-                enemies.splice(i, 1);
-                i--; // Adjust the index since we removed an enemy
+            else
+            {
+                //console.log("HIT FROM LEFT")
+                ball.directionX = directions.LEFT;
+            }
+            if (ballYHalf >= enemyYHalf)
+            {
+                //console.log("HIT FROM TOP")
+                ball.directionY = directions.DOWN;
+            }
+            else
+            {
+                //console.log("HIT FROM BOTTOM")
+                ball.directionY = directions.UP;
             }
         }
     }
@@ -269,3 +316,11 @@ function ranInt(min, max)
     return Math.round(random(min, max))
 }
 
+function checkTarget(ball, enemy)
+{
+    let d = dist(ball.x, ball.y, enemy.x, enemy.y);
+
+    let overlap = (d < px(1) / 2 + enemy.size / 2);
+
+    return overlap;
+}
