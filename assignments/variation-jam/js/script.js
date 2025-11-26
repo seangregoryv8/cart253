@@ -28,15 +28,35 @@ function setup() {
 function draw()
 {
     drawGrid();
+    movePaddle();
+    drawPaddle();
+    drawBall();
+
+    if (ball.state == ballState.START && keyState.space)
+    {
+        ball.state = ballState.LAUNCHED;
+        ball.directionY = directions.UP;
+        ball.directionX = ranInt(0, 1) == 0 ? directions.LEFT : directions.RIGHT;
+    }
+
+    moveBall();
+
+    ballPaddleCollision();
+
     for (let enemy of enemies)
     {
         drawEnemy(enemy);
     }
-    movePaddle();
-    drawPaddle();
-    drawBall();
+    ballEnemyCollision();
+    ballWallCollision();
 }
 
+let directions = {
+    LEFT: "left",
+    RIGHT: "right",
+    UP: "up",
+    DOWN: "down"
+}
 /**
  * 
  * @param {enemies} enemy 
@@ -55,7 +75,7 @@ function drawEnemy(enemy)
             fill(0, 0, 255);
             break;
     }
-    rect(enemy.x - px(1), enemy.y, px(3), px(1))
+    rect(enemy.x - px(1), enemy.y, enemy.size, px(1))
 }
 function drawLevel()
 {
@@ -71,7 +91,9 @@ function drawLevel()
                     health: ranInt(1, 3),
                     maxHealth: ranInt(1, 3),
                     x: x,
-                    y: y})
+                    y: y,
+                    size: px(3)
+                })
             }
         }
     }
@@ -89,13 +111,105 @@ let paddle = {
 let ball = {
     x: WIDTH / 2 + px(2),
     y: HEIGHT - px(2),
-    state: ballState.START
+    state: ballState.START,
+    directionX: "",
+    directionY: "",
+    speed: 3
 }
 
 function drawPaddle()
 {
     fill(0);
     rect(paddle.x, paddle.y, px(5), px(1), 10);
+}
+
+function moveBall()
+{
+    if (ball.state == ballState.LAUNCHED)
+    {
+        if (ball.directionX == directions.LEFT)
+        {
+            ball.x -= ball.speed;
+        }
+        if (ball.directionX == directions.RIGHT)
+        {
+            ball.x += ball.speed;
+        }
+        if (ball.directionY == directions.UP)
+        {
+            ball.y -= ball.speed;
+        }
+        if (ball.directionY == directions.DOWN)
+        {
+            ball.y += ball.speed;
+        }
+    }
+}
+
+function ballPaddleCollision()
+{
+    if (ball.y + px(1) >= paddle.y && ball.y <= paddle.y + px(1))
+    {
+        //if (ball.x + px(1) >= paddle.x && ball.size <= paddle.x + px(5))
+        {
+            ball.directionY = directions.UP;
+        }
+    }
+}
+
+let enemy = {
+    health: ranInt(1, 3),
+    maxHealth: ranInt(1, 3),
+    x: x,
+    y: y,
+    size: px(3)
+}
+
+function ballWallCollision()
+{
+    console.log(ball.x);
+    if (ball.x <= 0)
+    {
+        console.log("HI")
+        ball.directionX = directions.RIGHT;
+    }
+    if (ball.x + px(1) >= WIDTH)
+    {
+        ball.x = WIDTH - px(1);
+        ball.directionX = directions.LEFT;
+    }
+    if (ball.y <= 0)
+    {
+        ball.y = 0;
+        ball.directionY = directions.DOWN;
+    }
+}
+
+function ballEnemyCollision()
+{
+    for (let i = 0; i < enemies.length; i++)
+    {
+        let enemy = enemies[i];
+        
+        // Check if the ball is within the bounds of the enemy
+        if (ball.x + px(1) >= enemy.x && ball.x <= enemy.x + px(3) && ball.y + px(1) >= enemy.y && ball.y <= enemy.y + px(1)) {
+            // Ball hits enemy, reduce health
+            enemy.health--;
+
+            // Change ball direction based on where it hit the enemy
+            if (ball.directionY === directions.UP || ball.directionY === directions.DOWN) {
+                ball.directionY = (ball.directionY === directions.UP) ? directions.DOWN : directions.UP;
+            } else {
+                ball.directionX = (ball.directionX === directions.LEFT) ? directions.RIGHT : directions.LEFT;
+            }
+
+            // If the enemy's health is zero, remove the enemy from the game
+            if (enemy.health <= 0) {
+                enemies.splice(i, 1);
+                i--; // Adjust the index since we removed an enemy
+            }
+        }
+    }
 }
 
 function movePaddle()
