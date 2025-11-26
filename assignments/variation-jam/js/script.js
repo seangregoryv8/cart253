@@ -103,7 +103,7 @@ function drawLevel()
         for (let y = 0; y <= HEIGHT - px(10); y += px(1))
         {
            // if (!TESTONEENEMY)
-            if (ranInt(0, 100) > 50)
+           if (ranInt(0, 100) > 50)
             {
                 enemies.push({
                     health: ranInt(1, 3),
@@ -113,7 +113,7 @@ function drawLevel()
                     width: px(3),
                     height: px(1)
                 })
-             //   TESTONEENEMY = true;
+                //TESTONEENEMY = true;
             }
         }
     }
@@ -233,27 +233,32 @@ function ballEnemyCollision()
 
         if (detectionX && detectionY && ball.invincible == 0)
         {
+            let cornerR = ballXLeft == enemyXRight;
+            let cornerL = ballXRight == enemyXLeft;
             ball.invincible = 5;
             enemy.health--;
-            if (ballXHalf >= enemyXHalf)
+            if (cornerR)
             {
                 //console.log("HIT FROM RIGHT")
                 ball.directionX = directions.RIGHT;
             }
-            else
+            else if (cornerL)
             {
                 //console.log("HIT FROM LEFT")
                 ball.directionX = directions.LEFT;
             }
-            if (ballYHalf >= enemyYHalf)
-            {
-                //console.log("HIT FROM TOP")
-                ball.directionY = directions.DOWN;
-            }
             else
             {
-                //console.log("HIT FROM BOTTOM")
-                ball.directionY = directions.UP;
+                if (ballYHalf >= enemyYHalf)
+                {
+                    //console.log("HIT FROM TOP")
+                    ball.directionY = directions.DOWN;
+                }
+                else
+                {
+                    //console.log("HIT FROM BOTTOM")
+                    ball.directionY = directions.UP;
+                }
             }
         }
     }
