@@ -18,7 +18,6 @@ let HEIGHT = 1000;
 function setup() {
     createCanvas(WIDTH, HEIGHT);
     background(0);
-    drawGrid();
     drawLevel();
 }
 
@@ -28,10 +27,13 @@ function setup() {
 */
 function draw()
 {
+    drawGrid();
     for (let enemy of enemies)
     {
         drawEnemy(enemy);
     }
+    movePaddle();
+    drawPaddle();
 }
 
 /**
@@ -52,7 +54,7 @@ function drawEnemy(enemy)
             fill(0, 0, 255);
             break;
     }
-    rect(enemy.x - px(1), enemy.y, px(3), 20)
+    rect(enemy.x - px(1), enemy.y, px(3), px(1))
 }
 function drawLevel()
 {
@@ -60,7 +62,7 @@ function drawLevel()
     fill(60);
     for (let x = px(1); x <= WIDTH; x += px(3))
     {
-        for (let y = 0; y <= HEIGHT - 200; y += px(1))
+        for (let y = 0; y <= HEIGHT - px(10); y += px(1))
         {
             if (ranInt(0, 100) > 60)
             {
@@ -76,12 +78,25 @@ function drawLevel()
 
 let paddle = {
     x: WIDTH / 2,
-    y: HEIGHT - 100
+    y: HEIGHT - px(1)
 }
 
 function drawPaddle()
 {
-    rect(paddle.x, paddle.y, pixel(5), )
+    fill(0);
+    rect(paddle.x, paddle.y, px(5), px(1));
+}
+
+function movePaddle()
+{
+    if (keyState.a)
+    {
+        paddle.x--;
+    }
+    else if (keyState.d)
+    {
+        paddle.x++;
+    }
 }
 
 function drawBall()
@@ -95,11 +110,11 @@ function drawGrid()
     fill(230);
     // This is for the grid for the pixel art
     // This is for the vertical lines at 34 pixels
-    for (let x = 0; x <= WIDTH; x += 20)
+    for (let x = 0; x <= WIDTH; x += px(1))
     {
         rect(x, 0, px(1), px(1));
         // This is for the horizontal lines at 28 pixels
-        for (let y = 0; y <= HEIGHT; y += 20)
+        for (let y = 0; y <= HEIGHT; y += px(1))
             rect(x, y, px(1), px(1));
     }
     noStroke();
@@ -118,3 +133,4 @@ function ranInt(min, max)
 {
     return Math.round(random(min, max))
 }
+
