@@ -34,6 +34,7 @@ function draw()
     }
     movePaddle();
     drawPaddle();
+    drawBall();
 }
 
 /**
@@ -76,15 +77,25 @@ function drawLevel()
     }
 }
 
+let ballState = {
+    START: "start",
+    LAUNCHED: "launched"
+}
 let paddle = {
     x: WIDTH / 2,
     y: HEIGHT - px(1)
 }
 
+let ball = {
+    x: WIDTH / 2 + px(2),
+    y: HEIGHT - px(2),
+    state: ballState.START
+}
+
 function drawPaddle()
 {
     fill(0);
-    rect(paddle.x, paddle.y, px(5), px(1));
+    rect(paddle.x, paddle.y, px(5), px(1), 10);
 }
 
 function movePaddle()
@@ -92,16 +103,26 @@ function movePaddle()
     if (keyState.a)
     {
         paddle.x--;
+        if (ball.state == ballState.START)
+        {
+            ball.x--;
+        }
     }
     else if (keyState.d)
     {
         paddle.x++;
+        if (ball.state == ballState.START)
+        {
+            ball.x++;
+        }
     }
 }
 
 function drawBall()
 {
-
+    stroke(0);
+    fill(50);
+    rect(ball.x, ball.y, px(1), px(1), 20)
 }
 
 function drawGrid()
