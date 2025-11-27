@@ -1,8 +1,13 @@
 "use strict";
 
+let TESTTIMER = 0;
+
+let particles = [];
 let enemies = []
-let WIDTH = 300;
-let HEIGHT = 400;
+let WIDTH = 600;
+let HEIGHT = 1000;
+
+let triggerHappy = false;
 
 let directions = {
     LEFT: "left",
@@ -31,8 +36,8 @@ let ball = {
     state: ballState.START,
     directionX: "",
     directionY: "",
-    speedX: 4,
-    speedY: 4,
+
+    speedBank: 8,
     velocityX: 0,  // Velocity components for physics
     velocityY: 0,  // Velocity components for physics
     invincible: 0
@@ -45,58 +50,87 @@ let enemy = {
     y: y,
     width: px(3),
     height: px(1)
-}
+};
 
 /**
  * Setup game
  */
 function setup() {
     createCanvas(WIDTH, HEIGHT);
-    background(0);
     drawLevel();
 }
+
+// ELO system that collects global score and adjusts its own difciculty in mind
+// A cap where you can keep that same level for when you're comfortable with the level you want
+
 
 /**
  * Main game loop
  */
-function draw() {
-    drawGrid();
+function draw()
+{
+    background(0);
+    //drawGrid();
     drawPaddle();
     drawBall();
 
-    if (ball.state == ballState.START && keyState.space) {
+    if (ball.state == ballState.START && keyState.space)
+    {
         ball.state = ballState.LAUNCHED;
         ball.directionY = directions.UP;
-        ball.directionX = ranInt(0, 1) == 0 ? directions.LEFT : directions.RIGHT;
-        ball.velocityX = random(2, 4); // Random velocity for the ball
-        ball.velocityY = 4; // Initial velocity
+        if (keyState.a)
+            ball.directionX = directions.LEFT;
+        else if (keyState.d)
+            ball.directionX = directions.RIGHT;
+        else ball.directionX = ranInt(0, 1) == 0 ? directions.LEFT : directions.RIGHT;
+        ball.velocityX = ball.speedBank / 2; // Random velocity for the ball
+        ball.velocityY = ball.speedBank / 2; // Initial velocity
+        if (keyState.a || keyState.d)
+        {
+            ball.velocityX *= 2;
+            ball.velocityY /= 2;
+        }
     }
 
     // Draw all enemies (bricks)
-    for (let enemy of enemies) {
+    for (let enemy of enemies)
         drawEnemy(enemy);
+
+    if (TESTTIMER == 0)
+    {
+        movePaddle();
+        moveBall();
+        ballPaddleCollision();
+        ballEnemyCollision();
+        ballWallCollision();
     }
 
-    movePaddle();
-    moveBall();
-    ballPaddleCollision();
-    ballEnemyCollision();
-    ballWallCollision();
-
-    if (keyState.escape) {
-        TESTSTOP++;
+    for (let i = 0; i < particles.length; i++)
+    {
+        moveParticle(particles[i])
+        if (particles[i].y >= HEIGHT + px(2))
+            particles.splice(i, 1);
     }
 
-    if (ball.invincible > 0) {
+    if (ball.invincible > 0)
         ball.invincible--;
+
+    if (TESTTIMER > 0)
+        TESTTIMER--;
+
+    if (keyState.i)
+    {
+        triggerHappy = true;
     }
 }
 
 /**
  * Draw enemy (brick) based on health
  */
-function drawEnemy(enemy) {
-    switch (enemy.health) {
+function drawEnemy(enemy)
+{
+    switch (enemy.health)
+    {
         case 1:
             fill(255, 0, 0); // Red for low health
             break;
@@ -113,14 +147,15 @@ function drawEnemy(enemy) {
 /**
  * Draw the level (bricks)
  */
-function drawLevel() {
+function drawLevel()
+{
     noStroke();
     fill(60);
-    for (let x = px(5); x <= WIDTH; x += px(3))
+    for (let x = px(1); x <= WIDTH; x += px(3))
     {
-        for (let y = 0; y <= HEIGHT - px(10); y += px(1))
+        for (let y = 0; y <= HEIGHT - px(10); y += px(2))
         {
-            if (ranInt(0, 100) > 50)
+            if (ranInt(0, 100) >= 20)
             {
                 enemies.push({
                     health: ranInt(1, 3),
@@ -135,12 +170,33 @@ function drawLevel() {
     }
 }
 
+function makeParticle(x, y, velY, velX)
+{
+    particles.push({
+        x: x,
+        y: y,
+        velocityY: velY,
+        velocityX: velX,
+        size: random(5, 20),
+        shade: random(100, 255)
+    })
+}
+
+function moveParticle(particle)
+{
+    fill(particle.shade, 0, 0)
+    ellipse(particle.x, particle.y, particle.size)
+    particle.y += particle.velocityY;
+    particle.velocityY += random(0.2, 0.8);
+    particle.x += particle.velocityX;
+}
 /**
  * Draw the paddle
  */
 function drawPaddle()
 {
-    fill(0);
+    noStroke();
+    fill(255);
     rect(paddle.x, paddle.y, paddle.size, px(1), 10);
 }
 
@@ -161,19 +217,41 @@ function moveBall()
  */
 function ballPaddleCollision()
 {
-    if (ball.y + px(1) >= paddle.y && ball.y <= paddle.y + px(1)) {
-        if (ball.x + px(1) >= paddle.x && ball.size <= paddle.x + px(5)) {
+    if (ball.y + px(1) >= paddle.y && ball.y <= paddle.y + px(1))
+    {
+        if (ball.x + px(1) >= paddle.x && ball.x <= paddle.x + px(5))
+        {
+            if (ball.state == ballState.LAUNCHED)
+            {
+                // From -60 to 60 (-60 is closest to the left, 60 is furthest to the right)
+
+                // Lowst value would be 1
+                // Highest value would be 7
+                // Everything must always equal up to 8
+                let directional;
+                let pa = ball.x;
+                let pb = paddle.x + (paddle.size / 2);
+                directional = pa > pb ? pa - pb : pb - pa;
+
+                directional = (directional / 60) * ball.speedBank;
+
+                ball.velocityX = directional;
+                ball.velocityY = ball.speedBank - directional;
+                ball.speedBank *= 1.05;  // Increase speed after paddle collision
+                ball.velocityX += random(-0.5, 0.5);  // Add a little random variation to the ball's x velocity
+            }
             ball.directionY = directions.UP;
-            ball.velocityY *= 1.05;  // Increase speed after paddle collision
-            ball.velocityX += random(-0.5, 0.5);  // Add a little random variation to the ball's x velocity
         }
     }
 }
 
+// A system where, depedning where you hit the ball, it responds to that exact same movement.
+// Maybe it even trades around X for Y values if you hit it right.
 /**
  * Handle ball collision with walls
  */
-function ballWallCollision() {
+function ballWallCollision()
+{
     if (ball.x <= 0)
         ball.directionX = directions.RIGHT;
     if (ball.x + px(1) >= WIDTH)
@@ -185,14 +263,17 @@ function ballWallCollision() {
         ball.y = ballStartY;
         ball.x = paddle.x + (paddle.size / 2);
         ball.state = ballState.START;
+        ball.speedBank = 8;
     }
 }
 
 /**
  * Handle ball collision with enemies (bricks)
  */
-function ballEnemyCollision() {
-    for (let i = 0; i < enemies.length; i++) {
+function ballEnemyCollision()
+{
+    for (let i = 0; i < enemies.length; i++)
+    {
         let enemy = enemies[i];
 
         let ballXLeft = ball.x;
@@ -210,26 +291,27 @@ function ballEnemyCollision() {
         let detectionX = ballXRight >= enemyXLeft && ballXLeft <= enemyXRight;
         let detectionY = ballYDown >= enemyYUp && ballYUp <= enemyYDown;
 
-        if (detectionX && detectionY && ball.invincible == 0) {
+        if ((detectionX && detectionY && ball.invincible == 0) || triggerHappy)
+        {
             let cornerR = ballXLeft == enemyXRight;
             let cornerL = ballXRight == enemyXLeft;
             ball.invincible = 5;
             enemy.health--;
-            if (enemy.health <= 0) {
+            if (enemy.health <= 0)
+            {
+                for (let i = 0; i < ranInt(4, 8); i++)
+                    makeParticle(enemy.x + (enemy.width / 2), enemy.y + (enemy.height / 2), random(-5, -2), random(-3, 3))
                 // Remove the enemy from the array when its health reaches 0
                 enemies.splice(i, 1);
                 i--;  // Adjust the index since we removed an element
             }
-            if (cornerR) {
+            if (cornerR)
                 ball.directionX = directions.RIGHT;
-            } else if (cornerL) {
+            else if (cornerL)
                 ball.directionX = directions.LEFT;
-            } else {
-                if (ball.y + ball.size / 2 >= enemy.y + enemy.height / 2) {
-                    ball.directionY = directions.DOWN;
-                } else {
-                    ball.directionY = directions.UP;
-                }
+            else
+            {
+                ball.directionY = ball.y + ball.size / 2 >= enemy.y + enemy.height / 2 ? directions.DOWN : directions.UP;
             }
         }
     }
@@ -238,13 +320,13 @@ function ballEnemyCollision() {
 /**
  * Move the paddle based on user input
  */
-function movePaddle() {
+function movePaddle()
+{
     if (keyState.a && paddle.x >= 0)
     {
         paddle.x -= paddle.speed;
         if (ball.state == ballState.START)
         {
-            console.log("HI")
             ball.x -= paddle.speed;
         }
     }
@@ -261,19 +343,21 @@ function movePaddle() {
 /**
  * Draw the ball
  */
-function drawBall() {
-    stroke(0);
-    fill(50);
+function drawBall()
+{
+    fill(150);
     rect(ball.x, ball.y, px(1), px(1), 20);
 }
 
 /**
  * Draw grid for pixel art effect
  */
-function drawGrid() {
+function drawGrid()
+{
     stroke(0);
     fill(230);
-    for (let x = 0; x <= WIDTH; x += px(1)) {
+    for (let x = 0; x <= WIDTH; x += px(1))
+    {
         rect(x, 0, px(1), px(1));
         for (let y = 0; y <= HEIGHT; y += px(1))
             rect(x, y, px(1), px(1));

@@ -13,6 +13,7 @@ function keyPressed()
     if (key === " ") keyState.space = true;
     if (key === "a" || key === "A") keyState.a = true;
     if (key === "d" || key === "D") keyState.d = true;
+    if (key === "i" || key === "I") keyState.i = true;
     if (keyCode === ESCAPE) keyState.escape = true;
     
     keyState[key] = true;
