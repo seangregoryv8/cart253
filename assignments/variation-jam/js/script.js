@@ -2,6 +2,12 @@
 
 let TESTTIMER = 0;
 
+let brickImages = 
+{
+    health1: "",
+    health2: "",
+    health3: ""
+}
 let particles = [];
 let enemies = []
 let WIDTH = 600;
@@ -51,6 +57,13 @@ let enemy = {
     width: px(3),
     height: px(1)
 };
+
+function preload()
+{
+    brickImages.health1 = loadImage("../assets/images/brick3.png")
+    brickImages.health2 = loadImage("../assets/images/brick2.png")
+    brickImages.health3 = loadImage("../assets/images/brick1.png")
+}
 
 /**
  * Setup game
@@ -129,19 +142,20 @@ function draw()
  */
 function drawEnemy(enemy)
 {
+    let img;
     switch (enemy.health)
     {
         case 1:
-            fill(255, 0, 0); // Red for low health
+            img = brickImages.health1;
             break;
         case 2:
-            fill(0, 255, 0); // Green for mid health
+            img = brickImages.health2;
             break;
         case 3:
-            fill(0, 0, 255); // Blue for full health
+            img = brickImages.health3;
             break;
     }
-    rect(enemy.x, enemy.y, enemy.width, enemy.height);
+    image(img, enemy.x, enemy.y)
 }
 
 /**
@@ -297,6 +311,12 @@ function ballEnemyCollision()
             let cornerL = ballXRight == enemyXLeft;
             ball.invincible = 5;
             enemy.health--;
+            if (enemy.health <= 2)
+                for (let i = 0; i < ranInt(1, 2); i++)
+                    makeParticle(enemy.x + (enemy.width / 2), enemy.y + (enemy.height / 2), random(-5, -2), random(-3, 3))
+            if (enemy.health <= 1)
+                for (let i = 0; i < ranInt(1, 2); i++)
+                    makeParticle(enemy.x + (enemy.width / 2), enemy.y + (enemy.height / 2), random(-5, -2), random(-3, 3))
             if (enemy.health <= 0)
             {
                 for (let i = 0; i < ranInt(4, 8); i++)

@@ -15,8 +15,6 @@ function keyPressed()
     if (key === "d" || key === "D") keyState.d = true;
     if (key === "i" || key === "I") keyState.i = true;
     if (keyCode === ESCAPE) keyState.escape = true;
-    
-    keyState[key] = true;
 }
 
 /**
@@ -24,15 +22,8 @@ function keyPressed()
  */
 function keyReleased()
 {
-    if (keyState.a && keyState.d)
-    {
-        keyState.a = false;
-        keyState.d = false;
-    }
     if (key === "a" || key === "A") keyState.a = false;
     if (key === "d" || key === "D") keyState.d = false;
     if (key === " ") keyState.space = false;
     if (keyCode === ESCAPE) keyState.escape = false;
-
-    keyState[key] = false;
 }
