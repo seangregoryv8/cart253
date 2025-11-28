@@ -1,16 +1,31 @@
 "use strict";
 
+var scoreboard = 200;
+
 let TESTTIMER = 0;
 
 let brickImages = 
 {
-    health1: "",
-    health2: "",
-    health3: ""
+    health1: 
+    {
+        outside: "",
+        inside: ""
+    },
+    health2: 
+    {
+        outside: "",
+        inside: ""
+    },
+    health3: 
+    {
+        outside: "",
+        inside: ""
+    }
 }
 let particles = [];
 let enemies = []
-let WIDTH = 600;
+let GAMEWIDTH = 600;
+let WIDTH = 900;
 let HEIGHT = 1000;
 
 let triggerHappy = false;
@@ -28,7 +43,7 @@ let ballState = {
 }
 
 let paddle = {
-    x: WIDTH / 2,
+    x: GAMEWIDTH / 2,
     y: HEIGHT - px(1),
     size: px(5),
     speed: 5
@@ -36,7 +51,7 @@ let paddle = {
 
 let ballStartY = HEIGHT - px(2);
 let ball = {
-    x: WIDTH / 2 + px(2),
+    x: GAMEWIDTH / 2 + px(2),
     y: HEIGHT - px(2),
     size: px(1),
     state: ballState.START,
@@ -55,14 +70,18 @@ let enemy = {
     x: x,
     y: y,
     width: px(3),
-    height: px(1)
+    height: px(1),
+    color: 0
 };
 
 function preload()
 {
-    brickImages.health1 = loadImage("../assets/images/brick3.png")
-    brickImages.health2 = loadImage("../assets/images/brick2.png")
-    brickImages.health3 = loadImage("../assets/images/brick1.png")
+    brickImages.health1.outside = loadImage("../assets/images/brick3Outside.png")
+    brickImages.health1.inside = loadImage("../assets/images/brick3Inside.png")
+    brickImages.health2.outside = loadImage("../assets/images/brick2Outside.png")
+    brickImages.health2.inside = loadImage("../assets/images/brick2Inside.png")
+    brickImages.health3.outside = loadImage("../assets/images/brick1Outside.png")
+    brickImages.health3.inside = loadImage("../assets/images/brick1Inside.png")
 }
 
 /**
@@ -76,6 +95,12 @@ function setup() {
 // ELO system that collects global score and adjusts its own difciculty in mind
 // A cap where you can keep that same level for when you're comfortable with the level you want
 
+function drawELO()
+{
+    fill(255);
+    textSize(24);
+    text("ELO Score: " + Math.round(scoreboard), GAMEWIDTH + 25, 100);
+}
 
 /**
  * Main game loop
@@ -135,6 +160,8 @@ function draw()
     {
         triggerHappy = true;
     }
+
+    drawELO();
 }
 
 /**
@@ -142,20 +169,29 @@ function draw()
  */
 function drawEnemy(enemy)
 {
-    let img;
+    let imgOut;
+    let imgIn;
     switch (enemy.health)
     {
         case 1:
-            img = brickImages.health1;
+            imgOut = brickImages.health1.outside;
+            imgIn = brickImages.health1.inside;
             break;
         case 2:
-            img = brickImages.health2;
+            imgOut = brickImages.health2.outside;
+            imgIn = brickImages.health2.inside;
             break;
         case 3:
-            img = brickImages.health3;
+            imgOut = brickImages.health3.outside;
+            imgIn = brickImages.health3.inside;
             break;
     }
-    image(img, enemy.x, enemy.y)
+    image(imgOut, enemy.x, enemy.y)
+
+    push();
+    tint(enemy.color.r, enemy.color.g, enemy.color.b);
+    image(imgIn, enemy.x, enemy.y);
+    pop();
 }
 
 /**
@@ -165,7 +201,7 @@ function drawLevel()
 {
     noStroke();
     fill(60);
-    for (let x = px(1); x <= WIDTH; x += px(3))
+    for (let x = px(1); x <= GAMEWIDTH; x += px(3))
     {
         for (let y = 0; y <= HEIGHT - px(10); y += px(2))
         {
@@ -177,14 +213,25 @@ function drawLevel()
                     x: x - px(1),
                     y: y,
                     width: px(3),
-                    height: px(1)
+                    height: px(1),
+                    color:
+                    {
+                        r: ranInt(0, 255),
+                        g: ranInt(0, 255),
+                        b: ranInt(0, 255)
+                    }
                 });
             }
         }
     }
 }
 
-function makeParticle(x, y, velY, velX)
+function addScore(score)
+{
+    scoreboard += roundToNDecimals(score * ball.speedBank, 2); 
+}
+
+function makeParticle(x, y, velY, velX, color)
 {
     particles.push({
         x: x,
@@ -192,13 +239,13 @@ function makeParticle(x, y, velY, velX)
         velocityY: velY,
         velocityX: velX,
         size: random(5, 20),
-        shade: random(100, 255)
+        shade: color
     })
 }
 
 function moveParticle(particle)
 {
-    fill(particle.shade, 0, 0)
+    fill(particle.shade.r, particle.shade.g, particle.shade.b)
     ellipse(particle.x, particle.y, particle.size)
     particle.y += particle.velocityY;
     particle.velocityY += random(0.2, 0.8);
@@ -266,9 +313,13 @@ function ballPaddleCollision()
  */
 function ballWallCollision()
 {
+    if (ball.x <= 0 || ball.x + px(1) >= GAMEWIDTH || ball.y <= 0)
+    {
+        addScore(0.2);
+    }
     if (ball.x <= 0)
         ball.directionX = directions.RIGHT;
-    if (ball.x + px(1) >= WIDTH)
+    if (ball.x + px(1) >= GAMEWIDTH)
         ball.directionX = directions.LEFT;
     if (ball.y <= 0)
         ball.directionY = directions.DOWN;
@@ -278,6 +329,7 @@ function ballWallCollision()
         ball.x = paddle.x + (paddle.size / 2);
         ball.state = ballState.START;
         ball.speedBank = 8;
+        addScore(-5);
     }
 }
 
@@ -312,18 +364,25 @@ function ballEnemyCollision()
             ball.invincible = 5;
             enemy.health--;
             if (enemy.health <= 2)
+            {
                 for (let i = 0; i < ranInt(1, 2); i++)
-                    makeParticle(enemy.x + (enemy.width / 2), enemy.y + (enemy.height / 2), random(-5, -2), random(-3, 3))
+                    makeParticle(enemy.x + (enemy.width / 2), enemy.y + (enemy.height / 2), random(-5, -2), random(-3, 3), enemy.color)
+                addScore(0.5);
+            }
             if (enemy.health <= 1)
+            {
                 for (let i = 0; i < ranInt(1, 2); i++)
-                    makeParticle(enemy.x + (enemy.width / 2), enemy.y + (enemy.height / 2), random(-5, -2), random(-3, 3))
+                    makeParticle(enemy.x + (enemy.width / 2), enemy.y + (enemy.height / 2), random(-5, -2), random(-3, 3), enemy.color)
+                addScore(0.75);
+            }
             if (enemy.health <= 0)
             {
                 for (let i = 0; i < ranInt(4, 8); i++)
-                    makeParticle(enemy.x + (enemy.width / 2), enemy.y + (enemy.height / 2), random(-5, -2), random(-3, 3))
+                    makeParticle(enemy.x + (enemy.width / 2), enemy.y + (enemy.height / 2), random(-5, -2), random(-3, 3), enemy.color)
                 // Remove the enemy from the array when its health reaches 0
                 enemies.splice(i, 1);
                 i--;  // Adjust the index since we removed an element
+                addScore(1.5);
             }
             if (cornerR)
                 ball.directionX = directions.RIGHT;
@@ -350,7 +409,7 @@ function movePaddle()
             ball.x -= paddle.speed;
         }
     }
-    else if (keyState.d && paddle.x + paddle.size <= WIDTH)
+    else if (keyState.d && paddle.x + paddle.size <= GAMEWIDTH)
     {
         paddle.x += paddle.speed;
         if (ball.state == ballState.START)
@@ -376,7 +435,7 @@ function drawGrid()
 {
     stroke(0);
     fill(230);
-    for (let x = 0; x <= WIDTH; x += px(1))
+    for (let x = 0; x <= GAMEWIDTH; x += px(1))
     {
         rect(x, 0, px(1), px(1));
         for (let y = 0; y <= HEIGHT; y += px(1))
@@ -405,4 +464,10 @@ function checkTarget(ball, enemy)
     let overlap = (d < px(1) / 2 + enemy.size / 2);
 
     return overlap;
+}
+
+function roundToNDecimals(number, decimals)
+{
+    const factor = Math.pow(10, decimals);
+    return Math.round(number * factor) / factor;
 }
