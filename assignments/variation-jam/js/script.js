@@ -1,7 +1,5 @@
 "use strict";
 
-var scoreboard = 200;
-
 let TESTTIMER = 0;
 
 let brickImages = 
@@ -26,7 +24,7 @@ let particles = [];
 let enemies = []
 let GAMEWIDTH = 600;
 let WIDTH = 900;
-let HEIGHT = 1000;
+let HEIGHT = 900;
 
 let triggerHappy = false;
 
@@ -150,7 +148,7 @@ function draw()
         triggerHappy = true;
     }
 
-    drawELO();
+    updateElo();
 }
 
 /**
@@ -185,16 +183,6 @@ function drawLevel()
     }
 }
 
-// ELO system that collects global score and adjusts its own difciculty in mind
-// A cap where you can keep that same level for when you're comfortable with the level you want
-
-function drawELO()
-{
-    fill(255);
-    textSize(24);
-    text("ELO Score: " + Math.round(scoreboard), GAMEWIDTH + 25, 100);
-}
-
 
 /**
  * Draw enemy (brick) based on health
@@ -224,12 +212,6 @@ function drawEnemy(enemy)
     tint(enemy.color.r, enemy.color.g, enemy.color.b);
     image(imgIn, enemy.x, enemy.y);
     pop();
-}
-
-
-function addScore(score)
-{
-    scoreboard += roundToNDecimals(score * ball.speedBank, 2); 
 }
 
 /**
@@ -336,8 +318,13 @@ function ballWallCollision()
         ball.x = paddle.x + (paddle.size / 2);
         ball.state = ballState.START;
         ball.speedBank = random(5, 8);
-        addScore(-5);
+
+        addScore(-50);
+        combo = 0;
+        comboTimer = 0;
     }
+
+    updateDifficulty();
 }
 
 /**
@@ -399,6 +386,8 @@ function ballEnemyCollision()
             {
                 ball.directionY = ball.y + ball.size / 2 >= enemy.y + enemy.height / 2 ? directions.DOWN : directions.UP;
             }
+
+            updateDifficulty();
         }
     }
 }
