@@ -161,38 +161,55 @@ function setup() {
  * Main game loop
  */
 function draw()
-{
+{   
     background(0);
     //drawGrid();
-    drawPaddle();
+    if (selectedMode != GAMEMODES.Prediction) drawPaddle();
     drawBall();
 
     if (ball.state == ballState.START && keyState.space)
     {
         ball.state = ballState.LAUNCHED;
-        ball.directionY = directions.UP;
-        if (keyState.a)
-            ball.directionX = directions.LEFT;
-        else if (keyState.d)
-            ball.directionX = directions.RIGHT;
-        else ball.directionX = ranInt(0, 1) == 0 ? directions.LEFT : directions.RIGHT;
-        ball.velocityX = ball.speedBank / 2; // Random velocity for the ball
-        ball.velocityY = ball.speedBank / 2; // Initial velocity
-        if (keyState.a || keyState.d)
+        // If in Prediction mode, launch in the direction of the UI arrow (arrowAngle)
+        if (selectedMode == GAMEMODES.Prediction && typeof arrowAngle !== "undefined")
         {
-            ball.velocityX *= 2;
-            ball.velocityY /= 2;
+            // arrowAngle is the rotation applied to a sprite that originally points up.
+            // Use cos/sin of arrowAngle to produce a movement vector.
+            const ux = Math.cos(arrowAngle);
+            const uy = Math.sin(arrowAngle);
+
+            // use speedBank to set initial magnitude
+            const speed = ball.speedBank / 2;
+
+            ball.velocityX = Math.abs(ux) * speed;
+            ball.velocityY = Math.abs(uy) * speed;
+
+            ball.directionX = ux >= 0 ? directions.RIGHT : directions.LEFT;
+            ball.directionY = uy >= 0 ? directions.DOWN : directions.UP;
         }
+        else
+        {
+            // default launch behavior
+            ball.directionY = directions.UP;
+            ball.directionX = keyState.a ? directions.LEFT : keyState.d ? directions.RIGHT : ranInt(0, 1) == 0 ? directions.LEFT : directions.RIGHT;
+            ball.velocityX = ball.speedBank / 2;
+            ball.velocityY = ball.speedBank / 2;
+            if (keyState.a || keyState.d)
+            {
+                ball.velocityX *= 2;
+                ball.velocityY /= 2;
+            }
+        } 
     }
 
     // Draw all enemies (bricks)
     for (let enemy of enemies)
         drawEnemy(enemy);
 
-    movePaddle();
+    if (selectedMode != GAMEMODES.Prediction) movePaddle();
     handleDash();
     moveBall();
-    ballPaddleCollision();
+    if (selectedMode != GAMEMODES.Prediction) ballPaddleCollision();
     ballEnemyCollision();
     ballWallCollision();
 
