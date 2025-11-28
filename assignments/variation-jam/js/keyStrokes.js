@@ -4,6 +4,7 @@ let keyState = {
     i: false,
     space: false,
     escape: false,
+    shift: false
 }
 
 document.onkeydown = function(e) {
@@ -12,6 +13,12 @@ document.onkeydown = function(e) {
     if (e.key === "d" || e.key === "D") keyState.d = true;
     if (e.key === "i" || e.key === "I") keyState.i = true;
     if (e.keyCode === 27) keyState.escape = true;
+    if (e.key === "Shift" && !paddle.dashing) 
+    {
+        keyState.shift = true;
+        paddle.speed = 15;
+        paddle.dashing = true;
+    }
 }
 
 document.onkeyup = function(e) {
@@ -20,4 +27,5 @@ document.onkeyup = function(e) {
     if (e.key === "d" || e.key === "D") keyState.d = false;
     if (e.key === "i" || e.key === "I") keyState.i = false;
     if (e.keyCode === 27) keyState.escape = false;
+    if (e.key === "Shift") keyState.shift = false;
 }

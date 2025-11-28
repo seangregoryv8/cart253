@@ -51,7 +51,9 @@ let paddle = {
     x: GAMEWIDTH / 2,
     y: HEIGHT - px(1),
     size: px(5),
-    speed: 5
+    speed: 5,
+    dashing: false,
+    dashFalloff: 0.2
 }
 
 let ballStartY = HEIGHT - px(2);
@@ -151,6 +153,7 @@ function draw()
     if (TESTTIMER == 0)
     {
         movePaddle();
+        handleDash();
         moveBall();
         ballPaddleCollision();
         ballEnemyCollision();
@@ -294,6 +297,21 @@ function movePaddle()
         {
             ball.x += paddle.speed;
         }
+    }
+}
+
+function handleDash()
+{
+    if (paddle.dashing)
+    {
+        if (paddle.speed <= 5)
+        {
+            paddle.speed = 5;
+            paddle.dashing = false;
+            paddle.dashFalloff = 0.2;
+        }
+        paddle.speed -= paddle.dashFalloff;
+        paddle.dashFalloff += 0.05
     }
 }
 
