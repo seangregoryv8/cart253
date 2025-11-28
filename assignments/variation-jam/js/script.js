@@ -1,13 +1,5 @@
 "use strict";
 
-let TESTTIMER = 0;
-
-let GAMEMODES = {
-    CLASSIC: "classic",
-    PREDICTION: "prediction",
-    POWERUP: "powerup"
-}
-
 let brickImages = 
 {
     health1: 
@@ -30,7 +22,7 @@ let brickImages =
 let particles = [];
 let enemies = []
 let GAMEWIDTH = 600;
-let WIDTH = 900;
+let WIDTH = 1000;
 let HEIGHT = 900;
 
 let triggerHappy = false;
@@ -131,7 +123,7 @@ function preload()
     },
     {
         name: "PowerUp",
-        description: "Change speed, size, and everything in between.",
+        description: "Trade skill for fun.",
         x: GAMEWIDTH + 25,
         y: 220,
         width: 150,
@@ -143,6 +135,15 @@ function preload()
         description: "Cannonball to the heart.",
         x: GAMEWIDTH + 25,
         y: 250,
+        width: 150,
+        height: 30,
+        hovered: false
+    },
+    {
+        name: "RNG Hell",
+        description: "You die when the game decides you die",
+        x: GAMEWIDTH + 25,
+        y: 280,
         width: 150,
         height: 30,
         hovered: false
@@ -188,15 +189,12 @@ function draw()
     for (let enemy of enemies)
         drawEnemy(enemy);
 
-    if (TESTTIMER == 0)
-    {
-        movePaddle();
-        handleDash();
-        moveBall();
-        ballPaddleCollision();
-        ballEnemyCollision();
-        ballWallCollision();
-    }
+    movePaddle();
+    handleDash();
+    moveBall();
+    ballPaddleCollision();
+    ballEnemyCollision();
+    ballWallCollision();
 
     for (let i = 0; i < particles.length; i++)
     {
@@ -208,17 +206,17 @@ function draw()
     if (ball.invincible > 0)
         ball.invincible--;
 
-    if (TESTTIMER > 0)
-        TESTTIMER--;
-
-    if (keyState.i)
-    {
-        triggerHappy = true;
-    }
-
     updateElo();
 
     drawModes();
+
+    randomChance(true, () => {
+        ball.y = HEIGHT;
+        palmarScrew = "Random Death"
+    }, 1000);
+
+    if (rngEffects.frozenPaddle && ranInt(1, 30) == 27) rngEffects.frozenPaddle = false;
+    if (rngEffects.invisibleBall && ranInt(1, 30) == 27) rngEffects.invisibleBall = false;
 }
 
 /**
@@ -289,6 +287,11 @@ function drawEnemy(enemy)
  */
 function drawBall()
 {
+    randomChance(!rngEffects.invisibleBall, () => {
+        rngEffects.invisibleBall = true;
+        palmarScrew = "Random Invisible Ball"
+    });
+    if (rngEffects.invisibleBall) return;
     fill(150);
     rect(ball.x, ball.y, px(1), px(1), 20);
 }
@@ -320,6 +323,13 @@ function drawPaddle()
  */
 function movePaddle()
 {
+    randomChance(!rngEffects.frozenPaddle, () => {
+        rngEffects.frozenPaddle = true;
+        palmarScrew = "Random Frozen Paddle"
+    })
+
+    if (rngEffects.frozenPaddle) return;
+
     if (keyState.a && paddle.x >= 0)
     {
         paddle.x -= paddle.speed;
@@ -373,6 +383,11 @@ function ballPaddleCollision()
                 let pa = ball.x;
                 let pb = paddle.x + (paddle.size / 2);
                 directional = pa > pb ? pa - pb : pb - pa;
+
+                randomChance(true, () => {
+                    ball.speedBank *= 5;
+                    palmarScrew = "Random Speed Boost"
+                });
 
                 directional = (directional / 60) * ball.speedBank;
 
@@ -436,12 +451,19 @@ function ballEnemyCollision()
         let detectionX = ballXRight >= enemyXLeft && ballXLeft <= enemyXRight;
         let detectionY = ballYDown >= enemyYUp && ballYUp <= enemyYDown;
 
-        if ((detectionX && detectionY && ball.invincible == 0) || triggerHappy)
+        if (detectionX && detectionY && ball.invincible == 0)
         {
             let cornerR = ballXLeft == enemyXRight;
             let cornerL = ballXRight == enemyXLeft;
             ball.invincible = 5;
-            enemy.health--;
+            let ranD = ranInt(1, 4);
+            console.log(ranD);
+            if (selectedMode == "RNG Hell" && ball.state == ballState.LAUNCHED && ranD == 1)
+            {
+                enemy.health = ranInt(enemy.health, 3);
+                palmarScrew = "Random Brick Heal"
+            }
+            else enemy.health--;
             if (enemy.health <= 2)
             {
                 for (let i = 0; i < ranInt(1, 2); i++)
