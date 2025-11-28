@@ -76,31 +76,31 @@ let enemy = {
 
 function preload()
 {
-    brickImages.health1.outside = loadImage("../assets/images/brick3Outside.png")
-    brickImages.health1.inside = loadImage("../assets/images/brick3Inside.png")
-    brickImages.health2.outside = loadImage("../assets/images/brick2Outside.png")
-    brickImages.health2.inside = loadImage("../assets/images/brick2Inside.png")
-    brickImages.health3.outside = loadImage("../assets/images/brick1Outside.png")
-    brickImages.health3.inside = loadImage("../assets/images/brick1Inside.png")
+    brickImages.health1.outside = loadImage("assets/images/brick3Outside.png")
+    brickImages.health1.inside = loadImage("assets/images/brick3Inside.png")
+    brickImages.health2.outside = loadImage("assets/images/brick2Outside.png")
+    brickImages.health2.inside = loadImage("assets/images/brick2Inside.png")
+    brickImages.health3.outside = loadImage("assets/images/brick1Outside.png")
+    brickImages.health3.inside = loadImage("assets/images/brick1Inside.png")
 
-    exoFont.black = loadFont("../assets/fonts/Exo_2/static/Exo2-Black.ttf");
-    exoFont.blackItalic = loadFont("../assets/fonts/Exo_2/static/Exo2-BlackItalic.ttf");
-    exoFont.bold = loadFont("../assets/fonts/Exo_2/static/Exo2-Bold.ttf");
-    exoFont.boldItalic = loadFont("../assets/fonts/Exo_2/static/Exo2-BoldItalic.ttf");
-    exoFont.extraBold = loadFont("../assets/fonts/Exo_2/static/Exo2-ExtraBold.ttf");
-    exoFont.extraBoldItalic = loadFont("../assets/fonts/Exo_2/static/Exo2-ExtraBoldItalic.ttf");
-    exoFont.extraLight = loadFont("../assets/fonts/Exo_2/static/Exo2-ExtraLight.ttf");
-    exoFont.extraLightItalic = loadFont("../assets/fonts/Exo_2/static/Exo2-ExtraLightItalic.ttf");
-    exoFont.italic = loadFont("../assets/fonts/Exo_2/static/Exo2-Italic.ttf");
-    exoFont.light = loadFont("../assets/fonts/Exo_2/static/Exo2-Light.ttf");
-    exoFont.lightItalic = loadFont("../assets/fonts/Exo_2/static/Exo2-LightItalic.ttf");
-    exoFont.medium = loadFont("../assets/fonts/Exo_2/static/Exo2-Medium.ttf");
-    exoFont.mediumItalic = loadFont("../assets/fonts/Exo_2/static/Exo2-MediumItalic.ttf");
-    exoFont.regular = loadFont("../assets/fonts/Exo_2/static/Exo2-Regular.ttf");
-    exoFont.semiBold = loadFont("../assets/fonts/Exo_2/static/Exo2-SemiBold.ttf");
-    exoFont.semiBoldItalic = loadFont("../assets/fonts/Exo_2/static/Exo2-SemiBoldItalic.ttf");
-    exoFont.thin = loadFont("../assets/fonts/Exo_2/static/Exo2-Thin.ttf");
-    exoFont.thinItalic = loadFont("../assets/fonts/Exo_2/static/Exo2-ThinItalic.ttf");
+    exoFont.black = loadFont("assets/fonts/Exo_2/static/Exo2-Black.ttf");
+    exoFont.blackItalic = loadFont("assets/fonts/Exo_2/static/Exo2-BlackItalic.ttf");
+    exoFont.bold = loadFont("assets/fonts/Exo_2/static/Exo2-Bold.ttf");
+    exoFont.boldItalic = loadFont("assets/fonts/Exo_2/static/Exo2-BoldItalic.ttf");
+    exoFont.extraBold = loadFont("assets/fonts/Exo_2/static/Exo2-ExtraBold.ttf");
+    exoFont.extraBoldItalic = loadFont("assets/fonts/Exo_2/static/Exo2-ExtraBoldItalic.ttf");
+    exoFont.extraLight = loadFont("assets/fonts/Exo_2/static/Exo2-ExtraLight.ttf");
+    exoFont.extraLightItalic = loadFont("assets/fonts/Exo_2/static/Exo2-ExtraLightItalic.ttf");
+    exoFont.italic = loadFont("assets/fonts/Exo_2/static/Exo2-Italic.ttf");
+    exoFont.light = loadFont("assets/fonts/Exo_2/static/Exo2-Light.ttf");
+    exoFont.lightItalic = loadFont("assets/fonts/Exo_2/static/Exo2-LightItalic.ttf");
+    exoFont.medium = loadFont("assets/fonts/Exo_2/static/Exo2-Medium.ttf");
+    exoFont.mediumItalic = loadFont("assets/fonts/Exo_2/static/Exo2-MediumItalic.ttf");
+    exoFont.regular = loadFont("assets/fonts/Exo_2/static/Exo2-Regular.ttf");
+    exoFont.semiBold = loadFont("assets/fonts/Exo_2/static/Exo2-SemiBold.ttf");
+    exoFont.semiBoldItalic = loadFont("assets/fonts/Exo_2/static/Exo2-SemiBoldItalic.ttf");
+    exoFont.thin = loadFont("assets/fonts/Exo_2/static/Exo2-Thin.ttf");
+    exoFont.thinItalic = loadFont("assets/fonts/Exo_2/static/Exo2-ThinItalic.ttf");
 
     gameModesUI.push(
     {
