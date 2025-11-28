@@ -30,9 +30,12 @@ function updateElo()
 
 function drawELO()
 {
+    push();
     fill(255);
     textSize(24);
+    textFont(exoFont.light)
     text("ELO Score: " + Math.round(scoreboard), GAMEWIDTH + 25, HEIGHT - 50);
+    pop();
 }
 
 function addScore(baseScore)
@@ -57,6 +60,7 @@ function updateDifficulty()
 {
     if (elo.recentScores.length === 0) return;
     const avg = elo.recentScores.reduce((a, b) => a + b, 0) / elo.recentScores.length;
+    console.log(avg);
     const baseline = 5;
     elo.difficultyMultiplier = 1 + Math.tanh((avg - baseline) / baseline) * 0.5;
 }
