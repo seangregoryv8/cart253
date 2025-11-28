@@ -109,6 +109,44 @@ function preload()
     exoFont.semiBoldItalic = loadFont("../assets/fonts/Exo_2/static/Exo2-SemiBoldItalic.ttf");
     exoFont.thin = loadFont("../assets/fonts/Exo_2/static/Exo2-Thin.ttf");
     exoFont.thinItalic = loadFont("../assets/fonts/Exo_2/static/Exo2-ThinItalic.ttf");
+
+    gameModesUI.push(
+    {
+        name: "Classic",
+        description: "Standard Breakout gameplay.",
+        x: GAMEWIDTH + 25,
+        y: 160,
+        width: 150,
+        height: 30,
+        hovered: false
+    },
+    {
+        name: "Prediction",
+        description: "Predict the bounces.",
+        x: GAMEWIDTH + 25,
+        y: 190,
+        width: 150,
+        height: 30,
+        hovered: false
+    },
+    {
+        name: "PowerUp",
+        description: "Change speed, size, and everything in between.",
+        x: GAMEWIDTH + 25,
+        y: 220,
+        width: 150,
+        height: 30,
+        hovered: false
+    },
+    {
+        name: "Supershot",
+        description: "Cannonball to the heart.",
+        x: GAMEWIDTH + 25,
+        y: 250,
+        width: 150,
+        height: 30,
+        hovered: false
+    })
 }
 
 /**
