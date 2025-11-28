@@ -22,6 +22,7 @@ function keyPressed()
  */
 function keyReleased()
 {
+    keyState.space = false;
     if (key === "a" || key === "A") keyState.a = false;
     if (key === "d" || key === "D") keyState.d = false;
     if (key === " ") keyState.space = false;

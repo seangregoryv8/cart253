@@ -91,17 +91,6 @@ function setup() {
     createCanvas(WIDTH, HEIGHT);
     drawLevel();
 }
-
-// ELO system that collects global score and adjusts its own difciculty in mind
-// A cap where you can keep that same level for when you're comfortable with the level you want
-
-function drawELO()
-{
-    fill(255);
-    textSize(24);
-    text("ELO Score: " + Math.round(scoreboard), GAMEWIDTH + 25, 100);
-}
-
 /**
  * Main game loop
  */
@@ -165,36 +154,6 @@ function draw()
 }
 
 /**
- * Draw enemy (brick) based on health
- */
-function drawEnemy(enemy)
-{
-    let imgOut;
-    let imgIn;
-    switch (enemy.health)
-    {
-        case 1:
-            imgOut = brickImages.health1.outside;
-            imgIn = brickImages.health1.inside;
-            break;
-        case 2:
-            imgOut = brickImages.health2.outside;
-            imgIn = brickImages.health2.inside;
-            break;
-        case 3:
-            imgOut = brickImages.health3.outside;
-            imgIn = brickImages.health3.inside;
-            break;
-    }
-    image(imgOut, enemy.x, enemy.y)
-
-    push();
-    tint(enemy.color.r, enemy.color.g, enemy.color.b);
-    image(imgIn, enemy.x, enemy.y);
-    pop();
-}
-
-/**
  * Draw the level (bricks)
  */
 function drawLevel()
@@ -226,39 +185,60 @@ function drawLevel()
     }
 }
 
+// ELO system that collects global score and adjusts its own difciculty in mind
+// A cap where you can keep that same level for when you're comfortable with the level you want
+
+function drawELO()
+{
+    fill(255);
+    textSize(24);
+    text("ELO Score: " + Math.round(scoreboard), GAMEWIDTH + 25, 100);
+}
+
+
+/**
+ * Draw enemy (brick) based on health
+ */
+function drawEnemy(enemy)
+{
+    let imgOut;
+    let imgIn;
+    switch (enemy.health)
+    {
+        case 1:
+            imgOut = brickImages.health1.outside;
+            imgIn = brickImages.health1.inside;
+            break;
+        case 2:
+            imgOut = brickImages.health2.outside;
+            imgIn = brickImages.health2.inside;
+            break;
+        case 3:
+            imgOut = brickImages.health3.outside;
+            imgIn = brickImages.health3.inside;
+            break;
+    }
+    image(imgOut, enemy.x, enemy.y)
+
+    push();
+    tint(enemy.color.r, enemy.color.g, enemy.color.b);
+    image(imgIn, enemy.x, enemy.y);
+    pop();
+}
+
+
 function addScore(score)
 {
     scoreboard += roundToNDecimals(score * ball.speedBank, 2); 
 }
 
-function makeParticle(x, y, velY, velX, color)
-{
-    particles.push({
-        x: x,
-        y: y,
-        velocityY: velY,
-        velocityX: velX,
-        size: random(5, 20),
-        shade: color
-    })
-}
-
-function moveParticle(particle)
-{
-    fill(particle.shade.r, particle.shade.g, particle.shade.b)
-    ellipse(particle.x, particle.y, particle.size)
-    particle.y += particle.velocityY;
-    particle.velocityY += random(0.2, 0.8);
-    particle.x += particle.velocityX;
-}
 /**
- * Draw the paddle
+ * Draw the ball
  */
-function drawPaddle()
+function drawBall()
 {
-    noStroke();
-    fill(255);
-    rect(paddle.x, paddle.y, paddle.size, px(1), 10);
+    fill(150);
+    rect(ball.x, ball.y, px(1), px(1), 20);
 }
 
 /**
@@ -270,6 +250,39 @@ function moveBall()
     {
         ball.x += ball.velocityX * (ball.directionX == directions.RIGHT ? 1 : -1);
         ball.y += ball.velocityY * (ball.directionY == directions.UP ? -1 : 1);
+    }
+}
+
+/**
+ * Draw the paddle
+ */
+function drawPaddle()
+{
+    noStroke();
+    fill(255);
+    rect(paddle.x, paddle.y, paddle.size, px(1), 10);
+}
+
+/**
+ * Move the paddle based on user input
+ */
+function movePaddle()
+{
+    if (keyState.a && paddle.x >= 0)
+    {
+        paddle.x -= paddle.speed;
+        if (ball.state == ballState.START)
+        {
+            ball.x -= paddle.speed;
+        }
+    }
+    else if (keyState.d && paddle.x + paddle.size <= GAMEWIDTH)
+    {
+        paddle.x += paddle.speed;
+        if (ball.state == ballState.START)
+        {
+            ball.x += paddle.speed;
+        }
     }
 }
 
@@ -306,29 +319,23 @@ function ballPaddleCollision()
     }
 }
 
-// A system where, depedning where you hit the ball, it responds to that exact same movement.
-// Maybe it even trades around X for Y values if you hit it right.
 /**
  * Handle ball collision with walls
  */
 function ballWallCollision()
 {
     if (ball.x <= 0 || ball.x + px(1) >= GAMEWIDTH || ball.y <= 0)
-    {
         addScore(0.2);
-    }
-    if (ball.x <= 0)
-        ball.directionX = directions.RIGHT;
-    if (ball.x + px(1) >= GAMEWIDTH)
-        ball.directionX = directions.LEFT;
-    if (ball.y <= 0)
-        ball.directionY = directions.DOWN;
+
+    if (ball.x <= 0)                 ball.directionX = directions.RIGHT;
+    if (ball.x + px(1) >= GAMEWIDTH) ball.directionX = directions.LEFT;
+    if (ball.y <= 0)                 ball.directionY = directions.DOWN;
     if (ball.y >= HEIGHT)
     {
         ball.y = ballStartY;
         ball.x = paddle.x + (paddle.size / 2);
         ball.state = ballState.START;
-        ball.speedBank = 8;
+        ball.speedBank = random(5, 8);
         addScore(-5);
     }
 }
@@ -377,7 +384,7 @@ function ballEnemyCollision()
             }
             if (enemy.health <= 0)
             {
-                for (let i = 0; i < ranInt(4, 8); i++)
+                for (let i = 0; i < ranInt(3, 6); i++)
                     makeParticle(enemy.x + (enemy.width / 2), enemy.y + (enemy.height / 2), random(-5, -2), random(-3, 3), enemy.color)
                 // Remove the enemy from the array when its health reaches 0
                 enemies.splice(i, 1);
@@ -397,38 +404,6 @@ function ballEnemyCollision()
 }
 
 /**
- * Move the paddle based on user input
- */
-function movePaddle()
-{
-    if (keyState.a && paddle.x >= 0)
-    {
-        paddle.x -= paddle.speed;
-        if (ball.state == ballState.START)
-        {
-            ball.x -= paddle.speed;
-        }
-    }
-    else if (keyState.d && paddle.x + paddle.size <= GAMEWIDTH)
-    {
-        paddle.x += paddle.speed;
-        if (ball.state == ballState.START)
-        {
-            ball.x += paddle.speed;
-        }
-    }
-}
-
-/**
- * Draw the ball
- */
-function drawBall()
-{
-    fill(150);
-    rect(ball.x, ball.y, px(1), px(1), 20);
-}
-
-/**
  * Draw grid for pixel art effect
  */
 function drawGrid()
@@ -442,6 +417,27 @@ function drawGrid()
             rect(x, y, px(1), px(1));
     }
     noStroke();
+}
+
+function makeParticle(x, y, velY, velX, color)
+{
+    particles.push({
+        x: x,
+        y: y,
+        velocityY: velY,
+        velocityX: velX,
+        size: random(5, 20),
+        shade: color
+    })
+}
+
+function moveParticle(particle)
+{
+    fill(particle.shade.r, particle.shade.g, particle.shade.b)
+    ellipse(particle.x, particle.y, particle.size)
+    particle.y += particle.velocityY;
+    particle.velocityY += random(0.2, 0.8);
+    particle.x += particle.velocityX;
 }
 
 function px(s) { return s * 20; }
@@ -460,10 +456,7 @@ function ranInt(min, max)
 function checkTarget(ball, enemy)
 {
     let d = dist(ball.x, ball.y, enemy.x, enemy.y);
-
-    let overlap = (d < px(1) / 2 + enemy.size / 2);
-
-    return overlap;
+    return d < px(1) / 2 + enemy.size / 2;
 }
 
 function roundToNDecimals(number, decimals)
