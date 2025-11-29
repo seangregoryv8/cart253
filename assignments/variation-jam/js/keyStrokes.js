@@ -31,6 +31,7 @@ document.onkeydown = function(e)
 
 document.onkeyup = function(e)
 {
+    
     if (e.key === " ") keyState.space = false;
     if (e.key === "a" || e.key === "A") keyState.a = false;
     if (e.key === "d" || e.key === "D") keyState.d = false;

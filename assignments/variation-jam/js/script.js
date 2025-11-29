@@ -36,7 +36,8 @@ let directions = {
 
 let ballState = {
     START: "start",
-    LAUNCHED: "launched"
+    LAUNCHED: "launched",
+    CHARGING: "charging"
 }
 
 let paddle = {
@@ -169,25 +170,10 @@ function draw()
 
     if (ball.state == ballState.START && keyState.space)
     {
-        ball.state = ballState.LAUNCHED;
+        ball.state = selectedMode == GAMEMODES.Prediction ? ballState.CHARGING : ballState.LAUNCHED;
+
         // If in Prediction mode, launch in the direction of the UI arrow (arrowAngle)
-        if (selectedMode == GAMEMODES.Prediction && typeof arrowAngle !== "undefined")
-        {
-            // arrowAngle is the rotation applied to a sprite that originally points up.
-            // Use cos/sin of arrowAngle to produce a movement vector.
-            const ux = Math.cos(arrowAngle);
-            const uy = Math.sin(arrowAngle);
-
-            // use speedBank to set initial magnitude
-            const speed = ball.speedBank / 2;
-
-            ball.velocityX = Math.abs(ux) * speed;
-            ball.velocityY = Math.abs(uy) * speed;
-
-            ball.directionX = ux >= 0 ? directions.RIGHT : directions.LEFT;
-            ball.directionY = uy >= 0 ? directions.DOWN : directions.UP;
-        }
-        else
+        if (!(selectedMode == GAMEMODES.Prediction && typeof arrowAngle !== "undefined"))
         {
             // default launch behavior
             ball.directionY = directions.UP;
@@ -199,7 +185,22 @@ function draw()
                 ball.velocityX *= 2;
                 ball.velocityY /= 2;
             }
-        } 
+        }
+    }
+
+    if (ball.state == ballState.CHARGING && !keyState.space)
+    {
+        ball.state = ballState.LAUNCHED;
+        // arrowAngle is the rotation applied to a sprite that originally points up.
+        // Use cos/sin of arrowAngle to produce a movement vector.
+        const ux = Math.cos(arrowAngle);
+        const uy = Math.sin(arrowAngle);
+        // use speedBank to set initial magnitude
+        const speed = ball.speedBank / 2 * (3 + force / 100);
+        ball.velocityX = Math.abs(ux) * speed;
+        ball.velocityY = Math.abs(uy) * speed;
+        ball.directionX = ux >= 0 ? directions.RIGHT : directions.LEFT;
+        ball.directionY = uy >= 0 ? directions.DOWN : directions.UP;
     }
 
     // Draw all enemies (bricks)
@@ -234,6 +235,20 @@ function draw()
 
     if (rngEffects.frozenPaddle && ranInt(1, 30) == 27) rngEffects.frozenPaddle = false;
     if (rngEffects.invisibleBall && ranInt(1, 30) == 27) rngEffects.invisibleBall = false;
+}
+
+function launchBall()
+{
+    // default launch behavior
+    ball.directionY = directions.UP;
+    ball.directionX = keyState.a ? directions.LEFT : keyState.d ? directions.RIGHT : ranInt(0, 1) == 0 ? directions.LEFT : directions.RIGHT;
+    ball.velocityX = ball.speedBank / 2;
+    ball.velocityY = ball.speedBank / 2;
+    if (keyState.a || keyState.d)
+    {
+        ball.velocityX *= 2;
+        ball.velocityY /= 2;
+    }
 }
 
 /**
@@ -424,7 +439,10 @@ function ballPaddleCollision()
 function ballWallCollision()
 {
     if (ball.x <= 0 || ball.x + px(1) >= GAMEWIDTH || ball.y <= 0)
-        addScore(0.2);
+    {
+        if (selectedMode != GAMEMODES.Prediction) addScore(0.2);
+        bounces++;
+    }
 
     if (ball.x <= 0)                 ball.directionX = directions.RIGHT;
     if (ball.x + px(1) >= GAMEWIDTH) ball.directionX = directions.LEFT;
@@ -436,7 +454,31 @@ function ballWallCollision()
         ball.state = ballState.START;
         ball.speedBank = random(5, 8);
 
-        addScore(-50);
+        if (selectedMode != GAMEMODES.Prediction)
+            addScore(-50);
+        else
+        {
+            if (predict == bounces)
+            {
+                addScore(3 * predict);
+                congratsSpeech = "Bullseye! +" + (3 * predict) + " ELO!";
+            }
+            else if (Math.abs(predict - bounces) <= 2)
+            {
+                addScore(1 * Math.max(0, predict - Math.abs(predict - bounces)));
+                congratsSpeech = "Accurate! +" + (1 * Math.max(0, predict - Math.abs(predict - bounces))) + " ELO!";
+            }
+            else
+            {
+                congratsSpeech = "Missed! -20 ELO";
+                addScore(-20);
+            }
+
+            predict = 0;
+            bounces = 0;
+            force = 0;
+            
+        }
         combo = 0;
         comboTimer = 0;
     }
@@ -470,12 +512,11 @@ function ballEnemyCollision()
 
         if (detectionX && detectionY && ball.invincible == 0)
         {
+            bounces++;
             let cornerR = ballXLeft == enemyXRight;
             let cornerL = ballXRight == enemyXLeft;
             ball.invincible = 5;
-            let ranD = ranInt(1, 4);
-            console.log(ranD);
-            if (selectedMode == "RNG Hell" && ball.state == ballState.LAUNCHED && ranD == 1)
+            if (selectedMode == "RNG Hell" && ball.state == ballState.LAUNCHED && ranInt(1, 4) == 1)
             {
                 enemy.health = ranInt(enemy.health, 3);
                 palmarScrew = "Random Brick Heal"
@@ -485,13 +526,13 @@ function ballEnemyCollision()
             {
                 for (let i = 0; i < ranInt(1, 2); i++)
                     makeParticle(enemy.x + (enemy.width / 2), enemy.y + (enemy.height / 2), random(-5, -2), random(-3, 3), enemy.color)
-                addScore(0.5);
+                if (selectedMode != GAMEMODES.Prediction) addScore(0.5);
             }
             if (enemy.health <= 1)
             {
                 for (let i = 0; i < ranInt(1, 2); i++)
                     makeParticle(enemy.x + (enemy.width / 2), enemy.y + (enemy.height / 2), random(-5, -2), random(-3, 3), enemy.color)
-                addScore(0.75);
+                if (selectedMode != GAMEMODES.Prediction)addScore(0.75);
             }
             if (enemy.health <= 0)
             {
@@ -500,7 +541,7 @@ function ballEnemyCollision()
                 // Remove the enemy from the array when its health reaches 0
                 enemies.splice(i, 1);
                 i--;  // Adjust the index since we removed an element
-                addScore(1.5);
+                if (selectedMode != GAMEMODES.Prediction)addScore(1.5);
             }
             if (cornerR)
                 ball.directionX = directions.RIGHT;

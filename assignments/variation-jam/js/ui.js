@@ -130,6 +130,13 @@ let arrowAngle = 0;
 let predict = 0;
 let predictLeftHover = false;
 let predictRightHover = false;
+
+let force = 0;
+let slopeForce = 1;
+
+let bounces = 0;
+
+let congratsSpeech = "";
 function predictionUI()
 {
     const tx = GAMEWIDTH + 100;
@@ -158,17 +165,30 @@ function predictionUI()
 
     fill(255);
     scale(1);
+    
+    text("FORCE", 0, 30)
+    text("BOUNCES", 70, 30)
     text("Bounce Prediction", 5, -40);
+    text(congratsSpeech, 0, 80);
     textSize(26);
     textFont(exoFont.bold);
     fill(255, 150, 0);
     text(predict, 50, -10);
+    fill(150, 255, 0);
+    text(force, 10, 55);
+    fill(150, 0, 255);
+    text(bounces, 90, 55);
 
     if (keyState.w && !increased)
         predict++;
     if (keyState.s && !decreased)
         predict = Math.max(0, predict - 1);
     
+    if (keyState.space)
+    {
+        force += slopeForce;
+        if (force == 100 || force == 0) slopeForce = -slopeForce;
+    }
     if (keyState.w) 
     {
         increased = true;
@@ -199,7 +219,7 @@ function predictionUI()
     triangle(-10, -50, 0, -70, 10, -50);
     pop();
 
-    arrowAngle -= Math.PI / 2; 
+    arrowAngle -= Math.PI / 2;
 }
 
 function pointInTriangle(px, py, ax, ay, bx, by, cx, cy)
