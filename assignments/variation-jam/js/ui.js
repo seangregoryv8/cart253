@@ -66,12 +66,12 @@ function drawModes()
     fill(255);
     textSize(32);
     textFont(exoFont.black);
-    text("BREAKTHROUGH", GAMEWIDTH + 25, 50);
+    text("BREAKTHROUGH", GAMEWIDTH + 75, 50);
 
     textSize(18);
     textFont(exoFont.light);
-    text("Breakout Variation Game by", GAMEWIDTH + 25, 90);
-    text("Sean Gregory", GAMEWIDTH + 25, 110);
+    text("Breakout Variation Game by", GAMEWIDTH + 75, 90);
+    text("Sean Gregory", GAMEWIDTH + 75, 110);
 
     for (let mode of gameModesUI)
     {
@@ -109,7 +109,7 @@ function drawModes()
     {
         textSize(i == 0 ? 20 : 14);
         textFont(i == 0 ? exoFont.bold : exoFont.light);
-        text(instructions[i], GAMEWIDTH + 25, HEIGHT - (i == 0 ? 200 : 150) + i * 15);
+        text(instructions[i], GAMEWIDTH + 75, HEIGHT - (i == 0 ? 200 : 150) + i * 15);
     }
 
     switch (selectedMode)
@@ -273,19 +273,19 @@ function rngUI()
         {
             textFont(exoFont.bold);
             textSize(18);
-            text("Paddle currently frozen", GAMEWIDTH + 25, HEIGHT - 425);
+            text("Paddle currently frozen", GAMEWIDTH + 75, HEIGHT - 425);
         }
         if (rngEffects.invisibleBall)
         {
             textFont(exoFont.bold);
             textSize(18);
-            text("Ball currently invisible", GAMEWIDTH + 25, HEIGHT - 400);
+            text("Ball currently invisible", GAMEWIDTH + 75, HEIGHT - 400);
         }
         textFont(exoFont.bold);
-        textSize(18);
-        text("Screwed over by " + palmarScrew + "!", GAMEWIDTH + 25, HEIGHT - 375);
+        textSize(18); 
+        text("Screwed over by " + palmarScrew + "!", GAMEWIDTH + 75, HEIGHT - 375);
         textSize(24);
-        text(palmarWords[palmarChosen], GAMEWIDTH + 25, HEIGHT - 350);
+        text(palmarWords[palmarChosen], GAMEWIDTH + 75, HEIGHT - 350);
     }
 
 }
@@ -305,6 +305,7 @@ function mousePressed()
         if (mode.hovered)
         {
             selectedMode = mode.name;
+            triggerHappy = true;
             return false;
         }
     }

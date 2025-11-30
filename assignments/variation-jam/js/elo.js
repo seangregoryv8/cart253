@@ -34,7 +34,7 @@ function drawELO()
     fill(255);
     textSize(24);
     textFont(exoFont.light)
-    text("ELO Score: " + Math.round(scoreboard), GAMEWIDTH + 25, HEIGHT - 50);
+    text("ELO Score: " + Math.round(scoreboard), GAMEWIDTH + 75, HEIGHT - 50);
     pop();
 }
 

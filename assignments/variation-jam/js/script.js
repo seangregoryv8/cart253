@@ -1,5 +1,13 @@
 "use strict";
 
+var sounds = {
+    blockBreak: "",
+    blockCrack: "",
+    wallBounce: "",
+    music: "",
+    ballDrop: ""
+}
+
 let brickImages = 
 {
     health1: 
@@ -19,11 +27,12 @@ let brickImages =
     }
 }
 
+let destroyTimer = 0;
 let particles = [];
 let enemies = []
-let GAMEWIDTH = 600;
-let WIDTH = 1000;
-let HEIGHT = 900;
+let GAMEWIDTH = 700;
+let WIDTH = 1250;
+let HEIGHT = 850;
 
 let triggerHappy = false;
 
@@ -51,9 +60,11 @@ let paddle = {
 
 let ballStartY = HEIGHT - px(2);
 
+let ballResetX = GAMEWIDTH / 2 + px(2);
+let ballResetY = HEIGHT - px(2);
 let ball = {
-    x: GAMEWIDTH / 2 + px(2),
-    y: HEIGHT - px(2),
+    x: ballResetX,
+    y: ballResetY,
     size: px(1),
     state: ballState.START,
     directionX: "",
@@ -103,11 +114,17 @@ function preload()
     exoFont.thin = loadFont("assets/fonts/Exo_2/static/Exo2-Thin.ttf");
     exoFont.thinItalic = loadFont("assets/fonts/Exo_2/static/Exo2-ThinItalic.ttf");
 
+    sounds.blockBreak = loadSound("assets/sounds/break.wav");
+    sounds.blockCrack = loadSound("assets/sounds/crack.wav");
+    sounds.wallBounce = loadSound("assets/sounds/bounce.wav");
+    sounds.music = loadSound("assets/sounds/music.mp3");
+    sounds.ballDrop = loadSound("assets/sounds/over.wav");
+
     gameModesUI.push(
     {
         name: "Classic",
         description: "Standard Breakout gameplay.",
-        x: GAMEWIDTH + 25,
+        x: GAMEWIDTH + 75,
         y: 160,
         width: 150,
         height: 30,
@@ -116,7 +133,7 @@ function preload()
     {
         name: "Prediction",
         description: "Predict the bounces.",
-        x: GAMEWIDTH + 25,
+        x: GAMEWIDTH + 75,
         y: 190,
         width: 150,
         height: 30,
@@ -125,7 +142,7 @@ function preload()
     {
         name: "PowerUp",
         description: "Trade skill for fun.",
-        x: GAMEWIDTH + 25,
+        x: GAMEWIDTH + 75,
         y: 220,
         width: 150,
         height: 30,
@@ -134,7 +151,7 @@ function preload()
     {
         name: "Supershot",
         description: "Cannonball to the heart.",
-        x: GAMEWIDTH + 25,
+        x: GAMEWIDTH + 75,
         y: 250,
         width: 150,
         height: 30,
@@ -143,7 +160,7 @@ function preload()
     {
         name: "RNG Hell",
         description: "You die when the game decides you die",
-        x: GAMEWIDTH + 25,
+        x: GAMEWIDTH + 75,
         y: 280,
         width: 150,
         height: 30,
@@ -154,16 +171,29 @@ function preload()
 /**
  * Setup game
  */
-function setup() {
+function setup()
+{
     createCanvas(WIDTH, HEIGHT);
     drawLevel();
+    sounds.music.setVolume(0.5);
+    sounds.music.loop();
+    sounds.music.play();
+    
+    createStatic();
+    //createOverlay("./assets/images/1.gif");
+    createCrtOverlay();
+    createBars();
 }
+
 /**
  * Main game loop
  */
 function draw()
-{   
-    background(0);
+{
+    WIDTH = windowWidth * 0.65;
+    HEIGHT = windowHeight * 0.91;
+    GAMEWIDTH = WIDTH * 0.56;
+    background(50);
     //drawGrid();
     if (selectedMode != GAMEMODES.Prediction) drawPaddle();
     drawBall();
@@ -256,11 +286,12 @@ function launchBall()
  */
 function drawLevel()
 {
+    console.log("HI")
     noStroke();
     fill(60);
     for (let x = px(1); x <= GAMEWIDTH; x += px(3))
     {
-        for (let y = 0; y <= HEIGHT - px(10); y += px(2))
+        for (let y = px(2); y <= HEIGHT - px(10); y += px(2))
         {
             if (ranInt(0, 100) >= 20)
             {
@@ -442,6 +473,7 @@ function ballWallCollision()
     {
         if (selectedMode != GAMEMODES.Prediction) addScore(0.2);
         bounces++;
+        sounds.wallBounce.play();
     }
 
     if (ball.x <= 0)                 ball.directionX = directions.RIGHT;
@@ -449,24 +481,25 @@ function ballWallCollision()
     if (ball.y <= 0)                 ball.directionY = directions.DOWN;
     if (ball.y >= HEIGHT)
     {
-        ball.y = ballStartY;
+        ball.y = ballResetY;
         ball.x = paddle.x + (paddle.size / 2);
         ball.state = ballState.START;
         ball.speedBank = random(5, 8);
-
+        sounds.ballDrop.play();
+        
         if (selectedMode != GAMEMODES.Prediction)
             addScore(-50);
         else
         {
             if (predict == bounces)
             {
-                addScore(3 * predict);
-                congratsSpeech = "Bullseye! +" + (3 * predict) + " ELO!";
+                addScore(6 * predict);
+                congratsSpeech = "Bullseye! +" + (6 * predict) + " ELO!";
             }
             else if (Math.abs(predict - bounces) <= 2)
             {
-                addScore(1 * Math.max(0, predict - Math.abs(predict - bounces)));
-                congratsSpeech = "Accurate! +" + (1 * Math.max(0, predict - Math.abs(predict - bounces))) + " ELO!";
+                addScore(3 * Math.max(0, predict - Math.abs(predict - bounces)));
+                congratsSpeech = "Accurate! +" + (3 * Math.max(0, predict - Math.abs(predict - bounces))) + " ELO!";
             }
             else
             {
@@ -478,6 +511,7 @@ function ballWallCollision()
             bounces = 0;
             force = 0;
             
+            ball.x = ballResetX;
         }
         combo = 0;
         comboTimer = 0;
@@ -486,11 +520,20 @@ function ballWallCollision()
     updateDifficulty();
 }
 
+function destroyLevel()
+{
+    for (let i = 0; i < enemies.length; i++)
+    {
+        enemies[i].health = 0;
+    }
+}
+
 /**
  * Handle ball collision with enemies (bricks)
  */
 function ballEnemyCollision()
 {
+    if (triggerHappy) destroyTimer++;
     for (let i = 0; i < enemies.length; i++)
     {
         let enemy = enemies[i];
@@ -510,7 +553,7 @@ function ballEnemyCollision()
         let detectionX = ballXRight >= enemyXLeft && ballXLeft <= enemyXRight;
         let detectionY = ballYDown >= enemyYUp && ballYUp <= enemyYDown;
 
-        if (detectionX && detectionY && ball.invincible == 0)
+        if ((detectionX && detectionY && ball.invincible == 0) || triggerHappy)
         {
             bounces++;
             let cornerR = ballXLeft == enemyXRight;
@@ -522,26 +565,28 @@ function ballEnemyCollision()
                 palmarScrew = "Random Brick Heal"
             }
             else enemy.health--;
+            if (enemy.health != 0) sounds.blockCrack.play();
             if (enemy.health <= 2)
             {
                 for (let i = 0; i < ranInt(1, 2); i++)
                     makeParticle(enemy.x + (enemy.width / 2), enemy.y + (enemy.height / 2), random(-5, -2), random(-3, 3), enemy.color)
-                if (selectedMode != GAMEMODES.Prediction) addScore(0.5);
+                if (!triggerHappy && selectedMode != GAMEMODES.Prediction) addScore(0.5);
             }
             if (enemy.health <= 1)
             {
                 for (let i = 0; i < ranInt(1, 2); i++)
                     makeParticle(enemy.x + (enemy.width / 2), enemy.y + (enemy.height / 2), random(-5, -2), random(-3, 3), enemy.color)
-                if (selectedMode != GAMEMODES.Prediction)addScore(0.75);
+                if (!triggerHappy && selectedMode != GAMEMODES.Prediction)addScore(0.75);
             }
             if (enemy.health <= 0)
             {
+                sounds.blockBreak.play();
                 for (let i = 0; i < ranInt(3, 6); i++)
                     makeParticle(enemy.x + (enemy.width / 2), enemy.y + (enemy.height / 2), random(-5, -2), random(-3, 3), enemy.color)
                 // Remove the enemy from the array when its health reaches 0
                 enemies.splice(i, 1);
                 i--;  // Adjust the index since we removed an element
-                if (selectedMode != GAMEMODES.Prediction)addScore(1.5);
+                if (!triggerHappy && selectedMode != GAMEMODES.Prediction)addScore(1.5);
             }
             if (cornerR)
                 ball.directionX = directions.RIGHT;
@@ -553,7 +598,15 @@ function ballEnemyCollision()
             }
 
             updateDifficulty();
+            //healthPool += enemy.health;
         }
+    }
+    console.log(destroyTimer)
+    if (destroyTimer >= 3)
+    {
+        drawLevel();
+        destroyTimer = 0;
+        triggerHappy = false;
     }
 }
 
