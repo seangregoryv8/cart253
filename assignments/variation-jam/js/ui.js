@@ -309,6 +309,7 @@ function mousePressed()
             ball.x = ballResetX;
             ball.y = ballResetY;
             ball.state = ballState.START;
+            sounds.select.play();
             sounds.blockBreak.play();
             return false;
         }

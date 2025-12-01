@@ -9,7 +9,8 @@ var sounds = {
     charge: "",
     launch: "",
     paddle: "",
-    dash: ""
+    dash: "",
+    select: ""
 }
 
 let brickImages = 
@@ -80,6 +81,10 @@ let ball = {
     invincible: 0
 }
 
+let introScreen = [255, 150, 80, 0]
+let introInterval = 0;
+let introTimer = 0;
+
 let enemy = {
     health: ranInt(1, 3),
     maxHealth: ranInt(1, 3),
@@ -127,6 +132,7 @@ function preload()
     sounds.launch = loadSound("assets/sounds/launch.wav");
     sounds.charge = loadSound("assets/sounds/charge.wav");
     sounds.dash = loadSound("assets/sounds/dash.wav")
+    sounds.select = loadSound("assets/sounds/select.wav")
 
     gameModesUI.push(
     {
@@ -190,7 +196,7 @@ function setup()
     createStatic();
     //createOverlay("./assets/images/1.gif");
     createCrtOverlay();
-    createBars();
+    //createBars();
 }
 
 /**
@@ -198,19 +204,29 @@ function setup()
  */
 function draw()
 {
-    if (Math.round(windowWidth * 0.65) != Math.round(WIDTH))
+    let v = windowWidth * 0.65;
+    let w = windowHeight * 0.91;
+    if (Math.round(v) != Math.round(WIDTH) || Math.round(w) != Math.round(HEIGHT))
     {
-            triggerHappy = true;
-            ball.x = ballResetX;
-            ball.y = ballResetY;
-            ball.state = ballState.START;
+        triggerHappy = true;
+        ball.x = ballResetX;
+        ball.y = ballResetY;
+        ball.state = ballState.START;
+        paddle.x = GAMEWIDTH / 2;
+        ballResetX = GAMEWIDTH / 2 + px(2);
+        ballResetY = HEIGHT - px(2);
+        ball.x = ballResetX;
+        ball.y = ballResetY;
     }
     //if (windowHeight != HEIGHT) triggerHappy = true;
-    WIDTH = windowWidth * 0.65;
+    WIDTH = v;
     GAMEWIDTH = WIDTH * 0.56;
-    HEIGHT = windowHeight * 0.91;
+    HEIGHT = w;
+    for (let i = 0; i < gameModesUI.length; i++)
+        gameModesUI[i].x = GAMEWIDTH + 75;
     background(50);
     //drawGrid();
+    resizeCanvas(WIDTH, HEIGHT)
     if (selectedMode != GAMEMODES.Prediction) drawPaddle();
     drawBall();
 
@@ -285,6 +301,19 @@ function draw()
 
     if (rngEffects.frozenPaddle && ranInt(1, 30) == 27) rngEffects.frozenPaddle = false;
     if (rngEffects.invisibleBall && ranInt(1, 30) == 27) rngEffects.invisibleBall = false;
+
+    console.log(introTimer);
+    if (introInterval < 3)
+    {
+        introTimer++;
+        if (introTimer == 20)
+        {
+            introInterval++;
+            introTimer = 0;
+        }
+        fill(0, 0, 0, introScreen[introInterval]);
+        rect(0, 0, WIDTH, HEIGHT);
+    }
 }
 
 /**
