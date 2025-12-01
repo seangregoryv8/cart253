@@ -5,7 +5,11 @@ var sounds = {
     blockCrack: "",
     wallBounce: "",
     music: "",
-    ballDrop: ""
+    ballDrop: "",
+    charge: "",
+    launch: "",
+    paddle: "",
+    dash: ""
 }
 
 let brickImages = 
@@ -117,8 +121,12 @@ function preload()
     sounds.blockBreak = loadSound("assets/sounds/break.wav");
     sounds.blockCrack = loadSound("assets/sounds/crack.wav");
     sounds.wallBounce = loadSound("assets/sounds/bounce.wav");
-    sounds.music = loadSound("assets/sounds/music.mp3");
+    sounds.music = loadSound("assets/sounds/music.wav");
     sounds.ballDrop = loadSound("assets/sounds/over.wav");
+    sounds.paddle = loadSound("assets/sounds/paddle.wav");
+    sounds.launch = loadSound("assets/sounds/launch.wav");
+    sounds.charge = loadSound("assets/sounds/charge.wav");
+    sounds.dash = loadSound("assets/sounds/dash.wav")
 
     gameModesUI.push(
     {
@@ -144,7 +152,7 @@ function preload()
         description: "Trade skill for fun.",
         x: GAMEWIDTH + 75,
         y: 220,
-        width: 150,
+        width: 0,
         height: 30,
         hovered: false
     },
@@ -153,7 +161,7 @@ function preload()
         description: "Cannonball to the heart.",
         x: GAMEWIDTH + 75,
         y: 250,
-        width: 150,
+        width: 0,
         height: 30,
         hovered: false
     },
@@ -190,9 +198,17 @@ function setup()
  */
 function draw()
 {
+    if (Math.round(windowWidth * 0.65) != Math.round(WIDTH))
+    {
+            triggerHappy = true;
+            ball.x = ballResetX;
+            ball.y = ballResetY;
+            ball.state = ballState.START;
+    }
+    //if (windowHeight != HEIGHT) triggerHappy = true;
     WIDTH = windowWidth * 0.65;
-    HEIGHT = windowHeight * 0.91;
     GAMEWIDTH = WIDTH * 0.56;
+    HEIGHT = windowHeight * 0.91;
     background(50);
     //drawGrid();
     if (selectedMode != GAMEMODES.Prediction) drawPaddle();
@@ -202,9 +218,11 @@ function draw()
     {
         ball.state = selectedMode == GAMEMODES.Prediction ? ballState.CHARGING : ballState.LAUNCHED;
 
+        if (selectedMode == GAMEMODES.Prediction) sounds.charge.play();
         // If in Prediction mode, launch in the direction of the UI arrow (arrowAngle)
         if (!(selectedMode == GAMEMODES.Prediction && typeof arrowAngle !== "undefined"))
         {
+            sounds.launch.play();
             // default launch behavior
             ball.directionY = directions.UP;
             ball.directionX = keyState.a ? directions.LEFT : keyState.d ? directions.RIGHT : ranInt(0, 1) == 0 ? directions.LEFT : directions.RIGHT;
@@ -217,9 +235,11 @@ function draw()
             }
         }
     }
-
+    
     if (ball.state == ballState.CHARGING && !keyState.space)
     {
+        sounds.charge.stop();
+        sounds.launch.play();
         ball.state = ballState.LAUNCHED;
         // arrowAngle is the rotation applied to a sprite that originally points up.
         // Use cos/sin of arrowAngle to produce a movement vector.
@@ -267,26 +287,11 @@ function draw()
     if (rngEffects.invisibleBall && ranInt(1, 30) == 27) rngEffects.invisibleBall = false;
 }
 
-function launchBall()
-{
-    // default launch behavior
-    ball.directionY = directions.UP;
-    ball.directionX = keyState.a ? directions.LEFT : keyState.d ? directions.RIGHT : ranInt(0, 1) == 0 ? directions.LEFT : directions.RIGHT;
-    ball.velocityX = ball.speedBank / 2;
-    ball.velocityY = ball.speedBank / 2;
-    if (keyState.a || keyState.d)
-    {
-        ball.velocityX *= 2;
-        ball.velocityY /= 2;
-    }
-}
-
 /**
  * Draw the level (bricks)
  */
 function drawLevel()
 {
-    console.log("HI")
     noStroke();
     fill(60);
     for (let x = px(1); x <= GAMEWIDTH; x += px(3))
@@ -421,6 +426,8 @@ function handleDash()
             paddle.dashing = false;
             paddle.dashFalloff = 0.2;
         }
+        console.log(paddle.speed)
+        if (paddle.speed == 15) sounds.dash.play();
         paddle.speed -= paddle.dashFalloff;
         paddle.dashFalloff += 0.05
     }
@@ -437,6 +444,7 @@ function ballPaddleCollision()
         {
             if (ball.state == ballState.LAUNCHED)
             {
+                sounds.paddle.play();
                 // From -60 to 60 (-60 is closest to the left, 60 is furthest to the right)
 
                 // Lowst value would be 1
@@ -482,7 +490,7 @@ function ballWallCollision()
     if (ball.y >= HEIGHT)
     {
         ball.y = ballResetY;
-        ball.x = paddle.x + (paddle.size / 2);
+        ball.x = paddle.x + (paddle.size / 2) - 10;
         ball.state = ballState.START;
         ball.speedBank = random(5, 8);
         sounds.ballDrop.play();
@@ -565,7 +573,7 @@ function ballEnemyCollision()
                 palmarScrew = "Random Brick Heal"
             }
             else enemy.health--;
-            if (enemy.health != 0) sounds.blockCrack.play();
+            if (enemy.health != 0) if (!triggerHappy) sounds.blockCrack.play();
             if (enemy.health <= 2)
             {
                 for (let i = 0; i < ranInt(1, 2); i++)
@@ -576,11 +584,11 @@ function ballEnemyCollision()
             {
                 for (let i = 0; i < ranInt(1, 2); i++)
                     makeParticle(enemy.x + (enemy.width / 2), enemy.y + (enemy.height / 2), random(-5, -2), random(-3, 3), enemy.color)
-                if (!triggerHappy && selectedMode != GAMEMODES.Prediction)addScore(0.75);
+                if (!triggerHappy && selectedMode != GAMEMODES.Prediction) addScore(0.75);
             }
             if (enemy.health <= 0)
             {
-                sounds.blockBreak.play();
+                if (!triggerHappy) sounds.blockBreak.play();
                 for (let i = 0; i < ranInt(3, 6); i++)
                     makeParticle(enemy.x + (enemy.width / 2), enemy.y + (enemy.height / 2), random(-5, -2), random(-3, 3), enemy.color)
                 // Remove the enemy from the array when its health reaches 0
@@ -601,12 +609,12 @@ function ballEnemyCollision()
             //healthPool += enemy.health;
         }
     }
-    console.log(destroyTimer)
     if (destroyTimer >= 3)
     {
         drawLevel();
         destroyTimer = 0;
         triggerHappy = false;
+        bounces = 0;
     }
 }
 
@@ -628,6 +636,7 @@ function drawGrid()
 
 function makeParticle(x, y, velY, velX, color)
 {
+    if (particles.length <= 1000)
     particles.push({
         x: x,
         y: y,

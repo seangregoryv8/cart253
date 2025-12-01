@@ -28,7 +28,7 @@ let GAMEMODES = {
     Powerup: "PowerUp",
     Supershot: "Supershot"
 }
-let selectedMode = GAMEMODES.Prediction;
+let selectedMode = GAMEMODES.Classic;
 
 let palmar = false;
 let palmarTimer = 0;
@@ -179,7 +179,7 @@ function predictionUI()
     fill(150, 0, 255);
     text(bounces, 90, 55);
 
-    if (keyState.w && !increased)
+    if (keyState.w && !increased && ball.state != ballState.LAUNCHED)
         predict++;
     if (keyState.s && !decreased)
         predict = Math.max(0, predict - 1);
@@ -306,11 +306,15 @@ function mousePressed()
         {
             selectedMode = mode.name;
             triggerHappy = true;
+            ball.x = ballResetX;
+            ball.y = ballResetY;
+            ball.state = ballState.START;
+            sounds.blockBreak.play();
             return false;
         }
     }
 
-    if (selectedMode == GAMEMODES.Prediction)
+    if (selectedMode == GAMEMODES.Prediction && ball.state != ballState.LAUNCHED)
     {
         if (predictRightHover)
         {
