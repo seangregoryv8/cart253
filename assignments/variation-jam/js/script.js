@@ -154,7 +154,7 @@ function preload()
         hovered: false
     },
     {
-        name: "PowerUp",
+        name: "PowerUp (In Development)",
         description: "Trade skill for fun.",
         x: GAMEWIDTH + 75,
         y: 220,
@@ -163,7 +163,7 @@ function preload()
         hovered: false
     },
     {
-        name: "Supershot",
+        name: "Supershot (In Development)",
         description: "Cannonball to the heart.",
         x: GAMEWIDTH + 75,
         y: 250,
@@ -196,7 +196,7 @@ function setup()
     createStatic();
     //createOverlay("./assets/images/1.gif");
     createCrtOverlay();
-    //createBars();
+    createBars();
 }
 
 /**
@@ -302,7 +302,6 @@ function draw()
     if (rngEffects.frozenPaddle && ranInt(1, 30) == 27) rngEffects.frozenPaddle = false;
     if (rngEffects.invisibleBall && ranInt(1, 30) == 27) rngEffects.invisibleBall = false;
 
-    console.log(introTimer);
     if (introInterval < 3)
     {
         introTimer++;
@@ -547,6 +546,7 @@ function ballWallCollision()
             predict = 0;
             bounces = 0;
             force = 0;
+            slopeForce = 1;
             
             ball.x = ballResetX;
         }
