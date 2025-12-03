@@ -3,12 +3,11 @@ class Powerup
     constructor(x, y, sprite)
     {
         this.x = x;
-        console.log(x);
         this.y = y;
         this.size = px(5);
         this.sprite = sprite;
         this.tagged = false;
-        this.speed = random(0.5, 1.5)
+        this.speed = random(1, 2.5)
     }
 
     powerDraw()
@@ -50,6 +49,11 @@ class Powerup
                         break;
                     case powerupSprites.nonstick:
                         paddle.sticky = false;
+                        break;
+                    case powerupSprites.invincible:
+                        ball.powered = true;
+                        ball.y = ballResetY;
+                        ball.state = ballState.START;
                         break;
                 }
                 this.tagged = true;

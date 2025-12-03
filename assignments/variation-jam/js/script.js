@@ -20,7 +20,8 @@ var powerupSprites =
     faster: "",
     slower: "",
     sticky: "",
-    nonstick: ""
+    nonstick: "",
+    invincible: ""
 }
 
 let brickImages = 
@@ -91,7 +92,8 @@ let ball = {
     speedBank: 8,
     velocityX: 0,  // Velocity components for physics
     velocityY: 0,  // Velocity components for physics
-    invincible: 0
+    invincible: 0,
+    powered: false
 }
 
 let introScreen = [255, 150, 80, 0]
@@ -126,6 +128,7 @@ function loadAssets()
     powerupSprites.slower = loadImage("assets/images/slowerPowerUp.png")
     powerupSprites.sticky = loadImage("assets/images/stickyPowerUp.png")
     powerupSprites.nonstick = loadImage("assets/images/nonstickPowerUp.png")
+    powerupSprites.invincible = loadImage("assets/images/invinciblePowerUp.png")
     
 
     exoFont.black = loadFont("assets/fonts/Exo_2/static/Exo2-Black.ttf");
@@ -284,6 +287,7 @@ function draw()
             // default launch behavior
             ball.directionY = directions.UP;
             ball.directionX = keyState.a ? directions.LEFT : keyState.d ? directions.RIGHT : ranInt(0, 1) == 0 ? directions.LEFT : directions.RIGHT;
+            if (ball.powered) ball.speedBank *= 4;
             ball.velocityX = ball.speedBank / 2;
             ball.velocityY = ball.speedBank / 2;
             if (keyState.a || keyState.d)
@@ -456,7 +460,7 @@ function drawBall()
         palmarScrew = "Random Invisible Ball"
     });
     if (rngEffects.invisibleBall) return;
-    fill(150);
+    fill(ball.powered ? ranInt(0, 255) : 150, ball.powered ? ranInt(0, 255) : 150, ball.powered ? ranInt(0, 255) : 150);
     rect(ball.x, ball.y, px(1), px(1), 20);
 }
 
@@ -569,6 +573,7 @@ function ballPaddleCollision()
                     ball.y = ballResetY;
                     ball.state = ballState.START;
                 }
+                ball.powered = false;
             }
             ball.directionY = directions.UP;
         }
@@ -627,6 +632,7 @@ function ballWallCollision()
         }
         combo = 0;
         comboTimer = 0;
+        ball.powered = false;
     }
 
     updateDifficulty();
@@ -676,6 +682,7 @@ function ballEnemyCollision()
                 enemy.health = ranInt(enemy.health, 3);
                 palmarScrew = "Random Brick Heal"
             }
+            else if (ball.powered) enemy.health = 0;
             else enemy.health--;
             if (enemy.health != 0) if (!triggerHappy) sounds.blockCrack.play();
             if (enemy.health <= 2)
@@ -697,7 +704,11 @@ function ballEnemyCollision()
                 {
                     let powerupKeys = Object.keys(powerupSprites);
                     let randomKey = random(powerupKeys);
-                    let sprite = powerupSprites[randomKey]
+                    let sprite;
+                    do sprite = powerupSprites[randomKey]
+                    while (sprite == powerupSprites.invincible)
+                    if (ranInt(1, 10) == 7) sprite = powerupSprites.invincible;
+
                     powerups.push(new Powerup(enemy.x, enemy.y, sprite))
                 }
                 for (let i = 0; i < ranInt(3, 6); i++)
@@ -707,26 +718,28 @@ function ballEnemyCollision()
                 i--;  // Adjust the index since we removed an element
                 if (!triggerHappy && selectedMode != GAMEMODES.Prediction)addScore(1.5);
             }
-
-            if (ballYDown > enemyYUp && ballYUp < enemyYDown)
+            if (!ball.powered)
             {
-                if (ballXRight > enemyXLeft && ballXLeft < enemyXLeft)
-                    ball.directionX = directions.RIGHT;
-                else if (ballXLeft < enemyXRight && ballXRight > enemyXRight)
-                    ball.directionX = directions.LEFT;
-            }
+                if (ballYDown > enemyYUp && ballYUp < enemyYDown)
+                    {
+                        if (ballXRight > enemyXLeft && ballXLeft < enemyXLeft)
+                            ball.directionX = directions.RIGHT;
+                        else if (ballXLeft < enemyXRight && ballXRight > enemyXRight)
+                            ball.directionX = directions.LEFT;
+                    }
+                
+                    // Vertical bounce (top or bottom sides)
+                    if (ballXRight > enemyXLeft && ballXLeft < enemyXRight)
+                    {
+                        if (ballYDown >= enemyYUp && ballYUp < enemyYUp)
+                            ball.directionY = directions.UP; // Ball hits the top side of the enemy
+                        else if (ballYUp <= enemyYDown && ballYDown > enemyYDown)
+                            ball.directionY = directions.DOWN; // Ball hits the bottom side of the enemy
+                    }
+                    
         
-            // Vertical bounce (top or bottom sides)
-            if (ballXRight > enemyXLeft && ballXLeft < enemyXRight)
-            {
-                if (ballYDown >= enemyYUp && ballYUp < enemyYUp)
-                    ball.directionY = directions.UP; // Ball hits the top side of the enemy
-                else if (ballYUp <= enemyYDown && ballYDown > enemyYDown)
-                    ball.directionY = directions.DOWN; // Ball hits the bottom side of the enemy
+                    ball.directionY = ball.y + ball.size / 2 >= enemy.y + enemy.height / 2 ? directions.DOWN : directions.UP;
             }
-            
-
-            ball.directionY = ball.y + ball.size / 2 >= enemy.y + enemy.height / 2 ? directions.DOWN : directions.UP;
 
             updateDifficulty();
         }
