@@ -704,11 +704,8 @@ function ballEnemyCollision()
                 {
                     let powerupKeys = Object.keys(powerupSprites);
                     let randomKey = random(powerupKeys);
-                    let sprite;
-                    do sprite = powerupSprites[randomKey]
-                    while (sprite == powerupSprites.invincible)
-                    if (ranInt(1, 10) == 7) sprite = powerupSprites.invincible;
-
+                    let sprite = powerupSprites[randomKey];
+                    
                     powerups.push(new Powerup(enemy.x, enemy.y, sprite))
                 }
                 for (let i = 0; i < ranInt(3, 6); i++)
