@@ -1,3 +1,7 @@
+/**
+ * This is a function I took off another project of mine that adds a new div element and adds a vhs overlay to it.
+ * @param {*} src 
+ */
 function createOverlay(src = null)
 {
     let vhs_overlay_div = document.createElement('div');
@@ -22,6 +26,9 @@ function createOverlay(src = null)
     document.getElementById("breakBody").appendChild(vhs_overlay_div);
 }
 
+/**
+ * This is a function I took off another project of mine that adds a div and creates static inside of it.
+ */
 function createStatic()
 {
     let static_div = document.createElement('div');
@@ -43,6 +50,9 @@ function createStatic()
     document.getElementById("breakBody").appendChild(static_div);
 }
 
+/**
+ * This inserts a bunch of gradient lines onto the monitor to make it feel like a real CRT TV
+ */
 function createCrtOverlay()
 {
     let crt_container = document.createElement('div');
@@ -67,6 +77,9 @@ function createCrtOverlay()
     document.getElementById("breakBody").appendChild(crt_container);
 }
 
+/**
+ * This is a function I took off another project that adds small bars on either side for a 4x3 aspect ratio (most of the time)
+ */
 function createBars()
 {
     let leftBar = document.createElement('div');

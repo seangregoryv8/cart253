@@ -66,7 +66,7 @@ let paddle = {
 let ballStartY = HEIGHT - px(2);
 
 let ballResetX = GAMEWIDTH / 2 + px(2);
-let ballResetY = HEIGHT - px(2);
+let ballResetY = paddle.y - px(1);
 let ball = {
     x: ballResetX,
     y: ballResetY,
@@ -95,7 +95,10 @@ let enemy = {
     color: 0
 };
 
-function preload()
+/**
+ * Loads every asset I ever use, from the brick sprite art to the dozen or so fonts to the sounds.
+ */
+function loadAssets()
 {
     brickImages.health1.outside = loadImage("assets/images/brick3Outside.png")
     brickImages.health1.inside = loadImage("assets/images/brick3Inside.png")
@@ -133,6 +136,14 @@ function preload()
     sounds.charge = loadSound("assets/sounds/charge.wav");
     sounds.dash = loadSound("assets/sounds/dash.wav")
     sounds.select = loadSound("assets/sounds/select.wav")
+}
+
+/**
+ * Mostly done to push the different modes, including those I couldn't finish in time.
+ */
+function preload()
+{
+    loadAssets();
 
     gameModesUI.push(
     {
@@ -197,12 +208,14 @@ function setup()
     //createOverlay("./assets/images/1.gif");
     createCrtOverlay();
     createBars();
+    console
 }
 
 /**
- * Main game loop
+ * In case the window changes, the game will actually modify itself to be playable on nearly any size.
+ * Does not guarantee the UI will carry over in the process.
  */
-function draw()
+function resizeThings()
 {
     let v = windowWidth * 0.65;
     let w = windowHeight * 0.91;
@@ -213,19 +226,28 @@ function draw()
         ball.y = ballResetY;
         ball.state = ballState.START;
         paddle.x = GAMEWIDTH / 2;
+        paddle.y = HEIGHT - px(1);
         ballResetX = GAMEWIDTH / 2 + px(2);
         ballResetY = HEIGHT - px(2);
         ball.x = ballResetX;
         ball.y = ballResetY;
     }
-    //if (windowHeight != HEIGHT) triggerHappy = true;
     WIDTH = v;
     GAMEWIDTH = WIDTH * 0.56;
     HEIGHT = w;
+    paddle.y = HEIGHT - px(1);
+    if (ball.state == ballState.START) ball.y = paddle.y - px(1);
     for (let i = 0; i < gameModesUI.length; i++)
         gameModesUI[i].x = GAMEWIDTH + 75;
+}
+
+/**
+ * Main game loop
+ */
+function draw()
+{
+    resizeThings();
     background(50);
-    //drawGrid();
     resizeCanvas(WIDTH, HEIGHT)
     if (selectedMode != GAMEMODES.Prediction) drawPaddle();
     drawBall();
@@ -399,6 +421,7 @@ function moveBall()
 {
     if (ball.state == ballState.LAUNCHED)
     {
+        console.log(ball.directionX);
         ball.x += ball.velocityX * (ball.directionX == directions.RIGHT ? 1 : -1);
         ball.y += ball.velocityY * (ball.directionY == directions.UP ? -1 : 1);
     }
@@ -444,6 +467,9 @@ function movePaddle()
     }
 }
 
+/**
+ * Handles the dash mechanic that allows skill to overpower luck (except in RNG Hell Mode)
+ */
 function handleDash()
 {
     if (paddle.dashing)
@@ -557,6 +583,9 @@ function ballWallCollision()
     updateDifficulty();
 }
 
+/**
+ * Exclusively used when 
+ */
 function destroyLevel()
 {
     for (let i = 0; i < enemies.length; i++)
@@ -593,8 +622,11 @@ function ballEnemyCollision()
         if ((detectionX && detectionY && ball.invincible == 0) || triggerHappy)
         {
             bounces++;
-            let cornerR = ballXLeft == enemyXRight;
-            let cornerL = ballXRight == enemyXLeft;
+            let cornerR = (ballXLeft + 5) >= enemyXRight || (ballXLeft - 5) <= enemyXRight;
+            let cornerL = (ballXRight + 5) >= enemyXLeft || (ballXRight - 5) <= enemyXLeft;
+
+            console.log(ballXLeft + " x " + ballXRight)
+            console.log(enemyXLeft + " x " + enemyXRight)
             ball.invincible = 5;
             if (selectedMode == "RNG Hell" && ball.state == ballState.LAUNCHED && ranInt(1, 4) == 1)
             {
@@ -635,7 +667,6 @@ function ballEnemyCollision()
             }
 
             updateDifficulty();
-            //healthPool += enemy.health;
         }
     }
     if (destroyTimer >= 3)
@@ -653,7 +684,7 @@ function ballEnemyCollision()
 function drawGrid()
 {
     stroke(0);
-    fill(230);
+    fill(230, 230, 230, 110);
     for (let x = 0; x <= GAMEWIDTH; x += px(1))
     {
         rect(x, 0, px(1), px(1));
@@ -663,6 +694,14 @@ function drawGrid()
     noStroke();
 }
 
+/**
+ * Makes fancy particles for when the brick breaks for extra oomph
+ * @param {*} x 
+ * @param {*} y 
+ * @param {*} velY 
+ * @param {*} velX 
+ * @param {*} color 
+ */
 function makeParticle(x, y, velY, velX, color)
 {
     if (particles.length <= 1000)
@@ -676,6 +715,10 @@ function makeParticle(x, y, velY, velX, color)
     })
 }
 
+/**
+ * Moves those particles in a randomized order for flair.
+ * @param {*} particle 
+ */
 function moveParticle(particle)
 {
     fill(particle.shade.r, particle.shade.g, particle.shade.b)

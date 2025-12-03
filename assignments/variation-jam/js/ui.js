@@ -1,3 +1,6 @@
+/**
+ * This houses every single font variable so I can cycle through them efficiently
+ */
 var exoFont = {
     black: null,
     blackItalic: null,
@@ -59,6 +62,11 @@ let rngEffects = {
 
 let palmarChosen = -1;
 let palmarScrew = "";
+
+/**
+ * This draws out the title, instructions, different modes to chose from, alongside the special instructions for each,
+ * such as the UI for prediction mode or the random text for RNG hell mode
+ */
 function drawModes()
 {
     let selectedDesc = "";
@@ -137,6 +145,13 @@ let slopeForce = 1;
 let bounces = 0;
 
 let congratsSpeech = "";
+
+/**
+ * This is a big one.
+ * Using some math, specifically for prediction, it spawns in a triangle pointed at where the mouse is facing.
+ * Additionally, it makes the UI for bounces, force, and bounce prediction that the mode runs on.
+ * Finally, all the code to make those modes run is also here.
+ */
 function predictionUI()
 {
     const tx = GAMEWIDTH + 100;
@@ -154,6 +169,11 @@ function predictionUI()
 
     translate(tx, ty);
     scale(s);
+
+    if (ball.state == ballState.START)
+    {
+        ball.x = GAMEWIDTH / 2 + px(2);
+    }
 
     if (predictLeftHover) fill(100, 200, 255);
     else fill(255);
@@ -222,6 +242,18 @@ function predictionUI()
     arrowAngle -= Math.PI / 2;
 }
 
+/**
+ * Triangles are difficult to implement, and so is rotation. This simplifies it exponentially.
+ * @param {*} px 
+ * @param {*} py 
+ * @param {*} ax 
+ * @param {*} ay 
+ * @param {*} bx 
+ * @param {*} by 
+ * @param {*} cx 
+ * @param {*} cy 
+ * @returns 
+ */
 function pointInTriangle(px, py, ax, ay, bx, by, cx, cy)
 {
     // barycentric technique
@@ -244,6 +276,9 @@ function pointInTriangle(px, py, ax, ay, bx, by, cx, cy)
     return (u >= 0) && (v >= 0) && (u + v < 1);
 }
 
+/**
+ * This makes the RNG UI work by having the unfortunate text appear and disappear after a set time
+ */
 function rngUI()
 {
     if (palmarTimer > 0)
@@ -290,6 +325,10 @@ function rngUI()
 
 }
 
+/**
+ * Simple hovering updating function.
+ * @param {*} mode 
+ */
 function updateModeHover(mode)
 {
     // Check if mouse is within the text bounding box
@@ -297,6 +336,10 @@ function updateModeHover(mode)
         mouseY >= mode.y - mode.height && mouseY <= mode.y)
 }
 
+/**
+ * How you select the modes, mostly here to make sure the UI resets back to normal and the ball and paddle dont end up in weird spots depending on monitor size.
+ * @returns 
+ */
 function mousePressed()
 {
     // Check which mode was clicked
@@ -306,8 +349,9 @@ function mousePressed()
         {
             selectedMode = mode.name;
             triggerHappy = true;
-            ball.x = ballResetX;
-            ball.y = ballResetY;
+            paddle.x = GAMEWIDTH / 2;
+            ball.x = paddle.x + px(2)
+            ball.y = paddle.y - px(1);
             ball.state = ballState.START;
             sounds.select.play();
             sounds.blockBreak.play();
@@ -329,9 +373,9 @@ function mousePressed()
 }
 
 /**
- * 
- * @param {boolean} selectChance 
- * @param {Function} whatToDo 
+ * Universal screw you function for each of my funny rng situations.
+ * @param {boolean} selectChance What specific situation needs to happen for the dice to roll
+ * @param {Function} whatToDo What to do when taht dice roll happens
  */
 function randomChance(selectChance, whatToDo, chance = 300)
 {
