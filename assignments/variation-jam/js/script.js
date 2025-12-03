@@ -13,6 +13,11 @@ var sounds = {
     select: ""
 }
 
+var powerupSprites =
+{
+    bigPaddle: ""
+}
+
 let brickImages = 
 {
     health1: 
@@ -35,6 +40,7 @@ let brickImages =
 let destroyTimer = 0;
 let particles = [];
 let enemies = []
+let powerups = [];
 let GAMEWIDTH = 700;
 let WIDTH = 1250;
 let HEIGHT = 850;
@@ -106,6 +112,7 @@ function loadAssets()
     brickImages.health2.inside = loadImage("assets/images/brick2Inside.png")
     brickImages.health3.outside = loadImage("assets/images/brick1Outside.png")
     brickImages.health3.inside = loadImage("assets/images/brick1Inside.png")
+    powerupSprites.bigPaddle = loadImage("assets/images/bigPaddlePowerUp.png")
 
     exoFont.black = loadFont("assets/fonts/Exo_2/static/Exo2-Black.ttf");
     exoFont.blackItalic = loadFont("assets/fonts/Exo_2/static/Exo2-BlackItalic.ttf");
@@ -208,7 +215,6 @@ function setup()
     //createOverlay("./assets/images/1.gif");
     createCrtOverlay();
     createBars();
-    console
 }
 
 /**
@@ -335,6 +341,11 @@ function draw()
         fill(0, 0, 0, introScreen[introInterval]);
         rect(0, 0, WIDTH, HEIGHT);
     }
+
+    for (let i = 0; i < powerups.length; i++)
+    {
+        powerups[i].powerDraw();
+    }
 }
 
 /**
@@ -344,21 +355,40 @@ function drawLevel()
 {
     noStroke();
     fill(60);
+
+    let difficulty = (scoreboard - 500) / (3500 - 500);
+    difficulty = Math.max(0, Math.min(1, difficulty));
+
+    // Chance a block even spawns
+    let spawnChance = 20 + difficulty * 70; // 20% → 90%
+
+    // Weighted HP probabilities
+    let chanceHP1 = 70 - 60 * difficulty;  // 70 → 10
+    let chanceHP2 = 25 + 15 * difficulty;  // 25 → 40
+    let chanceHP3 = 5  + 45 * difficulty;  // 5 → 50
+
     for (let x = px(1); x <= GAMEWIDTH; x += px(3))
     {
-        for (let y = px(2); y <= HEIGHT - px(10); y += px(2))
+        for (let y = px(2); y <= HEIGHT - px(10); y += px(1))
         {
-            if (ranInt(0, 100) >= 20)
+            if (ranInt(0, 100) <= spawnChance)
             {
+                // Choose HP based on weighted probability
+                let roll = ranInt(1, 100);
+                let blockHealth;
+
+                if (roll <= chanceHP1) blockHealth = 1;
+                else if (roll <= chanceHP1 + chanceHP2) blockHealth = 2;
+                else blockHealth = 3;
+
                 enemies.push({
-                    health: ranInt(1, 3),
-                    maxHealth: ranInt(1, 3),
+                    health: blockHealth,
+                    maxHealth: blockHealth,
                     x: x - px(1),
                     y: y,
                     width: px(3),
                     height: px(1),
-                    color:
-                    {
+                    color: {
                         r: ranInt(0, 255),
                         g: ranInt(0, 255),
                         b: ranInt(0, 255)
@@ -421,7 +451,6 @@ function moveBall()
 {
     if (ball.state == ballState.LAUNCHED)
     {
-        console.log(ball.directionX);
         ball.x += ball.velocityX * (ball.directionX == directions.RIGHT ? 1 : -1);
         ball.y += ball.velocityY * (ball.directionY == directions.UP ? -1 : 1);
     }
@@ -480,7 +509,6 @@ function handleDash()
             paddle.dashing = false;
             paddle.dashFalloff = 0.2;
         }
-        console.log(paddle.speed)
         if (paddle.speed == 15) sounds.dash.play();
         paddle.speed -= paddle.dashFalloff;
         paddle.dashFalloff += 0.05
@@ -606,13 +634,11 @@ function ballEnemyCollision()
 
         let ballXLeft = ball.x;
         let ballXRight = ball.x + ball.size;
-
-        let enemyXLeft = enemy.x;
-        let enemyXRight = enemy.x + enemy.width;
-
         let ballYUp = ball.y;
         let ballYDown = ball.y + ball.size;
-
+        
+        let enemyXLeft = enemy.x;
+        let enemyXRight = enemy.x + enemy.width;
         let enemyYUp = enemy.y;
         let enemyYDown = enemy.y + enemy.height;
 
@@ -622,11 +648,7 @@ function ballEnemyCollision()
         if ((detectionX && detectionY && ball.invincible == 0) || triggerHappy)
         {
             bounces++;
-            let cornerR = (ballXLeft + 5) >= enemyXRight || (ballXLeft - 5) <= enemyXRight;
-            let cornerL = (ballXRight + 5) >= enemyXLeft || (ballXRight - 5) <= enemyXLeft;
 
-            console.log(ballXLeft + " x " + ballXRight)
-            console.log(enemyXLeft + " x " + enemyXRight)
             ball.invincible = 5;
             if (selectedMode == "RNG Hell" && ball.state == ballState.LAUNCHED && ranInt(1, 4) == 1)
             {
@@ -650,6 +672,7 @@ function ballEnemyCollision()
             if (enemy.health <= 0)
             {
                 if (!triggerHappy) sounds.blockBreak.play();
+                //if (ball.state == ballState.LAUNCHED) powerups.push(new Powerup(enemy.x, enemy.y, powerupSprites.bigPaddle))
                 for (let i = 0; i < ranInt(3, 6); i++)
                     makeParticle(enemy.x + (enemy.width / 2), enemy.y + (enemy.height / 2), random(-5, -2), random(-3, 3), enemy.color)
                 // Remove the enemy from the array when its health reaches 0
@@ -657,14 +680,26 @@ function ballEnemyCollision()
                 i--;  // Adjust the index since we removed an element
                 if (!triggerHappy && selectedMode != GAMEMODES.Prediction)addScore(1.5);
             }
-            if (cornerR)
-                ball.directionX = directions.RIGHT;
-            else if (cornerL)
-                ball.directionX = directions.LEFT;
-            else
+
+            if (ballYDown > enemyYUp && ballYUp < enemyYDown)
             {
-                ball.directionY = ball.y + ball.size / 2 >= enemy.y + enemy.height / 2 ? directions.DOWN : directions.UP;
+                if (ballXRight > enemyXLeft && ballXLeft < enemyXLeft)
+                    ball.directionX = directions.RIGHT;
+                else if (ballXLeft < enemyXRight && ballXRight > enemyXRight)
+                    ball.directionX = directions.LEFT;
             }
+        
+            // Vertical bounce (top or bottom sides)
+            if (ballXRight > enemyXLeft && ballXLeft < enemyXRight)
+            {
+                if (ballYDown >= enemyYUp && ballYUp < enemyYUp)
+                    ball.directionY = directions.UP; // Ball hits the top side of the enemy
+                else if (ballYUp <= enemyYDown && ballYDown > enemyYDown)
+                    ball.directionY = directions.DOWN; // Ball hits the bottom side of the enemy
+            }
+            
+
+            ball.directionY = ball.y + ball.size / 2 >= enemy.y + enemy.height / 2 ? directions.DOWN : directions.UP;
 
             updateDifficulty();
         }
