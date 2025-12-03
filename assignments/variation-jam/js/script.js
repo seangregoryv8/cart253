@@ -779,7 +779,7 @@ function drawGrid()
  */
 function makeParticle(x, y, velY, velX, color)
 {
-    if (particles.length <= 1000)
+    if (particles.length <= 2000)
     particles.push({
         x: x,
         y: y,

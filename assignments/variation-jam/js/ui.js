@@ -354,6 +354,8 @@ function mousePressed()
             ball.y = paddle.y - px(1);
             paddle.multiplier = 1;
             paddle.size = px(5);
+            paddle.sticky = false;
+            ball.powered = false;
             ball.state = ballState.START;
             sounds.select.play();
             sounds.blockBreak.play();
