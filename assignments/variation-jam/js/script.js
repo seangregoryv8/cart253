@@ -15,7 +15,10 @@ var sounds = {
 
 var powerupSprites =
 {
-    bigPaddle: ""
+    bigPaddle: "",
+    smallPaddle: "",
+    faster: "",
+    slower: ""
 }
 
 let brickImages = 
@@ -65,6 +68,7 @@ let paddle = {
     y: HEIGHT - px(1),
     size: px(5),
     speed: 5,
+    multiplier: 1,
     dashing: false,
     dashFalloff: 0.2
 }
@@ -112,7 +116,12 @@ function loadAssets()
     brickImages.health2.inside = loadImage("assets/images/brick2Inside.png")
     brickImages.health3.outside = loadImage("assets/images/brick1Outside.png")
     brickImages.health3.inside = loadImage("assets/images/brick1Inside.png")
+
     powerupSprites.bigPaddle = loadImage("assets/images/bigPaddlePowerUp.png")
+    powerupSprites.smallPaddle = loadImage("assets/images/smallPaddlePowerUp.png")
+    powerupSprites.faster = loadImage("assets/images/fasterPowerUp.png")
+    powerupSprites.slower = loadImage("assets/images/slowerPowerUp.png")
+    
 
     exoFont.black = loadFont("assets/fonts/Exo_2/static/Exo2-Black.ttf");
     exoFont.blackItalic = loadFont("assets/fonts/Exo_2/static/Exo2-BlackItalic.ttf");
@@ -172,11 +181,11 @@ function preload()
         hovered: false
     },
     {
-        name: "PowerUp (In Development)",
+        name: "PowerUp",
         description: "Trade skill for fun.",
         x: GAMEWIDTH + 75,
         y: 220,
-        width: 0,
+        width: 150,
         height: 30,
         hovered: false
     },
@@ -345,6 +354,8 @@ function draw()
     for (let i = 0; i < powerups.length; i++)
     {
         powerups[i].powerDraw();
+        if (powerups[i].tagged)
+            powerups.splice(i, 1);
     }
 }
 
@@ -480,18 +491,18 @@ function movePaddle()
 
     if (keyState.a && paddle.x >= 0)
     {
-        paddle.x -= paddle.speed;
+        paddle.x -= paddle.speed * paddle.multiplier;
         if (ball.state == ballState.START)
         {
-            ball.x -= paddle.speed;
+            ball.x -= paddle.speed * paddle.multiplier;
         }
     }
     else if (keyState.d && paddle.x + paddle.size <= GAMEWIDTH)
     {
-        paddle.x += paddle.speed;
+        paddle.x += paddle.speed * paddle.multiplier;
         if (ball.state == ballState.START)
         {
-            ball.x += paddle.speed;
+            ball.x += paddle.speed * paddle.multiplier;
         }
     }
 }
@@ -522,7 +533,7 @@ function ballPaddleCollision()
 {
     if (ball.y + px(1) >= paddle.y && ball.y <= paddle.y + px(1))
     {
-        if (ball.x + px(1) >= paddle.x && ball.x <= paddle.x + px(5))
+        if (ball.x + px(1) >= paddle.x && ball.x <= paddle.x + paddle.size)
         {
             if (ball.state == ballState.LAUNCHED)
             {
@@ -672,7 +683,13 @@ function ballEnemyCollision()
             if (enemy.health <= 0)
             {
                 if (!triggerHappy) sounds.blockBreak.play();
-                //if (ball.state == ballState.LAUNCHED) powerups.push(new Powerup(enemy.x, enemy.y, powerupSprites.bigPaddle))
+                if (ball.state == ballState.LAUNCHED && selectedMode == GAMEMODES.Powerup && ranInt(1, 7) == 3)
+                {
+                    let powerupKeys = Object.keys(powerupSprites);
+                    let randomKey = random(powerupKeys);
+                    let sprite = powerupSprites[randomKey]
+                    powerups.push(new Powerup(enemy.x, enemy.y, sprite))
+                }
                 for (let i = 0; i < ranInt(3, 6); i++)
                     makeParticle(enemy.x + (enemy.width / 2), enemy.y + (enemy.height / 2), random(-5, -2), random(-3, 3), enemy.color)
                 // Remove the enemy from the array when its health reaches 0
