@@ -8,7 +8,7 @@ class Powerup
         this.size = px(5);
         this.sprite = sprite;
         this.tagged = false;
-        console.log(this.sprite);
+        this.speed = random(0.5, 1.5)
     }
 
     powerDraw()
@@ -20,7 +20,7 @@ class Powerup
 
     powerFall()
     {
-        this.y++;
+        this.y += this.speed;
         if (this.y >= paddle.y + px(1))
             this.tagged = true;
     }
@@ -44,6 +44,12 @@ class Powerup
                         break;
                     case powerupSprites.slower:
                         if (paddle.multiplier > 0.25) paddle.multiplier -= 0.25;
+                        break;
+                    case powerupSprites.sticky:
+                        paddle.sticky = true;
+                        break;
+                    case powerupSprites.nonstick:
+                        paddle.sticky = false;
                         break;
                 }
                 this.tagged = true;

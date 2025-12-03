@@ -18,7 +18,9 @@ var powerupSprites =
     bigPaddle: "",
     smallPaddle: "",
     faster: "",
-    slower: ""
+    slower: "",
+    sticky: "",
+    nonstick: ""
 }
 
 let brickImages = 
@@ -70,7 +72,8 @@ let paddle = {
     speed: 5,
     multiplier: 1,
     dashing: false,
-    dashFalloff: 0.2
+    dashFalloff: 0.2,
+    sticky: false
 }
 
 let ballStartY = HEIGHT - px(2);
@@ -121,6 +124,8 @@ function loadAssets()
     powerupSprites.smallPaddle = loadImage("assets/images/smallPaddlePowerUp.png")
     powerupSprites.faster = loadImage("assets/images/fasterPowerUp.png")
     powerupSprites.slower = loadImage("assets/images/slowerPowerUp.png")
+    powerupSprites.sticky = loadImage("assets/images/stickyPowerUp.png")
+    powerupSprites.nonstick = loadImage("assets/images/nonstickPowerUp.png")
     
 
     exoFont.black = loadFont("assets/fonts/Exo_2/static/Exo2-Black.ttf");
@@ -559,6 +564,11 @@ function ballPaddleCollision()
                 ball.velocityY = ball.speedBank - directional;
                 ball.speedBank *= 1.05;  // Increase speed after paddle collision
                 ball.velocityX += random(-0.5, 0.5);  // Add a little random variation to the ball's x velocity
+                if (paddle.sticky)
+                {
+                    ball.y = ballResetY;
+                    ball.state = ballState.START;
+                }
             }
             ball.directionY = directions.UP;
         }
@@ -683,7 +693,7 @@ function ballEnemyCollision()
             if (enemy.health <= 0)
             {
                 if (!triggerHappy) sounds.blockBreak.play();
-                if (ball.state == ballState.LAUNCHED && selectedMode == GAMEMODES.Powerup && ranInt(1, 7) == 3)
+                if (ball.state == ballState.LAUNCHED && selectedMode == GAMEMODES.Powerup && ranInt(1, 4) == 3)
                 {
                     let powerupKeys = Object.keys(powerupSprites);
                     let randomKey = random(powerupKeys);
