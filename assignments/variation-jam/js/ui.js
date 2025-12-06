@@ -119,7 +119,7 @@ function drawModes()
         textFont(i == 0 ? exoFont.bold : exoFont.light);
         text(instructions[i], GAMEWIDTH + 75, HEIGHT - (i == 0 ? 200 : 150) + i * 15);
     }
-
+    
     switch (selectedMode)
     {
         case GAMEMODES.RNGHell:
@@ -127,6 +127,9 @@ function drawModes()
             break;
         case GAMEMODES.Prediction:
             predictionUI();
+            break;
+        case GAMEMODES.Powerup:
+            powerupUI();
             break;
     }
 
@@ -323,6 +326,33 @@ function rngUI()
         text(palmarWords[palmarChosen], GAMEWIDTH + 75, HEIGHT - 350);
     }
 
+}
+
+let latestPowerUp = "TEST";
+let latestPowerUpImage = "";
+let powerUpTimer = 0;
+
+function powerupUI()
+{
+    push();
+    textSize(18);
+    translate(GAMEWIDTH + 75, HEIGHT / 2);
+    text("Paddle Size: " + paddle.size, 0, -40)
+    text("Paddle speed: " + (paddle.multiplier * 8), 0, -20)
+    text("Sticky: " + paddle.sticky, 0, 0)
+
+    if (powerUpTimer > 0)
+    {
+        textSize(30);
+        fill(255, 100, 100);
+        textFont(exoFont.bold);
+        text("GOT POWER UP", 0, 60)
+        text(latestPowerUp, 0, 90)
+        scale(2);
+        image(latestPowerUpImage, 0, 50)
+        powerUpTimer--;
+    }
+    pop();
 }
 
 /**

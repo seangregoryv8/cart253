@@ -34,29 +34,39 @@ class Powerup
                 {
                     case powerupSprites.bigPaddle:
                         if (paddle.size < px(8)) paddle.size += px(1);
+                        latestPowerUp = "Paddle Size Increase"
                         break;
                     case powerupSprites.smallPaddle:
                         if (paddle.size > px(1)) paddle.size -= px(1);
+                        latestPowerUp = "Paddle Size Decrease"
                         break;
                     case powerupSprites.faster:
                         if (paddle.multiplier < 2) paddle.multiplier += 0.25;
+                        latestPowerUp = "Faster Paddle"
                         break;
                     case powerupSprites.slower:
                         if (paddle.multiplier > 0.25) paddle.multiplier -= 0.25;
+                        latestPowerUp = "Slower Paddle"
                         break;
                     case powerupSprites.sticky:
                         paddle.sticky = true;
+                        latestPowerUp = "Sticky Paddle"
                         break;
                     case powerupSprites.nonstick:
                         paddle.sticky = false;
+                        latestPowerUp = "Nonstick Paddle"
                         break;
                     case powerupSprites.invincible:
                         ball.powered = true;
                         ball.y = ballResetY;
                         ball.state = ballState.START;
+                        latestPowerUp = "Krazy 8"
                         break;
                 }
                 this.tagged = true;
+
+                latestPowerUpImage = this.sprite;
+                powerUpTimer = 125;
             }
         }
     }
